@@ -70,6 +70,8 @@ local spec = {
   { import = "core.treesitter" },
   { import = "plugins" },
   { import = "langs" },
+  { import = "core.myEditor" },
+  { import = "plugins.extras.myOverride" },
 }
 
 -- Enable extra plugins and languages

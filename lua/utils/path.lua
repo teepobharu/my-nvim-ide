@@ -13,6 +13,11 @@ function M.get_git_root()
   return vim.fn.systemlist("git rev-parse --show-toplevel")[1]
 end
 
+function M.get_git_root_dotgit()
+  local dot_git_path = vim.fn.finddir(".git", ".;")
+  return vim.fn.fnamemodify(dot_git_path, ":h")
+end
+
 --- Get root directory of git project or fallback to current directory
 ---@return string|nil
 function M.get_root_directory()

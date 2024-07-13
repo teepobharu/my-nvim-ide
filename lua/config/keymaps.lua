@@ -323,3 +323,4 @@ Cmd.create_cmd("LspRooter", function()
   end
 end, { nargs = 0 })
 map("n", "<leader>ld", ":LspRooter<CR>", { noremap = true, silent = true, desc = "Change directory to LSP root" })
+require("config.mykeymaps")

@@ -20,6 +20,12 @@ return {
     { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
   },
   config = function()
+    local map = vim.keymap.set
     vim.g.tmux_navigator_no_mappings = 1
+    opts = { noremap = true, silent = true, desc = "Navigate tmux" }
+    map("t", "<C-k>", "<cmd>TmuxNavigateUp<cr>", opts)
+    map("t", "<C-j>", "<cmd>TmuxNavigateDown<cr>", opts)
+    map("t", "<C-h>", "<cmd>TmuxNavigateLeft<cr>", opts)
+    map("t", "<C-l>", "<cmd>TmuxNavigateRight<cr>", opts)
   end,
 }

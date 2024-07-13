@@ -266,7 +266,6 @@ local function session_pickers()
 end
 
 return {
-  { import = "plugins.extras.telescope-lazy" },
   {
     "nvim-telescope/telescope.nvim",
     opts = {
@@ -304,33 +303,33 @@ return {
     },
     keys = {
       -- add <leader>fa to find all, including hidden files
-      {
-        "<leader>sc",
-        "<cmd> Telescope command_history <CR>",
-        mode = "v",
-        desc = "Command History",
-      },
+      -- {
+      --   "<leader>sc",
+      --   "<cmd> Telescope command_history <CR>",
+      --   mode = "v",
+      --   desc = "Command History",
+      -- },
       {
         "<leader>fa",
         "<cmd> Telescope find_files follow=true no_ignore=true hidden=true <CR>",
         desc = "Find All Files (including hidden)",
       },
       -- add <leader>fl to live grep from git root
-      {
-        "<leader>fl",
-        function()
-          live_grep_from_project_git_root()
-        end,
-        desc = "Live Grep From Project Git Root",
-      },
-      -- add <leader>fg to find files from project git root
-      {
-        "<leader>fg",
-        function()
-          find_files_from_project_git_root()
-        end,
-        desc = "Find Files From Project Git Root",
-      },
+      -- {
+      --   "<leader>fl",
+      --   function()
+      --     live_grep_from_project_git_root()
+      --   end,
+      --   desc = "Live Grep From Project Git Root",
+      -- },
+      -- -- add <leader>fg to find files from project git root
+      -- {
+      --   "<leader>fg",
+      --   function()
+      --     find_files_from_project_git_root()
+      --   end,
+      --   desc = "Find Files From Project Git Root",
+      -- },
       {
         "<leader>fz",
         find_files_in_home_and_config,

@@ -21,8 +21,11 @@ return {
       },
     },
   },
-  { import = "plugins.extras.copilot-chat-v2" },
+  -- { import = "plugins.extras.copilot-chat-v2" },
+  -- { import = "plugins.extras.telescope-lazy" },
   { import = "plugins.extras.telescope" },
+  -- { import = "plugins.extras.telescope-map-essntials" },
   { import = "plugins.extras.myNoice" },
   { import = "plugins.extras.neotree" },
+  { import = "plugins.extras.fzf" },
 }

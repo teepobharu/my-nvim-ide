@@ -5,7 +5,9 @@
 ## TO Patch
 
 Telescope-Lazy : Not work well when open root / git root
-Neotree: does not auto change dir of opened files
+
+- separate mapping for non overlap telescope (use both telescope and fzf for now)
+  Neotree: does not auto change dir of opened files
 
 - see this https://github.com/LazyVim/LazyVim/discussions/2150
 

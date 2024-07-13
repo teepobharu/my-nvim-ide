@@ -26,6 +26,8 @@ require("lazy").setup({
     -- Add the extra plugins here if needed
     -- { import = "plugins.extras.grug-far" },
     { import = "langs" },
+    { import = "core.myEditor" },
+    { import = "plugins.extras.myOverride" },
   },
   checker = { enabled = true }, -- automatically check for plugin updates
   performance = {

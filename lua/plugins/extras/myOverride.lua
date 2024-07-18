@@ -4,7 +4,6 @@ return {
     "stevearc/dressing.nvim",
     lazy = true,
     -- enabled = function()
-    -- return LazyVim.pick.want() == "telescope"
     -- end,
     init = function()
       ---@diagnostic disable-next-line: duplicate-set-field

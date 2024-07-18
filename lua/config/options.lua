@@ -106,3 +106,4 @@ end
 -- MY SETTINGS -----------------
 --  =========================
 vim.g.maplocalleader = ","
+vim.g.lazygit_config = true

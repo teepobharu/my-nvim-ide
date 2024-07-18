@@ -158,8 +158,10 @@ local function toggleTermCheck()
 end
 
 local function main()
-  printVariables()
+  print(table.concat({ 1, 2, 3 }, ","))
+
   if false then
+    printVariables()
     toggleTermCheck()
     testKeyMap()
     -- require("toggleterm").setup({ size = 20, open_mapping = [[<C-\>]] }) -- open terminal with <C-\>

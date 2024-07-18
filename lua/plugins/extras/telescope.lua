@@ -266,6 +266,7 @@ local function session_pickers()
 end
 
 return {
+  { import = "plugins.extras.telescope-zoxide" },
   {
     "nvim-telescope/telescope.nvim",
     opts = {

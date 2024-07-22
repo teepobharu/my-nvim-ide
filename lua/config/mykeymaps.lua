@@ -3,7 +3,6 @@ local keymap = vim.keymap.set
 -- ===========================
 -- LAZY NVIM ====================
 -- =======================
-vim.api.nvim_del_keymap("n", "<leader>l")
 
 -- Setup keys
 -- check using :letmapleader or :let maplocalleader
@@ -88,7 +87,18 @@ keymap("v", "<C-c>", '"+y', { desc = "Copy to system clipboard" })
 -- ============================
 --  Navigations
 -- ============================
--- Tmux navigation - move to plugins config
+--- Easier access to beginning and end of lines
+keymap("v", "<A-h>", "^", {
+  desc = "Go to start of line",
+  silent = true,
+})
+
+keymap("v", "<A-l>", "$", {
+  desc = "Go to end of line",
+  silent = true,
+})
+
+-- /Users/tharutaipree/dotfiles/README.mdTmux navigation - move to plugins config
 
 -- ============================
 --   Windows and Tabs
@@ -97,6 +107,7 @@ keymap("n", "<leader>wh", ":sp<CR>", { desc = "HSplit", silent = true })
 keymap("n", "<leader>wv", ":vs<CR>", { desc = "VSplit", silent = true })
 keymap("n", "<M-Tab>", ":tabnext<CR>", { noremap = true, silent = true })
 keymap("t", "<M-Tab>", "<cmd>tabnext<CR>", { noremap = true, silent = true })
+keymap("n", "<leader>wp", ":windo b#<CR>", { desc = "Previous Window", silent = true })
 
 -- map("n", "<C-Up>", ":resize -3<CR>", opts)
 -- map("n", "<C-Down>", ":resize +3<CR>", opts)
@@ -113,7 +124,7 @@ keymap("n", "<Right>", "<cmd>vertical resize +3<CR>", opts)
 -- map("n", "L", ":bn<CR>", { desc = "Next Buffer", silent = true })
 -- use <l>bd instead
 opts.desc = "Close buffer"
-keymap("n", "<leader>bd", ":bd<CR>", opts)
+keymap("n", "<leader>bd", ":b#|bd#<CR>", opts)
 opts.desc = nil
 -- map("n", "<leader>wX", ":bd!<CR>", { desc = "Force close buffer" })
 

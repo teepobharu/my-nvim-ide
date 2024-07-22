@@ -27,6 +27,17 @@ return {
     "nvimdev/dashboard-nvim",
     lazy = false, -- As https://github.com/nvimdev/dashboard-nvim/pull/450, dashboard-nvim shouldn't be lazy-loaded to properly handle stdin.
     opts = function()
+      -- check if fzf-lua is instaled or telescope
+
+      -- local okFzf, _ = pcall(require, "fzf-lua")
+      -- local okTelescope, _ = pcall(require, "telescope")
+      -- if not okFzf and not okTelescope then
+      --   vim.print("fzf-lua or telescope is required for dashboard-nvim")
+      --   return
+      -- end
+
+      -- local findfileaction = okFzf and "fzf-lua.files" or "telescope.find_files"
+
       local opts = {
         theme = "hyper",
         config = {
@@ -40,6 +51,7 @@ return {
               desc = "Files",
               group = "Label",
               action = [[lua require('fzf-lua').files({cwd_prompt = false})]],
+              action = [[lua require('telescope.builtin').find_files()]],
               key = "f",
             },
             {
@@ -47,7 +59,7 @@ return {
               desc = "Config",
               group = "Number",
               action = [[lua require('fzf-lua').files({ cwd = '~/.config/nvim' })]],
-              key = "c",
+              action = [[lua require('fzf-lua').files({ cwd = vim.expand("$XDG_CONFIG_HOME/$NVIM_APPNAME") })]],
             },
             {
               icon = " ",

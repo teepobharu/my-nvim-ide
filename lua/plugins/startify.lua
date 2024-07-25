@@ -7,11 +7,9 @@ return {
 		-- more settings example: https://github.com/mhinz/vim-startify/wiki/Example-configurations#show-modified-and-untracked-git-files
 
 		local function gitModified()
-			local files = vim.fn.systemlist("git ls-files -m 2>/dev/null")
-			return vim.tbl_map(function(val)
-				return { line = val, path = val }
-			end, files)
-		end
+      local files = vim.fn.systemlist("git ls-files -m 2>/dev/null")
+      return vim.tbl_map(function(val) return { line = val, path = val } end, files)
+    end
 
 		local function gitUntracked()
 			local files = vim.fn.systemlist("git ls-files -o --exclude-standard 2>/dev/null")

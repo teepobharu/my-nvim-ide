@@ -40,20 +40,20 @@ return {
       -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
     },
     keys = {
-      -- {
-      --   "<leader>e",
-      --   function()
-      --     require("neo-tree.command").execute({ toggle = true, dir = LazyVim.root() })
-      --   end,
-      --   desc = "Explorer NeoTree (Root Dir)",
-      -- },
-      -- {
-      --   "<leader>E",
-      --   function()
-      --     require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
-      --   end,
-      -- desc = "Explorer NeoTree (cwd)",
-      -- },
+      {
+        "<leader>e",
+        function()
+          require("neo-tree.command").execute({ toggle = true, dir = Path.get_root_directory() })
+        end,
+        desc = "Explorer NeoTree (Root)",
+      },
+      {
+        "<leader>E",
+        function()
+          require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
+        end,
+        desc = "Explorer NeoTree (CWD)",
+      },
       {
         "<leader>fE",
         function()
@@ -82,8 +82,8 @@ return {
         end,
         desc = "Explorer NeoTree (Root Dir)",
       },
-      { "<leader>e", "<leader>fe", desc = "Explorer NeoTree (Root Dir)", remap = true },
-      { "<leader>E", "<leader>fE", desc = "Explorer NeoTree (cwd)", remap = true },
+      -- { "<leader>e", "<leader>fe", desc = "Explorer NeoTree (Root Dir)", remap = true },
+      -- { "<leader>E", "<leader>fE", desc = "Explorer NeoTree (cwd)", remap = true },
     },
     -- { "<leader>e", "<leader>fe", desc = "Explorer NeoTree (Root Dir)", remap = true },
     -- { "<leader>E", "<leader>fE", desc = "Explorer NeoTree (cwd)", remap = true },
@@ -289,15 +289,18 @@ return {
       --   { event = events.FILE_MOVED, handler = on_move },
       --   { event = events.FILE_RENAMED, handler = on_move },
       -- })
-      require("neo-tree").setup(opts)
-      vim.api.nvim_create_autocmd("TermClose", {
-        pattern = "*lazygit",
-        callback = function()
-          if package.loaded["neo-tree.sources.git_status"] then
-            require("neo-tree.sources.git_status").refresh()
-          end
-        end,
-      })
+
+      -- require("neo-tree").setup(opts)
+      --   reload neotree git status when lazygit closed
+      --   vim.api.nvim_create_autocmd("TermClose", {
+      --     pattern = "*lazygit",
+      --     callback = function()
+      --       if package.loaded["neo-tree.sources.git_status"] then
+      --         require("neo-tree.sources.git_status").refresh()
+      --       end
+      --     end,
+      --   })
+      -- end,
     end,
   },
 }

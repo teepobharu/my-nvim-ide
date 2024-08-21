@@ -263,7 +263,7 @@ map("n", "<leader>cl", "<cmd>LspInfo<CR>", opts)
 
 -- Fix Spell checking
 map("n", "z0", "1z=", {
-  desc = "Fix world under cursor",
+  desc = "Fix word under cursor",
 })
 
 map(

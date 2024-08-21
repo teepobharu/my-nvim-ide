@@ -196,7 +196,12 @@ keymap("v", "<M-z>", ":Gitsigns reset_hunk<cr>", { desc = "Reset hunk" })
 --   # which key migrate .nvim $HOME/.config/nvim/keys/which-key.vim
 keymap("n", "<c-q>", ":q<CR>", { desc = "Close", noremap = true, silent = true })
 keymap("n", "<localleader>q", ":q<CR>", { desc = "Close", noremap = true, silent = true })
-keymap("n", ",c", ":lcd%:p:h <CR>", { desc = "CD to current dir" })
+keymap("n", "<localleader>cd", ":lcd%:p:h <CR>", { desc = "CD to current dir" })
+keymap("n", "<localleader>cn", ':let @"=expand("%:t")<CR>', { desc = "Copy basefilename into reg" })
+-- copy relative filepath name
+keymap("n", "<localleader>cf", ':let @"=@%<CR>', { desc = "Copy relative filepath name" })
+-- copy absolute filepath - use neotree (no relative file)
+keymap("n", "<localleader>cF", ':let @"=expand("%:p")<CR>', { desc = "Copy absolute filepath" })
 -- files
 keymap("n", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })
 keymap("v", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })
@@ -224,11 +229,9 @@ end
 -- map("n", "<leader>nn", "<cmd>so $MYVIMRC<CR>", { desc = "Source Config" })
 -- map("n", "<leader>S", "<cmd>SSave<CR>", { desc = "Save Session" })
 -- map('n', '<Leader>nm', ':messages <CR>', { noremap = true, silent = true, desc = 'Show messages' })
+-- map to get current basefile name
+
 -- map('n', '<Leader>nM', [[:redir @a<CR>:messages<CR>:redir END<CR>:put! a<CR>]], { noremap = true, silent = true, desc = 'Print messages' })
--- copy relative filepath name
--- map("n", "<leader>nf", ":let @+=@%<CR>", { desc = "Copy relative filepath name" })
--- copy absolute filepath - use neotree (no relative file)
--- map("n", "<leader>nF", ':let @+=expand("%:p")<CR>', { desc = "Copy absolute filepath" })
 -- Bind a key to invoke the renaming function
 keymap("n", "<leader>bR", rename_buffer, { desc = "Rename Buffer", noremap = true, silent = true })
 

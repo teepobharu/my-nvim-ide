@@ -2,6 +2,7 @@ return {
   { import = "plugins.extras.disabled" },
   {
     "stevearc/dressing.nvim",
+    enabled = false,
     lazy = true,
     -- enabled = function()
     -- end,

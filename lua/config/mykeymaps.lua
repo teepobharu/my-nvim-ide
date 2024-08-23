@@ -67,10 +67,13 @@ function duplicateselected()
   vim.fn.setreg('"', saved_unnamed)
 end
 
+-- above cause to move when quit with Esc
+--
+-- H and L to change buffer (LAZY)
 keymap("n", "<A-d>", duplicateselected, { desc = "Duplicate line and preserve yank register" })
 keymap("v", "<A-d>", duplicateselected, { desc = "Duplicate line and preserve yank register" })
-
 -- " Copy to system clipboard
+
 -- vnoremap <leader>y "+y
 -- nnoremap <leader>Y "+yg_
 -- nnoremap <leader>y "+y
@@ -98,6 +101,8 @@ keymap("v", "<A-l>", "$", {
   silent = true,
 })
 
+keymap("v", "jk", "<esc>", { desc = "jk to escape" })
+
 -- /Users/tharutaipree/dotfiles/README.mdTmux navigation - move to plugins config
 
 -- ============================
@@ -119,7 +124,6 @@ keymap("n", "<Up>", ":resize -3<CR>", opts)
 keymap("n", "<Down>", ":resize +3<CR>", opts)
 keymap("n", "<Left>", "<cmd>vertical resize -3<CR>", opts)
 keymap("n", "<Right>", "<cmd>vertical resize +3<CR>", opts)
--- H and L to change buffer (LAZY)
 -- map("n", "H", ":bp<CR>", { desc = "Previous Buffer", silent = true })
 -- map("n", "L", ":bn<CR>", { desc = "Next Buffer", silent = true })
 -- use <l>bd instead
@@ -273,3 +277,10 @@ set_opfunc = vim.fn[vim.api.nvim_exec(
 ]],
   true
 )]
+
+-- ===============================================
+-- DELETE MAP ==========================
+-- ===============================================
+-- disabled in keymaps.lua (original)
+vim.api.nvim_del_keymap("i", "<A-j>")
+vim.api.nvim_del_keymap("i", "<A-k>")

@@ -139,7 +139,7 @@ return {
         -- markdown
         "markdownlint",
         -- rustywind for tailwindcss
-        "rustywind",
+        -- "rustywind",
         -- astro
         "astro-language-server",
         -- Solidity

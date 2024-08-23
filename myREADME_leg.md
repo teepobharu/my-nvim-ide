@@ -93,7 +93,7 @@ Main lazy setup for plugins :
 <leader>-s + h(elp), b(uffers), t(odos), c(ommands), k(eymaps), f(replace)
 
 - s(symbols) / <leader>o Symbols {W,E toggle fold}
-- telescope which-key (i = C-/)
+- telescope which-key (i = C-_ or C-/)
 
 <leader>-f + f(iles), b(uffers),c(config)
 <leader>-g + g(it), b(lame), c(ommit), s(tatus)

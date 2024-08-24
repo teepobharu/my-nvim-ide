@@ -142,6 +142,7 @@ end
 keymap("n", "<Esc>", toggle_fold_or_clear_highlight, { expr = true, silent = true, noremap = true })
 -- Terminal & Commands
 -- ============================
+keymap("t", "<C-q>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
 keymap("n", ";", ":", { desc = "CMD enter command mode" })
 vim.api.nvim_create_user_command("OpenTerminalInSplitWithCwd", function()
   local cwd = vim.fn.expand("%:p:h")
@@ -149,7 +150,6 @@ vim.api.nvim_create_user_command("OpenTerminalInSplitWithCwd", function()
   vim.api.nvim_command("split | lcd " .. cwd .. " | terminal")
 end, {})
 keymap("n", "<Leader>t.", ":OpenTerminalInSplitWithCwd<CR>", { noremap = true, silent = true })
---
 -- ===========================================
 --  Search
 -- ===============================================

@@ -159,7 +159,10 @@ end
 
 local function main()
   print(table.concat({ 1, 2, 3 }, ","))
-
+  vim.opt_local.timeoutlen = 1000 -- setlocal can used (still not found any differences when set)
+  print([==[main   vim.timeoutlen:]==], vim.inspect(vim.opt.timeoutlen._value)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  print([==[main   vim.timeoutlenlocal:]==], vim.inspect(vim.opt_local.timeoutlen._value)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  -- __AUTO_GENERATED_PRINT_VAR_START__
   if false then
     printVariables()
     toggleTermCheck()

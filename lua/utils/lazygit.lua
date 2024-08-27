@@ -136,13 +136,15 @@ function M.update_config()
       theme[k] = M.get_color(v)
     end
   end
-
+  -- original lazy from: https://github.com/LazyVim/LazyVim/blob/12818a6cb499456f4903c5d8e68af43753ebc869/lua/lazyvim/util/lazygit.lua#L124
+  -- preset info: https://github.com/jesseduffield/lazygit/blob/8a8490d97d13b55d232f8a7c69a40668dc3cd5af/pkg/config/editor_presets.go#L4
   local config = [[
 os:
   editPreset: "nvim-remote"
+  openDirInEditor: "code -- {{dir}}"
 gui:
   nerdFontsVersion: 3
-  theme:
+  theme: 
 ]]
 
   ---@type string[]

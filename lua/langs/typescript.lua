@@ -270,11 +270,13 @@ return {
     "nvim-neotest/neotest",
     optional = true,
     dependencies = {
+      "nvim-neotest/neotest-jest",
       "marilari88/neotest-vitest",
     },
     opts = function(_, opts)
       opts.adapters = opts.adapters or {}
       vim.list_extend(opts.adapters, {
+        require("neotest-jest"),
         require("neotest-vitest"),
       })
     end,

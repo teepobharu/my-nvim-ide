@@ -1,5 +1,5 @@
 local Path = require("utils.path")
-
+local telescopePickers = require("config.telescope_pickers")
 --- Open selected file in vertical split
 local function open_selected_file_in_vertical()
   local entry = require("telescope.actions.state").get_selected_entry()
@@ -337,6 +337,11 @@ return {
         "<leader>fz",
         find_files_in_home_and_config,
         desc = "Find my dotconfig files in home and config",
+      },
+      {
+        "<localleader>go",
+        telescopePickers.telescope.getPickers({}).open_git_pickers,
+        desc = "Open Git Pickers",
       },
       {
         "<leader>fs",

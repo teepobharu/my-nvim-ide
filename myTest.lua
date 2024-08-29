@@ -156,14 +156,113 @@ local function toggleTermCheck()
   end, opts)
   opts.desc = ""
 end
+local function testGit()
+  local gitOriginSSH = "git@github.com:teepobharu/my-nvim-ide.git"
+  local gitOriginHTTPS = "https://github.com/teepobharu/my-nvim-ide.git"
+
+  local function extractNavigablePart(gitUrl)
+    local sshPattern = "git@(.+):(.+).git"
+    local httpsPattern = "https://(.+)/(.+).git"
+
+    local domain, repo = gitUrl:match(sshPattern)
+    if not domain then
+      domain, repo = gitUrl:match(httpsPattern)
+    end
+
+    if domain and repo then
+      return domain .. "/" .. repo
+    else
+      return nil, "Invalid Git URL"
+    end
+  end
+
+  local navigablePartSSH = extractNavigablePart(gitOriginSSH)
+  local navigablePartHTTPS = extractNavigablePart(gitOriginHTTPS)
+  local git_current_branch = vim.fn.system("git rev-parse --abbrev-ref HEAD")
+
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testGit git_mainbranch:]==], vim.inspect(git_mainbranch)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  print([==[testGit git_current_branch:]==], vim.inspect(git_current_branch)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  local function get_remote_path(remote_url)
+    -- Remove the protocol part (git@ or https://) and remove the first : after the protocol
+    local path = remote_url:gsub("^git@", ""):gsub("^https?://", "")
+    -- remove the first colon only
+    path = path:gsub(":", "/", 1)
+    -- Remove the .git suffix
+    path = path:gsub("%.git$", "")
+    return path
+  end
+  print("using gsub function")
+  print(get_remote_path(gitOriginSSH))
+  print("using gsub 2 function")
+  print(get_remote_path(gitOriginHTTPS) or "NONE")
+  print("using extract function")
+  print(navigablePartSSH) -- Output: github.com/teepobharu/my-nvim-ide
+  print(navigablePartHTTPS) -- Output: github.com/teepobharu/my-nvim-ide
+end
+function testGit2()
+  local current_file = path or vim.fn.expand("%:p")
+
+  local urlPath = require("utils.git").get_remote_path()
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testGit2 urlPath:]==], vim.inspect(urlPath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local mainBranch = require("utils.git").git_main_branch()
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testGit2 mainBranch:]==], vim.inspect(mainBranch)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local gitroot = require("utils.path").get_root_directory()
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testGit2 gitroot:]==], vim.inspect(gitroot)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local currentBranch = require("lazy.util").git_info(gitroot)
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testGit2 currentBranch:]==], vim.inspect(currentBranch)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  -- gitlab vs gfithuib cases
+  -- folder
+  -- https://github.com/teepobharu/lazy-nvim-ide/tree/main/spell
+  -- file
+  -- -- https://gitlab.agodadev.io/full-stack/fe-data/messaging-client-js-core/-/blob/beta/.husky/commit-msg?ref_type=heads
+
+  local branch = ""
+  vim.ui.select({
+    "1. Main Branch",
+    "2. Current Branch",
+  }, { prompt = "Choose to open in browser:" }, function(choice)
+    if choice then
+      local i = tonumber(choice:sub(1, 1))
+      if i == 1 then
+        branch = mainBranch
+      else
+        branch = currentBranch
+      end
+    else
+    end
+  end)
+  local fullUrl = "https://" .. urlPath .. "/" .. current_file .. "/blob/" .. branch
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testGit2 fullUrl:]==], vim.inspect(fullUrl)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  vim.fn.system("open " .. fullUrl)
+  require("lazy.util").open(fullUrl)
+end
+
+function getGitList()
+  local results = {}
+  local remote_branches = vim.fn.system("git branch -r")
+  for branch in remote_branches:gmatch("[^\r\n]+") do
+    table.insert(results, { value = branch })
+  end
+end
 
 local function main()
-  print(table.concat({ 1, 2, 3 }, ","))
-  vim.opt_local.timeoutlen = 1000 -- setlocal can used (still not found any differences when set)
-  print([==[main   vim.timeoutlen:]==], vim.inspect(vim.opt.timeoutlen._value)) -- __AUTO_GENERATED_PRINT_VAR_END__
-  print([==[main   vim.timeoutlenlocal:]==], vim.inspect(vim.opt_local.timeoutlen._value)) -- __AUTO_GENERATED_PRINT_VAR_END__
-  -- __AUTO_GENERATED_PRINT_VAR_START__
+  getGitList()
   if false then
+    testGit2()
+    testGit()
+    print(table.concat({ 1, 2, 3 }, ","))
+    vim.opt_local.timeoutlen = 1000 -- setlocal can used (still not found any differences when set)
+    print([==[main   vim.timeoutlen:]==], vim.inspect(vim.opt.timeoutlen._value)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    print([==[main   vim.timeoutlenlocal:]==], vim.inspect(vim.opt_local.timeoutlen._value)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    -- __AUTO_GENERATED_PRINT_VAR_START__
     printVariables()
     toggleTermCheck()
     testKeyMap()

@@ -1,5 +1,5 @@
 local M = {}
-
+local gitUtil = require("utils.git")
 M.telescope = {}
 
 M.telescope.getPickers = function(opts)
@@ -120,16 +120,6 @@ M.telescope.getPickers = function(opts)
   local open_git_pickers = function()
     local file_path = vim.fn.expand("%:p")
 
-    local function get_remote_path(remote_url)
-      -- Remove the protocol part (git@ or https://) and remove the first : after the protocol
-      local path = remote_url:gsub("^git@", ""):gsub("^https?://", "")
-      -- remove the first colon only
-      path = path:gsub(":", "/", 1)
-      -- Remove the .git suffix
-      path = path:gsub("%.git$", "")
-      return path
-    end
-
     local function get_git_root()
       local git_root = vim.fn.system("git rev-parse --show-toplevel"):gsub("\n", "")
       return git_root
@@ -151,13 +141,12 @@ M.telescope.getPickers = function(opts)
       -- local ssh="git@github.com:teepobharu/mynotes.git"
       -- local http="https://github.com/teepobharu/mynotes.git"
       -- result should not contain ssh part and .git suffix and colon for ssh and http case
-      local remote_url = vim.fn.system("git config --get remote.origin.url"):gsub("\n", "")
-      local remote_path = get_remote_path(remote_url)
+      local remote_path = gitUtil.get_remote_path()
       -- remote_path needs to remove prefix remotes/<any remote name>/
       remote_path = remove_remote_prefix(remote_path)
       local line_number = vim.fn.line(".")
       local git_file_path = file_path:gsub(get_git_root() .. "/", "")
-      local url_pattern = "https://%s/-/blob/%s/%s#L%d"
+      local url_pattern = "https://%s/blob/%s/%s#L%d"
       -- if findpath empty
       if git_file_path == "" or git_file_path:gsub(" ", "") == "" then
         -- return just the repo
@@ -180,48 +169,27 @@ M.telescope.getPickers = function(opts)
       -- vim.fn.jobstart({ "tmux", "run-shell", "-b", "-c", "open " .. url }, { detach = true })
       -- not work in tmux not sure why
       vim.fn.jobstart({ open_command, url }, { detach = true }) -- not work in tmux
+
+      require("lazy.util").open(url)
       -- vim.cmd("silent !open " .. url)
     end
 
-    local function git_main_branch()
-      local git_dir = vim.fn.system("git rev-parse --git-dir 2> /dev/null")
-      if vim.v.shell_error ~= 0 then
-        return nil
-      end
-
-      local refs = {
-        "refs/heads/main",
-        "refs/heads/trunk",
-        "refs/heads/mainline",
-        "refs/heads/default",
-        "refs/heads/master",
-        "refs/remotes/origin/main",
-        "refs/remotes/origin/trunk",
-        "refs/remotes/origin/mainline",
-        "refs/remotes/origin/default",
-        "refs/remotes/origin/master",
-        "refs/remotes/upstream/main",
-        "refs/remotes/upstream/trunk",
-        "refs/remotes/upstream/mainline",
-        "refs/remotes/upstream/default",
-        "refs/remotes/upstream/master",
-      }
-
-      for _, ref in ipairs(refs) do
-        local show_ref = vim.fn.system("git show-ref -q --verify " .. ref)
-        if vim.v.shell_error == 0 then
-          return ref:gsub("^refs/%w+/", "")
-        end
-      end
-
-      return "master"
-    end
-
-    local default_branch = git_main_branch()
+    local default_branch = gitUtil.git_main_branch()
     print(default_branch)
 
     vim.fn.setreg("+", get_branch_url(default_branch))
 
+    -- TODO: only get remote branches, trim * and whitespace, remove remotes/origin/ prefix
+    -- use this in neotree and normal shortcut in current buffer as well
+
+    local function get_remote_branches_name()
+      local results = {}
+      local remote_branches = vim.fn.system("git branch -r")
+      for branch in remote_branches:gmatch("[^\r\n]+") do
+        branch = branch:gsub("^%s*(.-)%s*$", "%1")
+        table.insert(results, { value = branch })
+      end
+    end
     return pickers
       .new({
         prompt_title = "Open Branch URL",

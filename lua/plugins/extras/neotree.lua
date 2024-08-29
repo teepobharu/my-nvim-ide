@@ -5,6 +5,38 @@
 local Util = require("lazy.core.util")
 local Path = require("utils.path")
 
+function openGitRemote(state)
+  local node = state.tree:get_node()
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[openGitRemote node:]==], vim.inspect(node)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local path = node:get_id()
+  local is_dir = node.type == "directory"
+  -- // run git remote url command to get the remote and construct in table_is_empty(table_to_check)he browser ( make sure to support ssh )
+  local current_file = path or vim.fn.expand("%:p")
+
+  local urlPath = require("utils.git").get_remote_path()
+  local mainBranch = require("utils.git").git_main_branch()
+  local gitroot = require("utils.path").get_root_directory()
+  local currentBranch = require("lazy.util").git_info(gitroot)
+  local branch = ""
+  vim.ui.select({
+    "1. Main Branch",
+    "2. Current Branch",
+  }, { prompt = "Choose to open in browser:" }, function(choice)
+    if choice then
+      local i = tonumber(choice:sub(1, 1))
+      if i == 1 then
+        branch = mainBranch
+      else
+        branch = currentBranch
+      end
+    else
+    end
+  end)
+  local fullUrl = "https://" .. gitDomain .. "/" .. current_file .. "/blob/" .. branch
+  require("lazy.util").open(fullUrl)
+end
+
 -- LazyVim : original neotree https://github.com/LazyVim/LazyVim/blob/1f8469a53c9c878d52932818533ce51c27ded5b6/lua/lazyvim/plugins/editor.lua#L23
 return {
   -- file explorer
@@ -147,6 +179,7 @@ return {
         ---- my part
         {
           commands = {
+            openGitRemote = openGitRemote,
             copy_selector = function(state)
               local node = state.tree:get_node()
               local filepath = node:get_id()
@@ -253,6 +286,7 @@ return {
                 ["P"] = { "toggle_preview", config = { use_float = false } },
                 -- custom binding
                 ["YY"] = "copy_selector",
+                ["go"] = "openGitRemote",
                 ["Yp"] = "copy_file_name_current",
                 ["YP"] = "copy_abs_file",
                 ["Tg"] = "telescope_livegrep_cwd",

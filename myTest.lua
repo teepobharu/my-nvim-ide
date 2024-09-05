@@ -252,10 +252,20 @@ function getGitList()
     table.insert(results, { value = branch })
   end
 end
-
+function checkPyVenv()
+  local pathVenv = vim.fn.getcwd() .. "/.venv"
+  local isdir = vim.fn.isdirectory(pathVenv)
+  if isdir == 1 then
+    print(pathVenv .. " exists")
+  else
+    print(pathVenv .. " not exists")
+  end
+end
 local function main()
-  getGitList()
+  printVariables()
+  checkPyVenv()
   if false then
+    getGitList()
     testGit2()
     testGit()
     print(table.concat({ 1, 2, 3 }, ","))
@@ -263,7 +273,6 @@ local function main()
     print([==[main   vim.timeoutlen:]==], vim.inspect(vim.opt.timeoutlen._value)) -- __AUTO_GENERATED_PRINT_VAR_END__
     print([==[main   vim.timeoutlenlocal:]==], vim.inspect(vim.opt_local.timeoutlen._value)) -- __AUTO_GENERATED_PRINT_VAR_END__
     -- __AUTO_GENERATED_PRINT_VAR_START__
-    printVariables()
     toggleTermCheck()
     testKeyMap()
     -- require("toggleterm").setup({ size = 20, open_mapping = [[<C-\>]] }) -- open terminal with <C-\>

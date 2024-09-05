@@ -129,21 +129,29 @@ M.telescope.getPickers = function(opts)
       -- local sanitized_branch = branch:gsub("^%s*(.-)%s*$", "")
       local function remove_remote_prefix(ref)
         local sanitized_ref = ref:gsub("^%s*(.-)%s*$", "%1")
+        -- # HEAD -> origin/HEAD
+        -- # remotes/origin/branch
+
+        -- Remove the first asterisk or + (if present)
+        -- trim space
+        sanitized_ref = sanitized_ref:gsub(" ", "")
+        santized_ref = sanitized_ref:gsub("^[*|+]", "")
         sanitized_ref = sanitized_ref:gsub("^remotes/[%w%p]+/", "")
         -- Remove leading/trailing whitespace
-        -- Remove the first asterisk (if present)
-        sanitized_ref = sanitized_ref:gsub("^*", "")
         -- remote_path needs to remove prefix remotes/<any remote name>/
         return sanitized_ref
       end
-      local sanitized_branch = remove_remote_prefix(branch)
 
+      local sanitized_branch = remove_remote_prefix(branch)
+      -- __AUTO_GENERATED_PRINT_VAR_START__
+      print([==[function#function#get_branch_url sanitized_branch:]==], vim.inspect(sanitized_branch)) -- __AUTO_GENERATED_PRINT_VAR_END__
       -- local ssh="git@github.com:teepobharu/mynotes.git"
       -- local http="https://github.com/teepobharu/mynotes.git"
       -- result should not contain ssh part and .git suffix and colon for ssh and http case
       local remote_path = gitUtil.get_remote_path()
+      -- __AUTO_GENERATED_PRINT_VAR_START__
+      print([==[function#function#get_branch_url remote_path:]==], vim.inspect(remote_path)) -- __AUTO_GENERATED_PRINT_VAR_END__
       -- remote_path needs to remove prefix remotes/<any remote name>/
-      remote_path = remove_remote_prefix(remote_path)
       local line_number = vim.fn.line(".")
       local git_file_path = file_path:gsub(get_git_root() .. "/", "")
       local url_pattern = "https://%s/blob/%s/%s#L%d"
@@ -184,16 +192,28 @@ M.telescope.getPickers = function(opts)
 
     local function get_remote_branches_name()
       local results = {}
-      local remote_branches = vim.fn.system("git branch -r")
+      local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||; s|^[^/]+/||' | uniq")
       for branch in remote_branches:gmatch("[^\r\n]+") do
-        branch = branch:gsub("^%s*(.-)%s*$", "%1")
         table.insert(results, { value = branch })
       end
+      return results
     end
+
     return pickers
       .new({
         prompt_title = "Open Branch URL",
-        finder = finders.new_oneshot_job({ "git", "branch", "--all" }, conf.vimgrep_arguments),
+        finder = finders.new_table({
+          results = get_remote_branches_name(),
+          entry_maker = function(entry)
+            return {
+              display = entry.value,
+              value = entry.value,
+              ordinal = entry.value,
+            }
+          end,
+        }),
+        -- finder = finders.new_oneshot_job(preview_commands, conf.vimgrep_arguments),
+
         sorter = conf.generic_sorter(opts),
         attach_mappings = function(prompt_bufnr, map)
           actions.select_default:replace(function()

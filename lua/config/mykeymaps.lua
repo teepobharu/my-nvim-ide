@@ -197,6 +197,31 @@ keymap("v", "<M-z>", ":Gitsigns reset_hunk<cr>", { desc = "Reset hunk" })
 -- ===============================================
 -- LOCALLEADER ==========================
 -- ===============================================
+local function addVenvPyrightConfig()
+  local pathUtil = require("utils.path")
+  local git_dir = pathUtil.get_git_root() or vim.fn.getcwd()
+
+  local venv_path = vim.fn.input("Enter venv path: ", git_dir .. "/.venv")
+  local config = { venvPath = venv_path, venv = ".venv" }
+  if vim.fn.isdirectory(venv_path) == 0 then
+    vim.notify("Venv path not exists, please run pipenv install", vim.log.levels.WARN)
+    return
+  end
+  -- if file exists then confirm before override
+  local pyrightconfig = git_dir .. "/pyrightconfig.json"
+
+  if vim.fn.filereadable(pyrightconfig) == 1 then
+    local confirm = vim.fn.input("Override existing pyrightconfig.json? (y/n): ")
+    -- confirm or empty string continue to override if not return
+    if confirm ~= "y" and confirm ~= "" then
+      vim.notify("Not override pyrightconfig.json")
+      return
+    end
+  end
+
+  configStr = vim.fn.json_encode(config)
+  vim.fn.writefile({ configStr }, pyrightconfig)
+end
 --   # which key migrate .nvim $HOME/.config/nvim/keys/which-key.vim
 keymap("n", "<c-q>", ":q<CR>", { desc = "Close", noremap = true, silent = true })
 keymap("n", "<localleader>q", ":q<CR>", { desc = "Close", noremap = true, silent = true })
@@ -206,10 +231,11 @@ keymap("n", "<localleader>cn", ':let @+=expand("%:t")<CR>', { desc = "Copy basef
 keymap("n", "<localleader>cf", ":let @+=@%<CR>", { desc = "Copy relative filepath name" })
 -- copy absolute filepath - use neotree (no relative file)
 keymap("n", "<localleader>cF", ':let @+=expand("%:p")<CR>', { desc = "Copy absolute filepath" })
+
+keymap("n", "<localleader>rp", addVenvPyrightConfig, { desc = "Reload Lua file" })
 -- files
 keymap("n", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })
 keymap("v", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })
--- map('n', 'localleader>rp', ':python3 %<CR>', { desc = "Run Python3" })
 
 -- ===========================
 -- Custom commands ====================

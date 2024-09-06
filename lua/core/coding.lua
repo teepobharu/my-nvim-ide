@@ -124,6 +124,35 @@ return {
 
       -- Set <C-d> to dismiss suggestion
       keymap("i", "<C-d>", "<Plug>(copilot-dismiss)", opts)
+
+      local function setup_copilot_proxy(proxy, strict_ssl)
+        print("Setting up copilot proxy to " .. proxy)
+        vim.g.copilot_proxy = proxy
+        vim.g.copilot_proxy_strict_ssl = strict_ssl
+        vim.notify("Copilot proxy set to " .. proxy, "info")
+      end
+      function toggle_proxy_settings()
+        -- select the proxy between local llama or no proxy
+        array_config = {
+          { name = "1. Default", ssl = true, proxy = "" },
+          { name = "2. Llama local", ssl = false, proxy = "http://localhost:11435" },
+        }
+        name_list = {}
+        for _, v in ipairs(array_config) do
+          table.insert(name_list, v.name)
+        end
+        vim.ui.select(name_list, { prompt = "Select the Proxy server " }, function(value)
+          local idx = tonumber(value:sub(1, 1))
+          local ssl = array_config[idx].ssl
+          local proxy = array_config[idx].proxy
+          setup_copilot_proxy(proxy, ssl)
+          vim.cmd("Copilot restart")
+        end)
+      end
+
+      opts.desc = "Copilot toggle proxy settings"
+      keymap("n", "<leader>as", toggle_proxy_settings, opts)
+      setup_copilot_proxy("", true)
     end,
   },
   -- Install LSP servers

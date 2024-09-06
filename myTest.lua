@@ -261,10 +261,23 @@ function checkPyVenv()
     print(pathVenv .. " not exists")
   end
 end
+
+function getArrListConfig()
+  local arrConfig = {
+    { ssl = true, proxy = "" },
+    { ssl = false, proxy = "http://localhost:11435" },
+  }
+  print(arrConfig[2].ssl)
+  print(arrConfig[2].proxy)
+
+  -- vim.g.copilot_proxy = "http://localhost:11435"
+  -- vim.g.copilot_proxy_strict_ssl = false
+end
 local function main()
-  printVariables()
-  checkPyVenv()
+  getArrListConfig()
   if false then
+    printVariables()
+    checkPyVenv()
     getGitList()
     testGit2()
     testGit()

@@ -178,6 +178,31 @@ return {
       },
     },
   },
+  {
+    "jellydn/quick-code-runner.nvim",
+    keys = {
+      {
+        "<leader>cP",
+        "gg0vGg$:QuickCodeRunner<CR>",
+        desc = "Code Run File",
+        mode = "n",
+      },
+    },
+    opts = {
+      debug = true,
+      file_types = {
+        -- @ Troubleshoot when pip install does not work globally
+        -- The code will create in ~/.cache/dir_/tofile.py
+        -- Workaround create pipenv inside the ~/.cache/
+        -- cd ~/.cache && pipenv --python 3
+        -- pipenv install pandas
+        python = {
+          "pipenv run python -u", -- Have some lag
+          -- "python3 -u", -- Original
+        },
+      },
+    },
+  },
   -- { import = "plugins.extras.copilot-chat-v2" },
   -- { import = "plugins.extras.telescope-lazy" },
   { import = "plugins.extras.telescope" },

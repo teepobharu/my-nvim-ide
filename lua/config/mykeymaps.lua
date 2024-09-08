@@ -14,7 +14,14 @@ keymap("n", "<leader>ll", "<cmd>Lazy<CR>", { desc = "Lazy" })
 -- ============================
 -- EDITING
 -- ============================
---
+-- Move Lines (add silence original didnot have will blip in visual mode)
+keymap("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move Down", silent = true })
+keymap("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move Up", silent = true })
+keymap("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down", silent = true })
+keymap("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up", silent = true })
+keymap("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move Down", silent = true })
+keymap("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move Up", silent = true })
+
 vim.cmd([[
   cnoremap <expr> <C-j> wildmenumode() ? "\<C-N>" : "\<C-j>"
   cnoremap <expr> <C-k> wildmenumode() ? "\<C-P>" : "\<C-k>"
@@ -25,7 +32,16 @@ local function handleMode(mode)
     if vim.fn.mode() == mode then
       vim.cmd("normal! y")
     else
-      vim.cmd("normal! gv")
+      -- do as normal trigger for visual mode / visual line modejgc
+      if mode == "v" then
+        vim.cmd("normal! v")
+      elseif mode == "V" then
+        vim.cmd("normal! V")
+      else
+        -- Handle unexpected mode by falling back to default key bindings
+        vim.notify("Unexpected mode: " .. vim.fn.mode(), vim.log.levels.WARN)
+        vim.cmd("normal! gv")
+      end
     end
   end
 end
@@ -49,9 +65,6 @@ function duplicateselected()
   else
     current_selected_line = vim.fn.getline(".")
   end
-
-  print("current_selected_line")
-  print(current_selected_line)
 
   -- Duplicate the current line or selected lines
   if current_mode == "v" or current_mode == "V" then
@@ -101,7 +114,10 @@ keymap("v", "<A-l>", "$", {
   silent = true,
 })
 
-keymap("v", "jk", "<esc>", { desc = "jk to escape" })
+-- v mode esc to exit visual modej
+keymap("v", "<C-q>", "<esc>", { desc = "exit" })
+keymap("v", "<C-j>", "<C-d>", { desc = "Move page down" })
+keymap("v", "<C-k>", "<C-u>", { desc = "Move page up" })
 
 -- /Users/tharutaipree/dotfiles/README.mdTmux navigation - move to plugins config
 

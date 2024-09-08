@@ -75,6 +75,7 @@ return {
               luasnip.jump(-1)
             end
           end, { "i", "s" }),
+          ["<ESC>"] = cmp.mapping.abort(),
         }),
 
         sources = {
@@ -128,7 +129,7 @@ return {
         print("Setting up copilot proxy to " .. proxy)
         vim.g.copilot_proxy = proxy
         vim.g.copilot_proxy_strict_ssl = strict_ssl
-        vim.notify("Copilot proxy set to " .. proxy, "info")
+        -- vim.notify("Copilot proxy set to " .. proxy, "info")
       end
       function toggle_proxy_settings()
         -- select the proxy between local llama or no proxy

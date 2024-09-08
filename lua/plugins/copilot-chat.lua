@@ -1,5 +1,3 @@
-local IS_DEV = false
-
 local prompts = {
   -- Code related prompts
   Explain = "Please explain how the following code works.",
@@ -18,6 +16,49 @@ local prompts = {
   Wording = "Please improve the grammar and wording of the following text.",
   Concise = "Please rewrite the following text to make it more concise.",
 }
+
+function setupPrompts(initialPrompts)
+  local sysp = require("CopilotChat.prompts") -- see default prompts here
+  ---@class CopilotChat.config.prompt
+  return vim.tbl_extend("force", initialPrompts, {
+    DocAlgo = "Please provide brief documentation for the following algorithm, if code does not summarize pitfalls briefly and add simple breaking case sample finnaly analyze the time and space complexity.",
+    ReactTestingLibraryConvert = {
+      prompt = [[
+      Please convert the React component testing code to not use enzyme related library,
+      and use React Testing Library instead.
+    ]],
+      description = "Convert React component testing code to use React Testing Library",
+      selection = function(source)
+        return require("CopilotChat.select").visual(source) or require("CopilotChat.select").buffer(source)
+      end,
+      system_prompt = sysp.COPILOT_WORKSPACE
+        .. [[
+
+Specific Guidelines:
+Using great typescript is more preferable over js make sure the typing is correct and the test is working as expected.
+Try to use data-testid instead of class or id for the selector.
+If the implementation uses data-component-name or some other tag please setup the RTL to use the data-component-name as a default testid selector before test run in a file
+Example: configure({ testIdAttribute: 'data-component-name' }); 
+But it is more preferable to use data-testid as a default testid selector.
+    ]],
+    },
+    ReactBestPractices = {
+      prompt = [[
+      Please refactor the following React code to follow best practices and performance measures : rerender, readability, etc.
+    ]],
+      selection = function(source)
+        return require("CopilotChat.select").visual(source) or require("CopilotChat.select").buffer(source)
+      end,
+      show_system_prompt = true,
+      -- seems not to working
+      system_prompt = [[
+      First greet the user with a random jokes message.
+      Then ask the user to provide the code.
+      Finally, thank the user for using the service.
+    ]],
+    },
+  })
+end
 
 return {
   {
@@ -91,6 +132,7 @@ return {
         prompt = '> #git:staged\n\nWrite commit message with commitizen convention. Write clear, informative commit messages that explain the "what" and "why" behind changes, not just the "how".',
       }
 
+      opts.prompts = setupPrompts(opts.prompts)
       chat.setup(opts)
 
       local select = require("CopilotChat.select")
@@ -112,6 +154,130 @@ return {
         })
       end, { nargs = "*", range = true })
 
+      -- Visual chat that get current buffer and the system clipboard combined as a selection
+      -- This is useful for chat that require both the current buffer and the system clipboard
+      -- For example, when you want to ask Copilot to refactor the code and provide a better Naming
+      vim.api.nvim_create_user_command("CopilotChatBuffEdit", function(args)
+        --- @param source CopilotChat.config.source
+        --- @return CopilotChat.config.selection|nil
+        ---
+        local curr_bufnr = vim.api.nvim_get_current_buf()
+        local curr_filepath = vim.fn.expand("%:p")
+        local curr_filetype = vim.bo[curr_bufnr].filetype
+        -- __AUTO_GENERATED_PRINT_VAR_START__
+        print([==[function#function curr_filetype:]==], vim.inspect(curr_filetype)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+        local buffer = {
+          -- __AUTO_GENERATED_PRINT_VAR_START__
+          --f ile name of current active buffer
+          filename = curr_filepath,
+          lines = vim.api.nvim_buf_get_lines(curr_bufnr, 0, -1, false),
+          filetype = vim.api.nvim_buf_get_option(curr_bufnr, "filetype"),
+          sname = vim.fn.fnamemodify(curr_filepath, ":."),
+          uptoTwoParentPath = vim.fn.fnamemodify(curr_filepath, ":~:~:t"),
+          rfname = vim.fn.fnamemodify(curr_filepath, ":."),
+        }
+        print([==[function#function buffer:]==], vim.inspect(buffer)) -- __AUTO_GENERATED_PRINT_VAR_END__
+        local clipboard = select.clipboard() or select.unnamed() or ""
+        local clipboard_lines = clipboard.lines
+            and vim.tbl_flatten({
+              { "```" .. curr_filetype },
+              vim.split(clipboard.lines, "\n"),
+              { "```" },
+            })
+          or {}
+
+        local lines = {
+          "`file: " .. buffer.uptoTwoParentPath .. "`",
+          "```" .. buffer.filetype,
+        }
+
+        -- Ensure lines is an array by appending each element of buffer.lines
+        for _, line in ipairs(buffer.lines) do
+          table.insert(lines, line)
+        end
+        -- vim.list_extend(lines, buffer.lines)
+        lines = vim.tbl_flatten({
+          lines,
+          "```",
+          clipboard_lines,
+        })
+
+        print([==[function#function lines:]==], vim.inspect(lines)) -- __AUTO_GENERATED_PRINT_VAR_END__
+        -- display the whle prompt in float temp buffer to see the aggregate content once saved to buffer proceed to run the editted content and pass to the chat
+        local bufnr = vim.api.nvim_create_buf(true, true)
+        -- __AUTO_GENERATED_PRINT_VAR_START__
+        print([==[function#function bufnr:]==], vim.inspect(bufnr)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+        vim.bo[bufnr].buftype = "" -- Allow writing to the buffer
+        vim.bo[bufnr].syntax = "markdown"
+        vim.bo[bufnr].modifiable = true
+        vim.treesitter.start(bufnr, "markdown")
+        -- set buffer unique name as CopilotChatBuffer
+        local bufname = "CopilotChatEdit ~" .. (buffer.uptoTwoParentPath or "")
+        -- if buf name exists add index until no buffer with the same name
+
+        local count = 0
+        while vim.fn.bufexists(bufname) == 1 do
+          count = count + 1
+          bufname = "CopilotChatEdit ~" .. (buffer.uptoTwoParentPath or "") .. " " .. count
+        end
+        --
+        vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
+        vim.api.nvim_buf_set_name(bufnr, bufname)
+        -- vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
+
+        local width = 0
+        for _, line in ipairs(lines) do
+          width = math.max(width, #line)
+        end
+
+        local height = math.min(vim.o.lines - 3, #lines)
+        local winOpts = {
+          title = bufname,
+          relative = "editor",
+          width = width,
+          height = height,
+          row = (vim.o.lines - height) / 2 - 1,
+          col = (vim.o.columns - width) / 2,
+          style = "minimal",
+          border = "rounded",
+          footer = table.concat({
+            "Press <enter>/C-s to send to Copilot",
+            "C-s CopilotChat - Save and send to chat",
+            "C-x Close and send original content",
+          }, " "),
+        }
+
+        local win = vim.api.nvim_open_win(bufnr, true, winOpts)
+        local function send_content_and_close(use_original)
+          print("send_content_and_close")
+          local content = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+          local selection = { lines = use_original and table.concat(lines, "\n") or table.concat(content, "\n") }
+          -- __AUTO_GENERATED_PRINT_VAR_START__
+          print([==[function#function#send_content_and_close content:]==], vim.inspect(content)) -- __AUTO_GENERATED_PRINT_VAR_END__
+          if win then
+            vim.api.nvim_win_close(win, true)
+            win = nil
+          end
+          if content then
+            chat.ask(table.concat(content, "\n"), {
+              selection = function(source)
+                return selection
+              end,
+            })
+          end
+        end
+        -- map c-s to use the edited content and send chat
+        vim.keymap.set("n", "<C-s>", function()
+          send_content_and_close(false)
+        end, { noremap = true, silent = true, buffer = bufnr })
+        vim.keymap.set("n", "<C-x>", function()
+          send_content_and_close(true)
+        end, { noremap = true, silent = true, buffer = bufnr })
+        -- listen for save or close event (if close use original content , if save use the edited content)
+        -- vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-s>", "<cmd>lua require('CopilotChat').ask(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), {selection = require('CopilotChat.select').buffer})<CR>", { noremap = true, silent = true })
+      end, { nargs = "*", range = true })
       -- Restore CopilotChatBuffer
       vim.api.nvim_create_user_command("CopilotChatBuffer", function(args)
         chat.ask(args.args, { selection = select.buffer })

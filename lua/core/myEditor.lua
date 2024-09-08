@@ -70,7 +70,7 @@ return {
         function()
           require("oil").toggle_float()
         end,
-        { desc = "Open OIL explorer" },
+        desc = "Open OIL explorer",
       },
     },
   },
@@ -179,6 +179,34 @@ return {
     },
   },
   {
+    "echasnovski/mini.bufremove",
+    keys = {
+      {
+        "<C-q>",
+        false,
+      },
+    },
+  },
+  {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    keys = {
+      {
+        "<leader>aE",
+        "<cmd>CopilotChatBuffEdit<cr>",
+        desc = "~ Copilot Chat Buf Edit ",
+      },
+    },
+    opts = {
+      debug = true, -- add to debug message by calling l-a-d and  see in file using <gf> or check :messages in the logfile name else see only error (not prompt and embedding used)
+      mappings = {
+        complete = {
+          detail = "Use @<C-Tab> or /<C-Tab> to complete the suggestion.",
+          insert = "<C-t>",
+        },
+      },
+    },
+  },
+  {
     "jellydn/quick-code-runner.nvim",
     keys = {
       {
@@ -189,7 +217,7 @@ return {
       },
     },
     opts = {
-      debug = true,
+      -- debug = true, -- add to debug and see what happens when codepad is called
       file_types = {
         -- @ Troubleshoot when pip install does not work globally
         -- The code will create in ~/.cache/dir_/tofile.py

@@ -18,6 +18,7 @@ keymap("n", "<leader>ll", "<cmd>Lazy<CR>", { desc = "Lazy" })
 keymap("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move Down", silent = true })
 keymap("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move Up", silent = true })
 keymap("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down", silent = true })
+keymap("i", "<A-/>", "<esc>mt<cmd>normal gcc<cr>`tji", { desc = "Comment current line" })
 keymap("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up", silent = true })
 keymap("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move Down", silent = true })
 keymap("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move Up", silent = true })
@@ -49,7 +50,6 @@ end
 opts.desc = "Yank in visual"
 keymap("v", "v", handleMode("v"), opts)
 keymap("v", "V", handleMode("V"), opts)
-opts.desc = nil
 
 local keymap = vim.keymap.set
 -- Duplicate line and preserve previous yank register
@@ -200,10 +200,12 @@ keymap("n", "<C-S-j>", gitsigns_jump_next_hunk, { desc = "Jump to next hunk", ex
 keymap("n", "<C-M-j>", gitsigns_jump_next_hunk, { desc = "Jump to next hunk", expr = true })
 keymap("n", "<C-S-k>", gitsigns_jump_prev_hunk, { desc = "Jump to prev hunk", expr = true })
 keymap("n", "<C-M-k>", gitsigns_jump_prev_hunk, { desc = "Jump to prev hunk", expr = true })
+opts.desc = "Reset hunk"
 keymap("n", "<M-z>", function()
   require("gitsigns").reset_hunk()
-end, { desc = "Reset hunk" })
-keymap("v", "<M-z>", ":Gitsigns reset_hunk<cr>", { desc = "Reset hunk" })
+end, opts)
+keymap("v", "<M-z>", ":Gitsigns reset_hunk<cr>", opts)
+opts.desc = nil
 -- Reconsidered
 -- keymap("n", "<leader>gbc", ":Telescope git_bcommits<cr>", { silent = true, desc = "Git BCommits" })
 -- keymap("n", "<leader>gbr", ":Telescope git_branches<cr>", { silent = true, desc = "Git Branches" })

@@ -36,6 +36,34 @@ function openGitRemote(state)
   local fullUrl = "https://" .. gitDomain .. "/" .. current_file .. "/blob/" .. branch
   require("lazy.util").open(fullUrl)
 end
+--- Get options for file and grep operations based on the current state and type.
+
+---@param state
+---@param type "file" | "directory"
+---@return table
+function get_opts_for_files_and_grep(state, type)
+  local node = state.tree:get_node()
+  local filepath = node:get_id()
+  local is_dir = node.type == "directory"
+  local current_file_dir = vim.fn.fnamemodify(filepath, ":h")
+  local cwdPath = is_dir and filepath or current_file_dir
+  local extra_opts_list = node.type == "file" and { "-d=1" } or {}
+  if type == "file" then
+    table.insert(extra_opts_list, "-t=f")
+  end
+  local extra_opts = table.concat(extra_opts_list, " ") -- works on fzf not in telescope
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[get_opts_for_files_and_grep extra_opts:]==], vim.inspect(extra_opts)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  -- # fzf opt: https://github.com/ibhagwan/fzf-lua/wiki/Options
+  return {
+    current_file_dir = current_file_dir,
+    cwdPath = cwdPath,
+    extra_opts = extra_opts, -- fzf files
+    extra_opts_list = extra_opts_list, -- telescope grep
+    filepath = filepath,
+  }
+end
 
 -- LazyVim : original neotree https://github.com/LazyVim/LazyVim/blob/1f8469a53c9c878d52932818533ce51c27ded5b6/lua/lazyvim/plugins/editor.lua#L23
 return {
@@ -231,21 +259,26 @@ return {
               vim.notify("Copied: " .. filepath)
             end,
             telescope_livegrep_cwd = function(state)
-              local node = state.tree:get_node()
-              local filepath = node:get_id()
-              local is_dir = node.type == "directory"
-              local cwdPath = is_dir and filepath or vim.fn.fnamemodify(filepath, ":h")
-              local extra_opts = node.type == "file" and { "-d=1" } or {}
+              local opts = get_opts_for_files_and_grep(state)
               -- fzf grep not work in live grep : https://www.reddit.com/r/neovim/comments/r74647/comment/hmx7i68/?utm_source=share&utm_medium=web2x&context=3
-              require("telescope.builtin").grep_string({ cwd = cwdPath, additional_args = extra_opts })
+              require("telescope.builtin").grep_string({ cwd = opts.cwdPath, additional_args = opts.extra_opts })
+            end,
+            fzf_grep = function(state)
+              local opts = get_opts_for_files_and_grep(state)
+              -- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/providers/grep.lua
+              require("fzf-lua").grep({
+                cwd = opts.cwdPath,
+                search_paths = { opts.current_file_dir },
+                rg_opts = opts.extra_opts_list,
+              })
+            end,
+            fzf_find_files = function(state)
+              local opts = get_opts_for_files_and_grep(state, "file")
+              require("fzf-lua").files({ cwd = opts.cwdPath, fd_opts = opts.extra_opts })
             end,
             telescope_find_files = function(state)
-              local node = state.tree:get_node()
-              local filepath = node:get_id()
-              local is_dir = node.type == "directory"
-              local cwdPath = is_dir and filepath or vim.fn.fnamemodify(filepath, ":h")
-              local extra_opts = node.type == "file" and { "-d=1" } or {}
-              require("telescope.builtin").find_files({ cwd = cwdPath, opts = extra_opts })
+              local opts = get_opts_for_files_and_grep(state, "file")
+              require("telescope.builtin").find_files({ cwd = opts.cwdPath })
             end,
             telescope_cd = function(state)
               local node = state.tree:get_node()
@@ -265,8 +298,12 @@ return {
                 ["<space>"] = "none",
                 ["<Esc>"] = "clear_filter",
                 ["/"] = "none",
-                ["f"] = "fuzzy_finder",
-                ["F"] = "filter_on_submit",
+                ["f"] = "none",
+                ["ff"] = "fuzzy_finder",
+                ["fF"] = "filter_on_submit",
+                -- ["F"] = "filter_on_submit",
+                ["Ff"] = "fzf_find_files",
+                ["Fg"] = "fzf_grep",
                 ["<tab>"] = "toggle_node",
 
                 ["Y"] = {

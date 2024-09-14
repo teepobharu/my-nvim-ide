@@ -328,6 +328,7 @@ set_opfunc = vim.fn[vim.api.nvim_exec(
 -- disabled in keymaps.lua (original)
 vim.api.nvim_del_keymap("i", "<A-j>")
 vim.api.nvim_del_keymap("i", "<A-k>")
+vim.api.nvim_del_keymap("n", "<C-c>")
 -- OVERRIDE MAP ==========================
 keymap("n", "zj", "zj")
 keymap("n", "zk", "zk")

@@ -18,7 +18,9 @@ keymap("n", "<leader>ll", "<cmd>Lazy<CR>", { desc = "Lazy" })
 keymap("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move Down", silent = true })
 keymap("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move Up", silent = true })
 keymap("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down", silent = true })
-keymap("i", "<A-/>", "<esc>mt<cmd>normal gcc<cr>`tji", { desc = "Comment current line" })
+opts.desc = "Comment Line"
+keymap("i", "<A-/>", "<esc>mt<cmd>normal gcc<cr>`tji", opts)
+-- keymap("v", "A-/", "gc", opts) -- v mode not work
 keymap("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up", silent = true })
 keymap("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move Down", silent = true })
 keymap("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move Up", silent = true })
@@ -145,7 +147,6 @@ keymap("n", "<Right>", "<cmd>vertical resize +3<CR>", opts)
 -- use <l>bd instead
 opts.desc = "Close buffer"
 keymap("n", "<leader>bd", ":b#|bd#<CR>", opts)
-opts.desc = nil
 -- map("n", "<leader>wX", ":bd!<CR>", { desc = "Force close buffer" })
 
 local function toggle_fold_or_clear_highlight()
@@ -158,7 +159,38 @@ end
 keymap("n", "<Esc>", toggle_fold_or_clear_highlight, { expr = true, silent = true, noremap = true })
 -- Terminal & Commands
 -- ============================
+opts.desc = "Toggle Normal"
 keymap("t", "<C-q>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
+opts.desc = nil
+
+function _G.set_toggleterm_keymaps()
+  -- run on all terminal buffers
+  -- https://github.com/akinsho/toggleterm.nvim?tab=readme-ov-file#terminal-window-mappings
+  local opts = opts
+  opts.buffer = 0
+  local ft = vim.bo.filetype -- toggleterm
+  local is_toggleterm = ft == "toggleterm"
+  local buffername = vim.fn.expand("%:t")
+  if string.find(buffername, "lazygit") then
+    print("Lazygit buffer")
+  else
+    opts.desc = "Toggle Terminal (press with <n> to toggle/open other term)"
+    vim.keymap.set("n", "<C-t>", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
+    vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
+  end
+  -- what about buffername ?
+  -- if not lazygit then do mapping
+  -- resize
+  opts.desc = "Resize" -- not working
+  -- vim.keymap.set("t", "Up", [[<C-\><C-n>:resize -3<CR>]], opts)
+  -- vim.keymap.set("t", "Down", [[:resize +3<CR>]], opts)
+  -- vim.keymap.set("t", "<C-Left>", [[<C-\><C-n>:vertical resize -3<CR>]], opts)
+  -- vim.keymap.set("t", "<C-Right>", [[<C-\><C-n>:vertical resize +3<CR>]], opts)
+  -- vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
+  -- vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
+end
+-- if you only want these mappings for toggle term use term://*toggleterm#* instead
+vim.cmd("autocmd! TermOpen term://* lua set_toggleterm_keymaps()")
 keymap("n", ";", ":", { desc = "CMD enter command mode" })
 vim.api.nvim_create_user_command("OpenTerminalInSplitWithCwd", function()
   local cwd = vim.fn.expand("%:p:h")
@@ -249,11 +281,27 @@ keymap("n", "<localleader>cn", ':let @+=expand("%:t")<CR>', { desc = "Copy basef
 keymap("n", "<localleader>cf", ":let @+=@%<CR>", { desc = "Copy relative filepath name" })
 -- copy absolute filepath - use neotree (no relative file)
 keymap("n", "<localleader>cF", ':let @+=expand("%:p")<CR>', { desc = "Copy absolute filepath" })
-
-keymap("n", "<localleader>rp", addVenvPyrightConfig, { desc = "Reload Lua file" })
--- files
+-- lsp / files
+keymap("n", "<localleader>rp", "", { desc = "Profile & Python" })
+keymap("n", "<localleader>rpp", addVenvPyrightConfig, { desc = "Python Setup pyright config " })
 keymap("n", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })
 keymap("v", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })
+keymap("n", "<localleader>rps", function()
+  vim.cmd([[
+		:profile start /tmp/nvim-profile.log
+		:profile func *
+		:profile file *
+	]])
+end, { desc = "Profile Start" })
+
+keymap("n", "<localleader>rpe", function()
+  vim.cmd([[
+		:profile stop
+		:e /tmp/nvim-profile.log
+	]])
+end, { desc = "Profile End" })
+
+--profile
 
 -- ===========================
 -- Custom commands ====================

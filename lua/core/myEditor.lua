@@ -75,7 +75,56 @@ return {
     },
   },
   {
+    "stevearc/overseer.nvim",
+    -- tutorials : https://github.com/stevearc/overseer.nvim/blob/master/doc/tutorials.md#run-a-file-on-save
+    -- support on vscode tasks ?
+    opts = {
+      -- default config: https://github.com/stevearc/overseer.nvim/blob/a2734d90c514eea27c4759c9f502adbcdfbce485/lua/overseer/config.lua#L4
+      strategy = {
+        "terminal",
+        -- "toggleterm", -- https://github.com/stevearc/overseer.nvim/blob/master/doc/third_party.md#toggleterm
+        use_shell = true,
+      },
+      task_list = {
+        bindings = {
+          ["<C-q>"] = ":q<CR>",
+          ["<C-s>"] = ":OverseerQuickAction<CR>",
+          ["S"] = ":OverseerSaveBundle<CR>",
+          ["T"] = ":OverseerTaskAction<CR>",
+          ["Q"] = ":OverseerDeleteBundle<CR>",
+          ["C"] = ":OverseerClearCache<CR>",
+          ["I"] = ":OverseerInfo<CR>",
+          ["B"] = ":OverseerLoadBundle<CR>",
+
+          ["<S-Up>"] = "ScrollOutputUp",
+          ["<S-Down>"] = "ScrollOutputDown",
+          ["<A-q>"] = "OpenQuickFix",
+          -- ["<C-l>"] = "",
+          -- ["<C-h>"] = "",
+          ["<C-l>"] = false,
+          ["<C-h>"] = false,
+          -- c-j and c-k remove bind
+          ["<C-j>"] = false,
+          ["<C-k>"] = false,
+          ["J"] = "DecreaseDetail",
+          ["L"] = "IncreaseDetail",
+          -- ["K"] = "IncreaseAllDetail",
+          -- ["L"] = "",
+          -- ["H"] = "",
+          -- ["zk"] = "DecreaseDetail",
+          -- ["zj"] = "IncreaseDetail",
+          -- ["zl"] = "IncreaseAllDetail",
+          -- ["zh"] = "DecreaseAllDetail",
+        },
+      },
+    },
+  },
+  {
     "akinsho/toggleterm.nvim",
+    opts = {
+      persist_size = false,
+      persist_mode = false,
+    },
     keys = {
       {
         "<c-_>",

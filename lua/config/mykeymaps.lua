@@ -247,6 +247,46 @@ opts.desc = nil
 -- ===============================================
 -- LOCALLEADER ==========================
 -- ===============================================
+local function addNvimConfigInRoot()
+  local pathUtil = require("utils.path")
+  local git_dir = pathUtil.get_git_root() or vim.fn.getcwd()
+  local nvim_config = git_dir .. "/.nvim-config.lua"
+  if vim.fn.filereadable(nvim_config) == 1 then
+    vim.notify(nvim_config .. "already exists", vim.log.levels.WARN)
+    vim.cmd("edit " .. nvim_config)
+    return
+  end
+
+  local config = [[
+-- Project specifc (not tracked original by git - followed by readme 22 Sep 2024)
+-- This is example of .nvim-config.lua can be put in any project folders
+-- Enable extra plugins for this project
+-- vim.g.enable_plugins = {
+--  wakatime = "no",
+--  ["no-neck-pain"] = "yes"
+--  }
+--  vim.g.enable_langs = {
+--  python = "no",
+--  }
+--  ... Please edit the DEFAULT settings below ...
+]]
+  -- append nvim base config content to the file $DOTFILES/$NVIM_DIR/$NVIM_CONFIG
+  local nvim_base_config = vim.fn.stdpath("config") .. "/lua/config/mydefault-nvim-config.lua"
+  if vim.fn.filereadable(nvim_base_config) == 1 then
+    local base_config = vim.fn.readfile(nvim_base_config)
+    for _, line in ipairs(base_config) do
+      config = config .. line .. "\n"
+    end
+  end
+
+  local config_lines = vim.split(config, "\n")
+  vim.fn.writefile(config_lines, nvim_config)
+
+  -- open that file in new window
+  vim.cmd("edit " .. nvim_config)
+  vim.notify("nvim-config.lua created at: " .. nvim_config, vim.log.levels.INFO)
+end
+
 local function addVenvPyrightConfig()
   local pathUtil = require("utils.path")
   local git_dir = pathUtil.get_git_root() or vim.fn.getcwd()
@@ -269,7 +309,7 @@ local function addVenvPyrightConfig()
     end
   end
 
-  configStr = vim.fn.json_encode(config)
+  local configStr = vim.fn.json_encode(config)
   vim.fn.writefile({ configStr }, pyrightconfig)
 end
 --   # which key migrate .nvim $HOME/.config/nvim/keys/which-key.vim
@@ -282,8 +322,10 @@ keymap("n", "<localleader>cf", ":let @+=@%<CR>", { desc = "Copy relative filepat
 -- copy absolute filepath - use neotree (no relative file)
 keymap("n", "<localleader>cF", ':let @+=expand("%:p")<CR>', { desc = "Copy absolute filepath" })
 -- lsp / files
-keymap("n", "<localleader>rp", "", { desc = "Profile & Python" })
-keymap("n", "<localleader>rpp", addVenvPyrightConfig, { desc = "Python Setup pyright config " })
+keymap("n", "<localleader>rs", "", { desc = "Setup" })
+keymap("n", "<localleader>rsp", addVenvPyrightConfig, { desc = "Python Setup pyright config " })
+keymap("n", "<localleader>rsn", addNvimConfigInRoot, { desc = "Setup nvim proj lang & plugin config" })
+keymap("n", "<localleader>rp", "", { desc = "Profile" })
 keymap("n", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })
 keymap("v", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })
 keymap("n", "<localleader>rps", function()

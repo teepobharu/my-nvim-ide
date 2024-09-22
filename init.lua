@@ -25,6 +25,8 @@ end
 -- for detecting the LSP root
 vim.g.root_lsp_ignore = { "copilot" }
 
+-- MY CUSTOM: Load default-nvim-config.lua into vim.g.enable_plugins
+require("config.mydefault-nvim-config")
 -- Load project setting if available, e.g: .nvim-config.lua
 -- This file is not tracked by git
 -- It can be used to set project specific settings
@@ -71,7 +73,6 @@ local spec = {
   { import = "plugins" },
   { import = "langs" },
   { import = "core.myEditor" },
-  { import = "plugins.extras.myOverride" },
 }
 
 -- Enable extra plugins and languages

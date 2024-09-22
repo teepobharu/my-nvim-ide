@@ -2,6 +2,18 @@ local opts = { noremap = true, silent = true }
 local keymap = vim.keymap.set
 
 local test = require("gitsigns.test")
+
+local function stringTest()
+  local somebuffername = "term://lazygit/1"
+  print(somebuffername)
+  local ismatchlzg1 = string.match(somebuffername, ".*(lazygit)/1$")
+  print([==[stringTest ismatchlzg1:]==], vim.inspect(ismatchlzg1)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  print([==[str find]==], string.find(somebuffername, "lazygit"))
+  print([==[str findnone]==], string.find(somebuffername, "zxc"))
+  is_lazygit = string.match(somebuffername, "lazygit")
+  print([==[stringTest is_lazygit:]==], vim.inspect(is_lazygit)) -- __AUTO_GENERATED_PRINT_VAR_END__
+end
+
 local function printVariables()
   local n = { 1, 2 }
   print([==[ n:]==], vim.inspect(n))
@@ -273,9 +285,17 @@ function getArrListConfig()
   -- vim.g.copilot_proxy = "http://localhost:11435"
   -- vim.g.copilot_proxy_strict_ssl = false
 end
+
+function filesys()
+  local f = vim.fn.tempname()
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[ f:]==], vim.inspect(f)) -- __AUTO_GENERATED_PRINT_VAR_END__
+end
 local function main()
-  getArrListConfig()
+  filesys()
+  -- getArrListConfig()
   if false then
+    stringTest()
     printVariables()
     checkPyVenv()
     getGitList()

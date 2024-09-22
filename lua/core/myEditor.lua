@@ -1,3 +1,4 @@
+local mapping_key_prefix = vim.g.ai_prefix_key or "<leader>A" -- orginal from codecompanion.lua
 function sentSelectedToTerminal()
   local mode = vim.fn.mode()
   if mode == "V" then
@@ -50,8 +51,10 @@ local isToggleCurrentLazyTerm = function(name, termOpts)
     lazygitTerm.term:toggle()
   end
 end
-
 return {
+  -- Disabled list
+  { "nvimdev/dashboard-nvim", lazy = true, enabled = false },
+  { "Wansmer/treesj", enabled = false },
   -- folke/edgy.nvim:  https://github.com/LazyVim/LazyVim/blob/1f8469a53c9c878d52932818533ce51c27ded5b6/lua/lazyvim/plugins/extras/ui/edgy.lua#L97
   -- { "ibhagwan/fzf-lua", enabled = false },
   {
@@ -234,6 +237,53 @@ return {
         "<C-q>",
         false,
       },
+    },
+  },
+  {
+    "olimorris/codecompanion.nvim",
+    keys = {
+      {
+        mapping_key_prefix .. "A",
+        "<cmd>CodeCompanionAdd<cr>",
+        desc = "Code Companion add selected",
+        mode = "v",
+      },
+    },
+    adapters = {
+      llama3 = function()
+        return require("codecompanion.adapters").extend("ollama", {
+          name = "llama3", -- Give this adapter a different name to differentiate it from the default ollama adapter
+          schema = {
+            model = {
+              default = "llama3:latest",
+            },
+            num_ctx = {
+              default = 16384,
+            },
+            num_predict = {
+              default = -1,
+            },
+          },
+        })
+      end,
+
+      -- https://github.com/olimorris/codecompanion.nvim/blob/main/lua/codecompanion/adapters/ollama.lua
+      llama3latest = function()
+        return require("codecompanion.adapters").extend("ollama", {
+          name = "llama3latest", -- Give this adapter a different name to differentiate it from the default ollama adapter
+          schema = {
+            model = {
+              default = "llama3:latest",
+            },
+            num_ctx = {
+              default = 16384,
+            },
+            num_predict = {
+              default = -1,
+            },
+          },
+        })
+      end,
     },
   },
   {

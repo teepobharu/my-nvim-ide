@@ -1,5 +1,9 @@
 # Notes
 
+## Todo
+
+- [ ] Move common mappings outside and import before loading plugins (will help get base mappings before something might fail + extend to vanilla vim)
+
 # Migrations
 
 ## TO Patch
@@ -20,5 +24,21 @@ Some interesting changes
 
 Features
 
-- _cp / _cr (select) = open code pad (not work with lua - vim and require)
+- \_cp / \_cr (select) = open code pad (not work with lua - vim and require)
 
+2024 ...
+
+- disabled some plugins with disabled
+- add custom script to add buffers and editable in copiot-chat
+
+2024 Sep 22
+
+- New Plugin
+  - codecompanion - leader A
+    - inline : ga gr
+    - chat : ga (change model ollama worked with model selection default)
+    - tools : execute in docker and auto resilent msg auto prompt fill
+    - https://github.com/olimorris/codecompanion.nvim/blob/e7d931ae027f9fdca2bd7c53aa0a8d3f8d620256/doc/AGENTS.md
+- Consolidated custom override into one file
+- Added custom override project level and setup create keymap using ,rsn keymap
+- Extras is disabled by default and

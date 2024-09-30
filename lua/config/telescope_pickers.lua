@@ -21,6 +21,8 @@ M.telescope.getPickers = function(opts)
     -- find to format output as filename only not the full path
     --p[[:alnum:]_].*find $(pwd) -name '
     --for more format see man re_format
+    -- [ ] enhance: add grep cd and "badd" in ~/.config/nvim/session  to see which files and base dir is used
+
     for file in
       io.popen(
         "find " .. session_dir .. ' -maxdepth 1 -type f -name "[[:alpha:][:digit:]][[:alnum:]_]*" -exec basename {} +'
@@ -164,10 +166,23 @@ M.telescope.getPickers = function(opts)
     end
 
     -- print(get_branch_url("master"))
-
-    local function open_branch_url(prompt_bufnr)
+    local function diff_ref(prompt_bufnr)
       local selection = action_state.get_selected_entry()
       local branch = selection.value
+      -- __AUTO_GENERATED_PRINT_VAR_START__
+      -- open new tab with command Gitsigns diffthis <ref> on file_path
+      vim.cmd("tabnew")
+      vim.cmd("edit " .. file_path)
+      vim.cmd("Gitsigns diffthis " .. branch)
+      print([==[function#function#diff_ref branch:]==], vim.inspect(branch)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    end
+    local function open_branch_url(prompt_bufnr)
+      local selection = action_state.get_selected_entry()
+
+      local branch = selection.value
+      -- replace up until first / with empty string
+      branch = branch:gsub("^[^/]+/", "")
+      -- origin/main => change to main
       local url = get_branch_url(branch)
 
       vim.fn.setreg("+", url)
@@ -192,7 +207,9 @@ M.telescope.getPickers = function(opts)
 
     local function get_remote_branches_name()
       local results = {}
-      local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||; s|^[^/]+/||' | uniq")
+      -- local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||; s|^[^/]+/||' | uniq") -- main
+      local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||' | uniq") -- origin/main
+
       for branch in remote_branches:gmatch("[^\r\n]+") do
         table.insert(results, { value = branch })
       end
@@ -218,6 +235,10 @@ M.telescope.getPickers = function(opts)
         attach_mappings = function(prompt_bufnr, map)
           actions.select_default:replace(function()
             open_branch_url(prompt_bufnr)
+          end)
+          -- add mapping to open current file buffer with gitsign diffthis <ref> commands
+          map("i", "<C-s>", function()
+            diff_ref(prompt_bufnr)
           end)
           map("i", "<CR>", function()
             open_branch_url(prompt_bufnr)

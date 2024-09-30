@@ -296,7 +296,7 @@ return {
       },
     },
     opts = {
-      debug = true, -- add to debug message by calling l-a-d and  see in file using <gf> or check :messages in the logfile name else see only error (not prompt and embedding used)
+      -- debug = true, -- add to debug message by calling l-a-d and  see in file using <gf> or check :messages in the logfile name else see only error (not prompt and embedding used)
       mappings = {
         complete = {
           detail = "Use @<C-Tab> or /<C-Tab> to complete the suggestion.",

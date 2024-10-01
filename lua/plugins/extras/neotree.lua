@@ -259,17 +259,21 @@ return {
               vim.notify("Copied: " .. filepath)
             end,
             telescope_livegrep_cwd = function(state)
-              local opts = get_opts_for_files_and_grep(state)
+              local opts = get_opts_for_files_and_grep(state, "file")
+              -- __AUTO_GENERATED_PRINT_VAR_START__
+              print([==[function#function opts:]==], vim.inspect(opts)) -- __AUTO_GENERATED_PRINT_VAR_END__
               -- fzf grep not work in live grep : https://www.reddit.com/r/neovim/comments/r74647/comment/hmx7i68/?utm_source=share&utm_medium=web2x&context=3
-              require("telescope.builtin").grep_string({ cwd = opts.cwdPath, additional_args = opts.extra_opts })
+              require("telescope.builtin").live_grep({ cwd = opts.cwdPath, additional_args = opts.extra_opts })
             end,
             fzf_grep = function(state)
-              local opts = get_opts_for_files_and_grep(state)
+              local opts = get_opts_for_files_and_grep(state, "file")
               -- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/providers/grep.lua
-              require("fzf-lua").grep({
+              -- print([==[function#function opts.cwdPath:]==], vim.inspect(opts)) -- __AUTO_GENERATED_PRINT_VAR_END__
+              -- local search_paths =
+              --   { opts.current_file_dir }, print([==[function#function search_paths:]==], vim.inspect(search_paths)) -- __AUTO_GENERATED_PRINT_VAR_END__
+              require("fzf-lua").live_grep({
                 cwd = opts.cwdPath,
-                search_paths = { opts.current_file_dir },
-                rg_opts = opts.extra_opts_list,
+                -- rg_opts = opts.extra_opts_list,
               })
             end,
             fzf_find_files = function(state)

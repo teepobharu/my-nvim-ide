@@ -175,7 +175,21 @@ return {
         "<cmd>:ToggleTerm direction=vertical<cr>",
         desc = "Toggle term vertical",
       },
-
+      {
+        "<localleader>t2",
+        "<cmd>:2ToggleTerm<cr>",
+        desc = "Find Terminal",
+      },
+      {
+        "<localleader>tr",
+        "<cmd>:ToggleTermSetName<cr>",
+        desc = "Set Terminal Name",
+      },
+      {
+        "<localleader>ts",
+        "<cmd>:TermSelect<cr>",
+        desc = "Find Term",
+      },
       {
         "<localleader>gl",
         function()

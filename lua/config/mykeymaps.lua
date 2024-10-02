@@ -163,6 +163,47 @@ opts.desc = "Toggle Normal"
 keymap("t", "<C-q>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
 opts.desc = nil
 
+function _G.cycle_term_buffers()
+  local term_buffers = {}
+  print([==[_G.cycle_term_buffers term_buffers:]==], vim.inspect(term_buffers)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    local ft = vim.bo[buf].filetype -- toggleterm
+    -- local buf_name = vim.api.nvim_buf_get_name(buf) -- bufname can change when rename buff
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    -- print([==[for ft:]==], "bufno=" .. buf .. "ft" .. vim.inspect(ft)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    local is_toggleterm = ft == "toggleterm"
+    if is_toggleterm then
+      -- __AUTO_GENERATED_PRINT_VAR_START__
+      table.insert(term_buffers, buf)
+      -- print([==[_G.cycle_term_buffers#for#if is_toggleterm:]==], buf_name)
+    end
+    -- if buf_name:match("term://.*toggleterm#.*") then
+    --   table.insert(term_buffers, buf)
+    -- end
+  end
+
+  if #term_buffers == 0 then
+    print("No terminal buffers found")
+    return
+  end
+
+  local current_buf = vim.api.nvim_get_current_buf()
+  local next_buf = nil
+
+  for i, buf in ipairs(term_buffers) do
+    if buf == current_buf then
+      next_buf = term_buffers[(i % #term_buffers) + 1]
+      break
+    end
+  end
+
+  if not next_buf then
+    next_buf = term_buffers[1]
+  end
+
+  vim.api.nvim_set_current_buf(next_buf)
+end
+
 function _G.set_toggleterm_keymaps()
   -- run on all terminal buffers
   -- https://github.com/akinsho/toggleterm.nvim?tab=readme-ov-file#terminal-window-mappings
@@ -174,8 +215,21 @@ function _G.set_toggleterm_keymaps()
   if string.find(buffername, "lazygit") then
     print("Lazygit buffer")
   else
-    opts.desc = "Toggle Terminal (press with <n> to toggle/open other term)"
+    opts.desc = "Toggle Term <n> (press with <n> to toggle/open other term)"
     vim.keymap.set("n", "<C-t>", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
+    vim.keymap.set(
+      "n",
+      "<c-e>",
+      ":lua cycle_term_buffers()<CR>",
+      { buffer = 0, desc = "Cycle term buffer", noremap = true, silent = true }
+    )
+    vim.keymap.set("n", "<localleader>tt", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
+    opts.desc = "Toggle Term 2 toggle"
+    -- cycle through all terminal buffers
+    -- J and K to move between all buffers next and rpev
+    vim.keymap.set("n", "J", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
+    --
+    opts.desc = "Enter normal mode"
     vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
   end
   -- what about buffername ?

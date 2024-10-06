@@ -1,6 +1,6 @@
 local opts = { noremap = true, silent = true }
 local keymap = vim.keymap.set
-
+local pathUtils = require("utils.path")
 local test = require("gitsigns.test")
 
 local function stringTest()
@@ -291,8 +291,87 @@ function filesys()
   -- __AUTO_GENERATED_PRINT_VAR_START__
   print([==[ f:]==], vim.inspect(f)) -- __AUTO_GENERATED_PRINT_VAR_END__
 end
+
+function executables()
+  local ppath = vim.fn.exepath("python3")
+  local ppath = vim.fn.exepath("python")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[main ppath:]==], vim.inspect(ppath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  get_pythonpath()
+end
+
+function get_pythonpath()
+  -- check if pyrightconfig.json exists if yes proceed to get path from there else use pipenv --py to get other path else use default
+  --
+  -- find upward but do not exceed root project dir
+  -- check if pyrightconfig.json exists
+  -- if yes read venvPath and venv from there
+  local root_dir = pathUtils.get_root_directory()
+  local pyrightconfig = root_dir .. "/pyrightconfig.json"
+  print([==[M.get_pythonpath pyrightconfig:]==], vim.inspect(pyrightconfig))
+  if vim.fn.filereadable(pyrightconfig) == 1 then
+    local config_content = vim.fn.readfile(pyrightconfig)
+    local config = vim.fn.json_decode(table.concat(config_content, "\n"))
+
+    if config == nil then
+      print("config is nil")
+    else
+      local venvPath = config.venvPath
+      local venv = config.venv
+      local test = config.asda
+      print([==[get_pythonpath#if config.venvPath:]==], vim.inspect(config)) -- __AUTO_GENERATED_PRINT_VAR_END__
+      -- error if path not found
+      if venvPath == nil or vim.fn.empty(venvPath) == 1 then
+        vim.notify("pyrightconfig exist but venvPath not found", vim.log.levels.ERROR)
+      else
+        local venvPath = string.gsub(venvPath, root_dir, "")
+        -- Remove front / back slash if it exists
+        if string.sub(venvPath, 1, 1) == "/" then
+          venvPath = string.sub(venvPath, 2)
+        end
+        if string.sub(venvPath, -1) == "/" then
+          venvPath = string.sub(venvPath, 1, -2)
+        end
+        -- print("using from config: " .. root_dir .. "/" .. venvPath .. "/" .. "/bin/python")
+        local pythonPath = root_dir .. "/" .. venvPath .. "/" .. "/bin/python"
+        if vim.fn.filereadable(pythonPath) == 1 then
+          -- print("pythonPath exists")
+          return root_dir .. "/" .. venvPath .. "/" .. "/bin/python"
+          -- print("pythonPath not exists")
+        end
+      end
+    end
+  end
+
+  local python_path = vim.fn.systemlist("pipenv --py")[1]
+  if vim.v.shell_error == 0 then
+    print([==[get_pythonpath python_path (pipenv --py):]==], vim.inspect(python_path)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    return python_path
+  else
+    local python = vim.fn.exepath("python")
+    print("==get_pythonpath using default python exe == :", python)
+    return python
+  end
+end
+
+function errorHandling()
+  local ok, result = pcall(function()
+    -- read non existing json decode
+    local config = vim.fn.readfile("nonexisting.json")
+    local decoded = vim.fn.json_decode(table.concat(config, "\n"))
+    -- error("error")
+  end)
+  if not ok then
+    print("error ==")
+    vim.notify(result, vim.log.levels.ERROR)
+  end
+end
+
 local function main()
-  filesys()
+  get_pythonpath()
+  -- errorHandling()
+  -- executables()
+  -- filesys()
   -- getArrListConfig()
   if false then
     stringTest()

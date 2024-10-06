@@ -368,7 +368,7 @@ return {
       },
       {
         "<localleader>go",
-        telescopePickers.telescope.getPickers({}).open_git_pickers,
+        telescopePickers.telescope.getPickers({}).git_branch_remote_n_diff_picker,
         desc = "Open Git Pickers",
       },
       {

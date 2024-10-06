@@ -165,7 +165,6 @@ opts.desc = nil
 
 function _G.cycle_term_buffers()
   local term_buffers = {}
-  print([==[_G.cycle_term_buffers term_buffers:]==], vim.inspect(term_buffers)) -- __AUTO_GENERATED_PRINT_VAR_END__
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     local ft = vim.bo[buf].filetype -- toggleterm
     -- local buf_name = vim.api.nvim_buf_get_name(buf) -- bufname can change when rename buff
@@ -217,6 +216,7 @@ function _G.set_toggleterm_keymaps()
   else
     opts.desc = "Toggle Term <n> (press with <n> to toggle/open other term)"
     vim.keymap.set("n", "<C-t>", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
+    vim.keymap.set("n", "<C-q>", [[<Cmd>ToggleTerm<CR>]], opts)
     vim.keymap.set(
       "n",
       "<c-e>",
@@ -396,6 +396,11 @@ keymap("n", "<localleader>rpe", function()
 		:e /tmp/nvim-profile.log
 	]])
 end, { desc = "Profile End" })
+
+opts.desc = "Git branch FZF"
+keymap("n", "<localleader>gO", function()
+  require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
+end, opts)
 
 --profile
 

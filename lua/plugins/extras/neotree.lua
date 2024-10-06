@@ -223,25 +223,28 @@ return {
                 modify(filename, ":e"),
               }
 
-              vim.ui.select({
-                "1. Absolute path: " .. results[1],
-                "2. Path relative to CWD: " .. results[2],
-                "3. Path relative to HOME: " .. results[3],
-                "4. Filename: " .. results[4],
-                "5. Filename without extension: " .. results[5],
-                "6. Extension of the filename: " .. results[6],
-              }, { prompt = "Choose to copy to clipboard:" }, function(choice)
+              local options = {}
+              table.insert(options, string.format("1 Path full   : %s", results[1]))
+              table.insert(options, string.format("2 Path rel    : %s", results[2]))
+              table.insert(options, string.format("3 Path ~      : %s", results[3]))
+
+              if node.type == "file" then
+                table.insert(options, string.format("4 File        : %s", results[4]))
+                table.insert(options, string.format("5 File no ext : %s", results[5]))
+              end
+
+              vim.ui.select(options, { prompt = "Choose to copy to clipboard:" }, function(choice)
                 if choice then
                   local i = tonumber(choice:sub(1, 1))
                   if i then
                     local result = results[i]
-                    vim.fn.setreg('"', result)
+                    vim.fn.setreg("+", result)
                     vim.notify("Copied: " .. result .. " to vim clipboard")
                   else
                     vim.notify("Invalid selection")
                   end
                 else
-                  vim.fn.setreg('"', results[4])
+                  vim.fn.setreg("+", results[4])
                   vim.notify("Copied: " .. results[4] .. " to vim clipbard by default")
                 end
               end)

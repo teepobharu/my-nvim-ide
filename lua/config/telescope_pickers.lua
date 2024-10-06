@@ -2,6 +2,96 @@ local M = {}
 local gitUtil = require("utils.git")
 M.telescope = {}
 
+local get_git_pickers_fn = function()
+  local file_path = vim.fn.expand("%:p")
+
+  local function get_git_root()
+    local git_root = vim.fn.system("git rev-parse --show-toplevel"):gsub("\n", "")
+    return git_root
+  end
+
+  local function get_branch_url(branch)
+    local function remove_remote_prefix(ref)
+      local sanitized_ref = ref:gsub("^%s*(.-)%s*$", "%1")
+      sanitized_ref = sanitized_ref:gsub(" ", "")
+      sanitized_ref = sanitized_ref:gsub("^[*|+]", "")
+      sanitized_ref = sanitized_ref:gsub("^remotes/[%w%p]+/", "")
+      return sanitized_ref
+    end
+
+    local sanitized_branch = remove_remote_prefix(branch)
+    local remote_path = gitUtil.get_remote_path()
+    local line_number = vim.fn.line(".")
+    local git_file_path = file_path:gsub(get_git_root() .. "/", "")
+    local url_pattern = "https://%s/blob/%s/%s#L%d"
+
+    if git_file_path == "" or git_file_path:gsub(" ", "") == "" then
+      return remote_path
+    end
+
+    return string.format(url_pattern, remote_path, sanitized_branch, git_file_path, line_number)
+  end
+
+  local function diff_ref(branch)
+    vim.cmd("tabnew")
+    vim.cmd("edit " .. file_path)
+    vim.cmd("Gitsigns diffthis " .. branch)
+  end
+
+  local function open_branch_url(branch)
+    branch = branch:gsub("^[^/]+/", "")
+    local url = get_branch_url(branch)
+    vim.fn.setreg("+", url)
+    vim.fn.jobstart({ "open", url }, { detach = true })
+    require("lazy.util").open(url)
+  end
+
+  local function get_remote_branches_name()
+    local results = {}
+    local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||' | uniq")
+
+    for branch in remote_branches:gmatch("[^\r\n]+") do
+      table.insert(results, { value = branch })
+    end
+    return results
+  end
+  return {
+    get_remote_branches_name = get_remote_branches_name,
+    get_branch_url = get_branch_url,
+    diff_ref = diff_ref,
+    open_branch_url = open_branch_url,
+  }
+end
+
+M.fzf = {}
+M.fzf.pickers = {}
+M.fzf.pickers.open_git_pickers_telescope = function()
+  print("FZF PICKERS OPEN GIT PICKERS")
+  local fn_list = get_git_pickers_fn()
+  local fzf_lua = require("fzf-lua")
+  local results = fn_list.get_remote_branches_name()
+  -- transform { value = "x.."} => { "x", }
+  results = vim.tbl_map(function(v)
+    return v.value
+  end, results)
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[function results:]==], vim.inspect(results)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  fzf_lua.fzf_exec(results, {
+    prompt = "Open Branch URL (c-s to diff, c-y to copy url) >",
+    actions = {
+      ["default"] = function(selected)
+        fn_list.open_branch_url(selected[1])
+      end,
+      ["ctrl-s"] = function(selected)
+        fn_list.diff_ref(selected[1])
+      end,
+      ["ctrl-y"] = function(selected)
+        vim.fn.setreg("+", fn_list.get_branch_url(selected[1]))
+      end,
+    },
+  })
+end
+
 M.telescope.getPickers = function(opts)
   local conf = require("telescope.config").values
   local finders = require("telescope.finders")
@@ -119,106 +209,15 @@ M.telescope.getPickers = function(opts)
     -- }
   end
 
-  local open_git_pickers = function()
-    local file_path = vim.fn.expand("%:p")
-
-    local function get_git_root()
-      local git_root = vim.fn.system("git rev-parse --show-toplevel"):gsub("\n", "")
-      return git_root
-    end
-
-    local function get_branch_url(branch)
-      -- local sanitized_branch = branch:gsub("^%s*(.-)%s*$", "")
-      local function remove_remote_prefix(ref)
-        local sanitized_ref = ref:gsub("^%s*(.-)%s*$", "%1")
-        -- # HEAD -> origin/HEAD
-        -- # remotes/origin/branch
-
-        -- Remove the first asterisk or + (if present)
-        -- trim space
-        sanitized_ref = sanitized_ref:gsub(" ", "")
-        santized_ref = sanitized_ref:gsub("^[*|+]", "")
-        sanitized_ref = sanitized_ref:gsub("^remotes/[%w%p]+/", "")
-        -- Remove leading/trailing whitespace
-        -- remote_path needs to remove prefix remotes/<any remote name>/
-        return sanitized_ref
-      end
-
-      local sanitized_branch = remove_remote_prefix(branch)
-      -- __AUTO_GENERATED_PRINT_VAR_START__
-      print([==[function#function#get_branch_url sanitized_branch:]==], vim.inspect(sanitized_branch)) -- __AUTO_GENERATED_PRINT_VAR_END__
-      -- local ssh="git@github.com:teepobharu/mynotes.git"
-      -- local http="https://github.com/teepobharu/mynotes.git"
-      -- result should not contain ssh part and .git suffix and colon for ssh and http case
-      local remote_path = gitUtil.get_remote_path()
-      -- __AUTO_GENERATED_PRINT_VAR_START__
-      print([==[function#function#get_branch_url remote_path:]==], vim.inspect(remote_path)) -- __AUTO_GENERATED_PRINT_VAR_END__
-      -- remote_path needs to remove prefix remotes/<any remote name>/
-      local line_number = vim.fn.line(".")
-      local git_file_path = file_path:gsub(get_git_root() .. "/", "")
-      local url_pattern = "https://%s/blob/%s/%s#L%d"
-      -- if findpath empty
-      if git_file_path == "" or git_file_path:gsub(" ", "") == "" then
-        -- return just the repo
-        return remote_path
-      end
-      return string.format(url_pattern, remote_path, sanitized_branch, git_file_path, line_number)
-    end
-
-    -- print(get_branch_url("master"))
-    local function diff_ref(prompt_bufnr)
-      local selection = action_state.get_selected_entry()
-      local branch = selection.value
-      -- __AUTO_GENERATED_PRINT_VAR_START__
-      -- open new tab with command Gitsigns diffthis <ref> on file_path
-      vim.cmd("tabnew")
-      vim.cmd("edit " .. file_path)
-      vim.cmd("Gitsigns diffthis " .. branch)
-      print([==[function#function#diff_ref branch:]==], vim.inspect(branch)) -- __AUTO_GENERATED_PRINT_VAR_END__
-    end
-    local function open_branch_url(prompt_bufnr)
-      local selection = action_state.get_selected_entry()
-
-      local branch = selection.value
-      -- replace up until first / with empty string
-      branch = branch:gsub("^[^/]+/", "")
-      -- origin/main => change to main
-      local url = get_branch_url(branch)
-
-      vim.fn.setreg("+", url)
-
-      local open_command = "open"
-
-      -- vim.fn.jobstart({ "tmux", "run-shell", "-b", "-c", "open " .. url }, { detach = true })
-      -- not work in tmux not sure why
-      vim.fn.jobstart({ open_command, url }, { detach = true }) -- not work in tmux
-
-      require("lazy.util").open(url)
-      -- vim.cmd("silent !open " .. url)
-    end
-
-    local default_branch = gitUtil.git_main_branch()
-    print(default_branch)
-
-    vim.fn.setreg("+", get_branch_url(default_branch))
-
-    -- TODO: only get remote branches, trim * and whitespace, remove remotes/origin/ prefix
-    -- use this in neotree and normal shortcut in current buffer as well
-
-    local function get_remote_branches_name()
-      local results = {}
-      -- local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||; s|^[^/]+/||' | uniq") -- main
-      local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||' | uniq") -- origin/main
-
-      for branch in remote_branches:gmatch("[^\r\n]+") do
-        table.insert(results, { value = branch })
-      end
-      return results
-    end
-
+  local git_branch_remote_n_diff_picker = function()
+    local fn_list = get_git_pickers_fn()
+    local get_remote_branches_name = fn_list.get_remote_branches_name
+    local get_branch_url = fn_list.get_branch_url
+    local diff_ref = fn_list.diff_ref
+    local open_branch_url = fn_list.open_branch_url
     return pickers
-      .new({
-        prompt_title = "Open Branch URL",
+      .new(opts, {
+        prompt_title = "Open Branch URL (c-s to diff, c-c to copy) >",
         finder = finders.new_table({
           results = get_remote_branches_name(),
           entry_maker = function(entry)
@@ -234,17 +233,28 @@ M.telescope.getPickers = function(opts)
         sorter = conf.generic_sorter(opts),
         attach_mappings = function(prompt_bufnr, map)
           actions.select_default:replace(function()
-            open_branch_url(prompt_bufnr)
+            local selection = action_state.get_selected_entry()
+            if selection then
+              open_branch_url(selection.value)
+            end
           end)
-          -- add mapping to open current file buffer with gitsign diffthis <ref> commands
           map("i", "<C-s>", function()
-            diff_ref(prompt_bufnr)
+            local selection = action_state.get_selected_entry()
+            if selection then
+              diff_ref(selection.value)
+            end
           end)
           map("i", "<CR>", function()
-            open_branch_url(prompt_bufnr)
+            local selection = action_state.get_selected_entry()
+            if selection then
+              open_branch_url(selection.value)
+            end
           end)
           map("i", "<C-c>", function()
-            vim.fn.setreg("+", get_branch_url(action_state.get_selected_entry().value))
+            local selection = action_state.get_selected_entry()
+            if selection then
+              vim.fn.setreg("+", get_branch_url(selection.value))
+            end
           end)
           return true
         end,
@@ -324,7 +334,7 @@ M.telescope.getPickers = function(opts)
   return {
     session_pickers = session_pickers,
     test_pickers = test_pickers,
-    open_git_pickers = open_git_pickers,
+    git_branch_remote_n_diff_picker = git_branch_remote_n_diff_picker,
   }
 end
 

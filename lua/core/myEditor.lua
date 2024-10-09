@@ -341,6 +341,22 @@ return {
           "pipenv run python -u", -- Have some lag
           -- "python3 -u", -- Original
         },
+        -- from common  -------------------
+        -- https://github.com/jellydn/quick-code-runner.nvim/blob/main/lua/quick-code-runner/init.lua#L17
+        -- do not know why ned to override else not work
+        javascript = {
+          "bun run",
+        },
+        go = {
+          "go run",
+        },
+        lua = {
+          "lua",
+        },
+        typescript = {
+          "bun run",
+        },
+        --  end common -------------------
       },
     },
   },

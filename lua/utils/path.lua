@@ -89,4 +89,20 @@ function M.get_pythonpath()
   end
 end
 
+--- FROM QUICK-CODE-RUNNER :  Get global file path by type : https://github.com/jellydn/quick-code-runner.nvim/blob/main/lua/quick-code-runner/init.lua#L4
+--- Get global file path by type
+---@param ext string
+---@return string
+function M.get_global_file_by_type(ext)
+  local state_path = vim.fn.stdpath("state")
+  local path = state_path .. "/code-runner"
+
+  -- Create code-runner folder if it does not exist
+  if vim.fn.isdirectory(path) == 0 then
+    vim.fn.mkdir(path)
+  end
+
+  return string.format("%s/code-pad.%s", path, ext)
+end
+
 return M

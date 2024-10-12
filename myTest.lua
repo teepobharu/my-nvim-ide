@@ -366,9 +366,16 @@ function errorHandling()
     vim.notify(result, vim.log.levels.ERROR)
   end
 end
-
+local function buffers()
+  local prev_buf = vim.fn.bufnr("#") or 0
+  local line_no = vim.api.nvim_buf_get_mark(prev_buf, ".")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[ line_no:]==], prev_buf, "line:", vim.inspect(line_no))
+  print([==[ line_no][1]==], line_no[1])
+end
 local function main()
-  get_pythonpath()
+  buffers()
+  -- get_pythonpath()
   -- errorHandling()
   -- executables()
   -- filesys()

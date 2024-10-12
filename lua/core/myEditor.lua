@@ -1,3 +1,5 @@
+local pathUtils = require("utils.path")
+
 local mapping_key_prefix = vim.g.ai_prefix_key or "<leader>A" -- orginal from codecompanion.lua
 function sentSelectedToTerminal()
   local mode = vim.fn.mode()
@@ -357,14 +359,20 @@ return {
           "bun run",
         },
         --  end common -------------------
+        sh = {
+          "bash",
+        },
       },
+      global_files = {
+        sh = pathUtils.get_global_file_by_type("sh"),
+      }
     },
   },
   -- { import = "plugins.extras.copilot-chat-v2" },
   -- { import = "plugins.extras.telescope-lazy" },
+  { import = "plugins.extras.neotree" },
+  { import = "plugins.extras.myNoice" },
+  { import = "plugins.extras.fzf" },
   { import = "plugins.extras.telescope" },
   -- { import = "plugins.extras.telescope-map-essntials" },
-  { import = "plugins.extras.myNoice" },
-  { import = "plugins.extras.neotree" },
-  { import = "plugins.extras.fzf" },
 }

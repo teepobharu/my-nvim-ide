@@ -259,11 +259,21 @@ end
 
 function getGitList()
   local results = {}
-  local remote_branches = vim.fn.system("git branch -r")
+  -- local remote_branches = vim.fn.system("git branch -r")
+  local addedCd = ""
+  -- addedCd = "cd $(zoxide query mmbweb) > /dev/null && "
+  local remote_branches = vim.fn.system(addedCd .. "git branch --remote | sed -E 's|.* ||' | uniq")
   for branch in remote_branches:gmatch("[^\r\n]+") do
     table.insert(results, { value = branch })
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    -- remote = first part before branch name
+    local remote_name = branch:match("([^/]+)")
+    print("getGitList orignal name", branch, " extracted remote:", remote_name)
   end
+
+  -- print([==[getGitList#for results:]==], vim.inspect(results)) -- __AUTO_GENERATED_PRINT_VAR_END__
 end
+
 function checkPyVenv()
   local pathVenv = vim.fn.getcwd() .. "/.venv"
   local isdir = vim.fn.isdirectory(pathVenv)
@@ -374,7 +384,8 @@ local function buffers()
   print([==[ line_no][1]==], line_no[1])
 end
 local function main()
-  buffers()
+  getGitList()
+  -- buffers()
   -- get_pythonpath()
   -- errorHandling()
   -- executables()
@@ -384,7 +395,6 @@ local function main()
     stringTest()
     printVariables()
     checkPyVenv()
-    getGitList()
     testGit2()
     testGit()
     print(table.concat({ 1, 2, 3 }, ","))

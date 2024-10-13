@@ -58,7 +58,31 @@ return {
   { "nvimdev/dashboard-nvim", lazy = true, enabled = false },
   { "Wansmer/treesj", enabled = false },
   -- folke/edgy.nvim:  https://github.com/LazyVim/LazyVim/blob/1f8469a53c9c878d52932818533ce51c27ded5b6/lua/lazyvim/plugins/extras/ui/edgy.lua#L97
-  -- { "ibhagwan/fzf-lua", enabled = false },
+  {
+    "ibhagwan/fzf-lua",
+    keys = {
+      -- opts.desc = "Git branch FZF"
+      -- keymap("n", "<localleader>gO", function()
+      --   require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
+      -- end, opts)
+      {
+        "<leader>go",
+        function()
+          require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
+        end,
+        desc = "Git branch FZF",
+        mode = "n",
+      },
+      -- session_pickers leader-fS
+      {
+        "<leader>fs",
+        function()
+          require("config.telescope_pickers").fzf.pickers.session_picker()
+        end,
+        desc = "Session FZF",
+      },
+    },
+  },
   {
     "stevearc/oil.nvim",
     opts = {
@@ -365,7 +389,7 @@ return {
       },
       global_files = {
         sh = pathUtils.get_global_file_by_type("sh"),
-      }
+      },
     },
   },
   -- { import = "plugins.extras.copilot-chat-v2" },

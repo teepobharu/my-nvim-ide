@@ -397,11 +397,6 @@ keymap("n", "<localleader>rpe", function()
 	]])
 end, { desc = "Profile End" })
 
-opts.desc = "Git branch FZF"
-keymap("n", "<localleader>gO", function()
-  require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
-end, opts)
-
 --profile
 
 -- ===========================

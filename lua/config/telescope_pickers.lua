@@ -19,8 +19,10 @@ local get_git_pickers_fn = function()
       return sanitized_ref
     end
 
+    local remote_name = branch:match("([^/]+)")
+    branch = branch:gsub("^[^/]+/", "") -- remove remote
     local sanitized_branch = remove_remote_prefix(branch)
-    local remote_path = gitUtil.get_remote_path()
+    local remote_path = gitUtil.get_remote_path(remote_name)
     local line_number = vim.fn.line(".")
     local git_file_path = file_path:gsub(get_git_root() .. "/", "")
     local url_pattern = "https://%s/blob/%s/%s#L%d"
@@ -39,7 +41,6 @@ local get_git_pickers_fn = function()
   end
 
   local function open_branch_url(branch)
-    branch = branch:gsub("^[^/]+/", "")
     local url = get_branch_url(branch)
     vim.fn.setreg("+", url)
     vim.fn.jobstart({ "open", url }, { detach = true })
@@ -65,6 +66,48 @@ end
 
 M.fzf = {}
 M.fzf.pickers = {}
+M.fzf.pickers.session_picker = function()
+  local fzf = require("fzf-lua")
+  local session_dir = vim.g.startify_session_dir or "~/.config/session"
+  local results = {}
+
+  for file in
+    io.popen(
+      "find " .. session_dir .. ' -maxdepth 1 -type f -name "[[:alpha:][:digit:]][[:alnum:]_]*" -exec basename {} +'
+    )
+      :lines()
+  do
+    table.insert(results, file)
+  end
+
+  fzf.fzf_exec(results, {
+    prompt = "Startify Sessions> (c-s to save, c-x to delete) >",
+    actions = {
+      ["default"] = function(selected)
+        local session = selected[1]
+        vim.cmd("SLoad " .. session)
+      end,
+      ["ctrl-s"] = function(selected, opts)
+        local session = opts.last_query or selected[1]
+        if session == "" then
+          session = vim.fn.input("Save Session As: ")
+        end
+
+        vim.cmd("SSave! " .. session)
+        vim.notify("Session Saved: " .. session, vim.log.levels.INFO)
+      end,
+      ["ctrl-x"] = function(selected)
+        local session = selected[1]
+        local user_input = vim.fn.confirm("Confirm Delete Session " .. session, "yesno", 2)
+        if user_input == 1 then
+          vim.cmd("SDelete! " .. session)
+          vim.notify("Session Deleted: " .. session, vim.log.levels.INFO)
+        end
+      end,
+    },
+  })
+end
+
 M.fzf.pickers.open_git_pickers_telescope = function()
   print("FZF PICKERS OPEN GIT PICKERS")
   local fn_list = get_git_pickers_fn()

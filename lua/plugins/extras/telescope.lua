@@ -341,7 +341,7 @@ return {
       --   desc = "Command History",
       -- },
       {
-        "<leader>fa",
+        "<localleader>fa",
         "<cmd> Telescope find_files follow=true no_ignore=true hidden=true <CR>",
         desc = "Find All Files (including hidden)",
       },
@@ -362,17 +362,19 @@ return {
       --   desc = "Find Files From Project Git Root",
       -- },
       {
-        "<leader>fz",
+        "<localleader>fz",
         find_files_in_home_and_config,
         desc = "Find my dotconfig files in home and config",
       },
       {
         "<localleader>go",
-        telescopePickers.telescope.getPickers({}).git_branch_remote_n_diff_picker,
+        function()
+          telescopePickers.telescope.getPickers({}).git_branch_remote_n_diff_picker()
+        end,
         desc = "Open Git Pickers",
       },
       {
-        "<leader>fs",
+        "<localleader>fs",
         session_pickers,
         desc = "Find Sesssions",
       },

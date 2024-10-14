@@ -388,6 +388,12 @@ return {
         },
       },
       global_files = {
+        javascript = pathUtils.get_global_file_by_type("js"),
+        typescript = pathUtils.get_global_file_by_type("ts"),
+        python = pathUtils.get_global_file_by_type("py"),
+        go = pathUtils.get_global_file_by_type("go"),
+        lua = pathUtils.get_global_file_by_type("lua"),
+        --  end common -------------------
         sh = pathUtils.get_global_file_by_type("sh"),
       },
     },

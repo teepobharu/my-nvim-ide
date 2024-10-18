@@ -28,7 +28,9 @@ function M.get_root_directory()
   return vim.fn.getcwd()
 end
 
-function M.get_pythonpath()
+-- Function to get the Python path.
+-- @param isLog boolean: If true, logs the Python path using vim.notify.
+function M.get_pythonpath(isLog)
   local root_dir = M.get_root_directory()
   local pyrightconfig = root_dir .. "/pyrightconfig.json"
 
@@ -51,10 +53,11 @@ function M.get_pythonpath()
           -- print([==[M.get_pythonpath#if#if#if#if venvPath .. pythonExeDir):]==], vim.inspect(venvPath .. pythonExeDir))
           -- print(
           --   [==[M.get_pythonpath#if#if#if#if#if vim.fn.filereadable(venvPath .. pythonExeDir):]==],
-          vim.inspect(vim.fn.filereadable(venvPath .. pythonExeDir))
           if vim.fn.filereadable(venvPath .. pythonExeDir) == 1 then
             -- __AUTO_GENERATED_PRINT_VAR_START__
-            vim.notify("Using absolute path from pyrightconfig.json: " .. venvPath, vim.log.levels.INFO)
+            if isLog then
+              vim.notify("Using absolute path from pyrightconfig.json: " .. venvPath, vim.log.levels.INFO)
+            end
             return venvPath .. pythonExeDir
           end
         else
@@ -67,7 +70,9 @@ function M.get_pythonpath()
             venvPath = string.sub(venvPath, 1, -2)
           end
           local python_path = root_dir .. "/" .. venvPath .. pythonExeDir
-          vim.notify("Using pythonpath from pyright: " .. python_path, vim.log.levels.INFO)
+          if isLog then
+            vim.notify("Using relative path from pyrightconfig.json: " .. python_path, vim.log.levels.INFO)
+          end
           if vim.fn.filereadable(python_path) == 1 then
             return python_path
           end
@@ -79,12 +84,16 @@ function M.get_pythonpath()
   -- Fallback to pipenv --py
   local python_path = vim.fn.systemlist("pipenv --py")[1]
   if vim.v.shell_error == 0 then
-    vim.notify("get_pythonpath python_path (pipenv --py): " .. vim.inspect(python_path), vim.log.levels.INFO)
+    if isLog then
+      vim.notify("get_pythonpath python_path (pipenv --py): " .. vim.inspect(python_path), vim.log.levels.INFO)
+    end
     return python_path
   else
     -- Fallback to default python executable
     local python = vim.fn.exepath("python")
-    vim.notify("get_pythonpath using default python exe: " .. python, vim.log.levels.INFO)
+    if isLog then
+      vim.notify("get_pythonpath using default python exe: " .. python, vim.log.levels.INFO)
+    end
     return python
   end
 end

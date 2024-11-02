@@ -42,3 +42,7 @@ Features
 - Consolidated custom override into one file
 - Added custom override project level and setup create keymap using ,rsn keymap
 - Extras is disabled by default and
+
+## Some issues
+
+- [ ] Toggleterm size cannot be changes even persistence is set to false override on myEditor but nothing changes ?

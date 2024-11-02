@@ -13,8 +13,7 @@ function sentSelectedToTerminal()
     -- print("in v mode")
     require("toggleterm").send_lines_to_terminal("visual_selection", true, { args = vim.v.count })
   else
-    -- print("other " .. mode)
-    require("toggleterm").send_lines_to_terminal("visual_lines", true, { args = vim.v.count })
+    require("toggleterm").send_lines_to_terminal("single_line", true, {})
   end
 end
 

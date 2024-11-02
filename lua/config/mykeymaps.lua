@@ -163,7 +163,7 @@ opts.desc = "Toggle Normal"
 keymap("t", "<C-q>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
 opts.desc = nil
 
-function _G.cycle_term_buffers()
+local getTermBuffer = function()
   local term_buffers = {}
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     local ft = vim.bo[buf].filetype -- toggleterm
@@ -180,7 +180,11 @@ function _G.cycle_term_buffers()
     --   table.insert(term_buffers, buf)
     -- end
   end
+  return term_buffers
+end
 
+function _G.cycle_term_buffers()
+  local term_buffers = getTermBuffer()
   if #term_buffers == 0 then
     print("No terminal buffers found")
     return
@@ -203,6 +207,48 @@ function _G.cycle_term_buffers()
   vim.api.nvim_set_current_buf(next_buf)
 end
 
+function _G.cycle_term_layout()
+  local termlayout = vim.g.mytoggtermlayout or "horizontal"
+  if termlayout == "float" then
+    vim.g.mytoggtermlayout = "horizontal"
+    -- elseif termlayout == "horizontal" then -- vertical not working (same as horizontal)
+    -- vim.g.mytoggtermlayout = "vertical"
+    -- elseif termlayout == "vertical" then -- tab use case not good
+    --   vim.g.mytoggtermlayout = "tab"
+  else
+    vim.g.mytoggtermlayout = "float"
+  end
+  vim.cmd("ToggleTerm")
+  termlayout = vim.g.mytoggtermlayout
+  vim.cmd("ToggleTerm direction=" .. termlayout)
+  -- enter normal mode again from insert terminal mode
+  vim.cmd("stopinsert")
+end
+
+function _G.create_new_term()
+  local term_buffers = getTermBuffer()
+  -- #term#<id>
+  local next_id = 1
+  local sorted_term_num = {}
+  for i, buf in ipairs(term_buffers) do
+    local bufname = vim.api.nvim_buf_get_name(buf)
+    local id = bufname:match("term://.*#(%d+)$")
+    if tonumber(id) > 0 then
+      table.insert(sorted_term_num, tonumber(id))
+    end
+  end
+  table.sort(sorted_term_num)
+  for i, id in ipairs(sorted_term_num) do
+    if next_id < id then
+      break
+    else
+      next_id = next_id + 1
+    end
+  end
+  local command = next_id .. "ToggleTerm"
+  vim.cmd(command)
+end
+
 function _G.set_toggleterm_keymaps()
   -- run on all terminal buffers
   -- https://github.com/akinsho/toggleterm.nvim?tab=readme-ov-file#terminal-window-mappings
@@ -214,23 +260,29 @@ function _G.set_toggleterm_keymaps()
   if string.find(buffername, "lazygit") then
     print("Lazygit buffer")
   else
-    opts.desc = "Toggle Term <n> (press with <n> to toggle/open other term)"
+    opts.desc = "Enter normal mode"
+    vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
+    opts.desc = "Toggle Term <num> (press with <n> to open other term)"
     vim.keymap.set("n", "<C-t>", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
-    vim.keymap.set("n", "<C-q>", [[<Cmd>ToggleTerm<CR>]], opts)
+    vim.keymap.set("n", "<localleader>tt", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
+
+    opts.desc = "Toggle Layout"
+    vim.keymap.set("n", "<C-SPACE>", ":lua cycle_term_layout()<CR>", opts)
+    opts.desc = "Create new Term"
+    vim.keymap.set("n", "<C-n>", ":lua create_new_term()<CR>", opts)
+    -- durection=float|horizontal|vertical
+    opts.desc = "Quit Current Term"
+    vim.keymap.set("n", "Q", ":bd!<CR>", opts)
     vim.keymap.set(
       "n",
       "<c-e>",
       ":lua cycle_term_buffers()<CR>",
       { buffer = 0, desc = "Cycle term buffer", noremap = true, silent = true }
     )
-    vim.keymap.set("n", "<localleader>tt", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
-    opts.desc = "Toggle Term 2 toggle"
     -- cycle through all terminal buffers
     -- J and K to move between all buffers next and rpev
+    opts.desc = "Toggle Term next toggle"
     vim.keymap.set("n", "J", [[<Cmd>exe v:count1 . "ToggleTerm"<CR>]], opts)
-    --
-    opts.desc = "Enter normal mode"
-    vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
   end
   -- what about buffername ?
   -- if not lazygit then do mapping

@@ -82,20 +82,29 @@ function M.get_pythonpath(isLog)
   end
 
   -- Fallback to pipenv --py
-  local python_path = vim.fn.systemlist("pipenv --py")[1]
+  local outputpipenvpy = vim.fn.systemlist("pipenv --py")
+
   if vim.v.shell_error == 0 then
-    if isLog then
-      vim.notify("get_pythonpath python_path (pipenv --py): " .. vim.inspect(python_path), vim.log.levels.INFO)
+    local python_path = ""
+    for _, line in ipairs(outputpipenvpy) do
+      if line:match("^/") then
+        python_path = line
+        break
+      end
     end
-    return python_path
-  else
-    -- Fallback to default python executable
-    local python = vim.fn.exepath("python")
     if isLog then
-      vim.notify("get_pythonpath using default python exe: " .. python, vim.log.levels.INFO)
+      vim.notify("python_path from (pipenv --py) = " .. vim.inspect(python_path), vim.log.levels.INFO)
     end
-    return python
+    if vim.fn.filereadable(python_path) == 1 then
+      return python_path
+    end
   end
+  -- Fallback to default python executable
+  local python = vim.fn.exepath("python")
+  if isLog then
+    vim.notify("get_pythonpath using default python exe: " .. python, vim.log.levels.INFO)
+  end
+  return python
 end
 
 --- FROM QUICK-CODE-RUNNER :  Get global file path by type : https://github.com/jellydn/quick-code-runner.nvim/blob/main/lua/quick-code-runner/init.lua#L4

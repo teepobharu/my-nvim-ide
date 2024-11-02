@@ -318,8 +318,8 @@ function get_pythonpath()
   -- if yes read venvPath and venv from there
   local root_dir = pathUtils.get_root_directory()
   local pyrightconfig = root_dir .. "/pyrightconfig.json"
-  print([==[M.get_pythonpath pyrightconfig:]==], vim.inspect(pyrightconfig))
   if vim.fn.filereadable(pyrightconfig) == 1 then
+    print([==[M.pythonpath pyrightconfig exists:]==], vim.inspect(pyrightconfig))
     local config_content = vim.fn.readfile(pyrightconfig)
     local config = vim.fn.json_decode(table.concat(config_content, "\n"))
 
@@ -353,8 +353,18 @@ function get_pythonpath()
     end
   end
 
-  local python_path = vim.fn.systemlist("pipenv --py")[1]
+  local python_path = ""
+  local outputpipenvpy = vim.fn.systemlist("pipenv --py")
+  print([==[get_pythonpath outputpipenvpy:]==], vim.inspect(outputpipenvpy))
   if vim.v.shell_error == 0 then
+    -- Loading .env environment variables... <- sometimes show this extra line ??
+    -- /Users/tharutaipree/Personal/streamlitgemini/.venv/bin/python
+    for _, line in ipairs(output) do
+      if line:match("^/") then
+        python_path = line
+        break
+      end
+    end
     print([==[get_pythonpath python_path (pipenv --py):]==], vim.inspect(python_path)) -- __AUTO_GENERATED_PRINT_VAR_END__
     return python_path
   else
@@ -384,9 +394,9 @@ local function buffers()
   print([==[ line_no][1]==], line_no[1])
 end
 local function main()
-  getGitList()
+  get_pythonpath()
+  -- getGitList()
   -- buffers()
-  -- get_pythonpath()
   -- errorHandling()
   -- executables()
   -- filesys()

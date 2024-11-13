@@ -287,12 +287,29 @@ return {
               local opts = get_opts_for_files_and_grep(state, "file")
               require("telescope.builtin").find_files({ cwd = opts.cwdPath })
             end,
-            telescope_cd = function(state)
+            cd = function(state)
               local node = state.tree:get_node()
               local filepath = node:get_id()
               local cwdPath = vim.fn.fnamemodify(filepath, ":h")
               vim.notify("Changing directory to: " .. cwdPath)
               vim.cmd("cd " .. cwdPath)
+            end,
+            fzf_cd = function(state)
+              local opts = get_opts_for_files_and_grep(state, "directory")
+              require("fzf-lua").files({
+                cwd = opts.cwdPath,
+                fd_opts = "-t d",
+                action = {
+                  ["default"] = function(selected)
+                    vim.notify("CD: Changing directory to: " .. selected, vim.log.levels.INFO)
+                    vim.cmd("cd " .. selected)
+                  end,
+                  ["ctrl-s"] = function(selected)
+                    vim.notify("LCD : Changing directory to: " .. selected, vim.log.levels.INFO)
+                    vim.cmd("lcd " .. selected)
+                  end,
+                },
+              })
             end,
           },
           -- https://github.com/nvim-neo-tree/neo-tree.nvim/discussions/370
@@ -342,7 +359,8 @@ return {
                 ["ga"] = "git_add_file",
                 ["gr"] = "git_revert_file",
                 ["gc"] = "git_commit",
-                ["Tc"] = "telescope_cd",
+                ["Tc"] = "cd",
+                ["TC"] = "fzf_cd",
               },
             },
           },

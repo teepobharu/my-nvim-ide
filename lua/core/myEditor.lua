@@ -283,7 +283,7 @@ return {
     keys = {
       {
         mapping_key_prefix .. "A",
-        "<cmd>CodeCompanionAdd<cr>",
+        "<cmd>CodeCompanionChat Add<cr>",
         desc = "Code Companion add selected",
         mode = "v",
       },

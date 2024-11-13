@@ -93,13 +93,12 @@ Main lazy setup for plugins :
 <leader>-s + h(elp), b(uffers), t(odos), c(ommands), k(eymaps), f(replace)
 
 - s(symbols) / <leader>o Symbols {W,E toggle fold}
-- telescope which-key (i = C-_ or C-/)
+- telescope which-key (i = C-\_ or C-/)
 
 <leader>-f + f(iles), b(uffers),c(config)
 <leader>-g + g(it), b(lame), c(ommit), s(tatus)
 
 - h => stage, diff
-
 
 - gs - surround : replace, delete
 
@@ -111,7 +110,7 @@ Understand each plugin more: https://www.youtube.com/watch?v=6pAG3BHurdM&ab_chan
 
 ## Keymaps
 
-  🤩 try to search the keys should already be there
+🤩 try to search the keys should already be there
 
 ### Hidden settings / keymaps
 
@@ -248,6 +247,9 @@ Tables plugin (manual enabled)
 ### Replacing
 
 Use nvim spectre
+
+- sometimes in config file not see need to toggle hidden (I)
+- <leader>+sF search + replace current word
 
 - no undo
   Guide: basic cdo + spectre : https://www.youtube.com/watch?v=YzVmdJ41Xkg&ab_channel=AndrewCourter

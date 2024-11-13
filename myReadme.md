@@ -35,6 +35,8 @@ Features
 
 - New Plugin
   - codecompanion - leader A
+    - ? for help
+    - type / for slash commands , @ to use tools
     - inline : ga gr
     - chat : ga (change model ollama worked with model selection default)
     - tools : execute in docker and auto resilent msg auto prompt fill

@@ -289,12 +289,12 @@ return {
       },
     },
     adapters = {
-      llama3 = function()
+      llama3_2 = function()
         return require("codecompanion.adapters").extend("ollama", {
           name = "llama3", -- Give this adapter a different name to differentiate it from the default ollama adapter
           schema = {
             model = {
-              default = "llama3:latest",
+              default = "llama3.2:latest",
             },
             num_ctx = {
               default = 16384,
@@ -335,6 +335,7 @@ return {
       },
     },
     opts = {
+      model = "", -- override claude-sonnet model since not support on my copilot (get ereror)
       -- debug = true, -- add to debug message by calling l-a-d and  see in file using <gf> or check :messages in the logfile name else see only error (not prompt and embedding used)
       mappings = {
         complete = {

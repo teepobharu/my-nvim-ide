@@ -196,38 +196,36 @@ Config file settings / debug
 | <leader> fm | Format whole file                    |
 | <leader> fF | Toggle Format on Save Buff(!)/Global |
 
-## Old section
+### Files
 
-#### Files
+Find other files
 
-Nvim Tree - TODO: Delete
-| Key | Description |
-| --- | ----------- |
-| <C-n> | Toggle NvimTree |
-| y | Copy file name (with ext) |
-| ge | copy base name (no ext) |
-| ------------- |
-| Option 1 | use fzf-telescope (on v mode ? )|
-| Option 2| telescope (can try this : https://github.com/nvim-telescope/telescope-fzf-native.nvim)
+- <leader>fp : select project + file in project
+- <leader>fr : find recent open
 
 Neo Tree
 
-- Fix
+<leader-e> 
+- h = help
 
-CDs
-
-Nvim Tree - TODO: Delete
-
-| Key           | Description                                                                            |
-| ------------- | -------------------------------------------------------------------------------------- |
-| <C-n>         | Toggle NvimTree                                                                        |
-| y             | Copy file name (with ext)                                                              |
-| ge            | copy base name (no ext)                                                                |
-| ------------- |
-| Option 1      | use fzf-telescope (on v mode ? )                                                       |
-| Option 2      | telescope (can try this : https://github.com/nvim-telescope/telescope-fzf-native.nvim) |
+- Custom actions
+  - Ff => fzf find in node
+  - Fg => fzf grep in node
+  - Tf/Tg => telescope
+  - TC,Tc => telescope cd / cd
 
 ## Others
+
+#### Coding
+
+Overseer - task manangement (leader + o)
+
+Hurl - HTTP client runner (leader + h)
+
+https://github.com/jellydn/hurl.nvim?tab=readme-ov-file#swappable-environment
+Set env file by
+
+- uses `vars.env` relative or recursively to root project, can change using :HurlSetEnvFile (support mult use ,)
 
 #### Refactoring
 
@@ -330,6 +328,35 @@ plugin: https://www.youtube.com/watch?v=jrFjtwm-R94&ab_channel=NerdSignals
 - Docs
 - Chat Grammar correct Bug fixes, Explain
 
+#### CodeCompanion
+
+Pros:
+
+- Support Tools calling and run docker (but might not setup deps correctly)
+- Diff pane (only show when use with quick chat) acceptable / rejectable
+  - but a bit weird to edit code sometimes not correct
+
+Cons:
+
+- when Toggle with visual does not Add context of selected to the chat like copilot chat
+
+| Key          | Description                       |
+| ------------ | --------------------------------- |
+| <leader>A    | toggle commands                   |
+| + A          | add selected code to chat         |
+| + q          | Chat with input (select/deselect) |
+| gy           | copy code section using gy        |
+| ga           | accept diff code                  |
+| gr           | reject diff code                  |
+| chat /       | slash commands                    |
+| chat @       | tools                             |
+| -- MODIFY -- |                                   |
+| + Q          | Chat with input (select/deselect) |
+
+# copy code section using gy
+
+#
+
 #### Copilot
 
 https://github.com/CopilotC-Nvim/CopilotChat.nvim
@@ -351,3 +378,30 @@ Copilot Chat
 | <esc>        | toggle fold if exists else no highlight |
 | VIM DEFAULTS | ----------                              |
 | <C-g>        | Show current file path                  |
+
+## Old section
+
+#### Files
+
+Nvim Tree - TODO: Delete
+| Key | Description |
+| --- | ----------- |
+| <C-n> | Toggle NvimTree |
+| y | Copy file name (with ext) |
+| ge | copy base name (no ext) |
+| ------------- |
+| Option 1 | use fzf-telescope (on v mode ? )|
+| Option 2| telescope (can try this : https://github.com/nvim-telescope/telescope-fzf-native.nvim)
+
+CDs
+
+Nvim Tree - TODO: Delete
+
+| Key           | Description                                                                            |
+| ------------- | -------------------------------------------------------------------------------------- |
+| <C-n>         | Toggle NvimTree                                                                        |
+| y             | Copy file name (with ext)                                                              |
+| ge            | copy base name (no ext)                                                                |
+| ------------- |
+| Option 1      | use fzf-telescope (on v mode ? )                                                       |
+| Option 2      | telescope (can try this : https://github.com/nvim-telescope/telescope-fzf-native.nvim) |

@@ -393,6 +393,17 @@ local function buffers()
   print([==[ line_no:]==], prev_buf, "line:", vim.inspect(line_no))
   print([==[ line_no][1]==], line_no[1])
 end
+
+testGetlineExe = function()
+  local current_selected_line = vim.fn.getline("`<", "`>")
+  local lastselectedcontent = vim.fn.getline("'<", "'>")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[lastselectedcontent:]==], vim.inspect(lastselectedcontent)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[current_selected_line:]==], vim.inspect(current_selected_line)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  -- # why always empty
+end
+
 local function main()
   get_pythonpath()
   -- getGitList()
@@ -401,6 +412,7 @@ local function main()
   -- executables()
   -- filesys()
   -- getArrListConfig()
+  -- testGetlineExe()
   if false then
     stringTest()
     printVariables()

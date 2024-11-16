@@ -83,6 +83,10 @@ return {
     },
   },
   {
+    "jellydn/hurl.nvim",
+    keys = {},
+  },
+  {
     "stevearc/oil.nvim",
     opts = {
       -- default_file_explorer = false,
@@ -284,7 +288,30 @@ return {
       {
         mapping_key_prefix .. "A",
         "<cmd>CodeCompanionChat Add<cr>",
-        desc = "Code Companion add selected",
+        desc = "Code Companion - Add selected",
+        mode = "v",
+      },
+      {
+        mapping_key_prefix .. "V",
+        -- "<cmd>CodeCompanionChat Toggle<cr>",
+        "<cmd>CodeCompanionChat<cr>", -- will add selected input and toggle
+        desc = "Code Companion - Add and Toggle",
+        mode = "v",
+      },
+      { mapping_key_prefix .. "v", "<cmd>CodeCompanionChat<cr>", mode = "v" }, -- not sure why not override
+
+      {
+        mapping_key_prefix .. "q",
+        "<cmd>CodeCompanionChat<cr>",
+        desc = "Code Companion - Chat",
+        mode = "v",
+      },
+      {
+        mapping_key_prefix .. "Q",
+        function()
+          vim.cmd("CodeCompanion")
+        end,
+        desc = "Code Companion - Quick chat",
         mode = "v",
       },
     },

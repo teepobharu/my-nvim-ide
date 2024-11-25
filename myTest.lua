@@ -215,6 +215,9 @@ local function testGit()
 end
 function testGit2()
   local current_file = path or vim.fn.expand("%:p")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testGit2 current_file:]==], vim.inspect(current_file)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  -- __AUTO_GENERATED_PRINT_VAR_START__
 
   local urlPath = require("utils.git").get_remote_path()
   -- __AUTO_GENERATED_PRINT_VAR_START__
@@ -224,6 +227,8 @@ function testGit2()
   print([==[testGit2 mainBranch:]==], vim.inspect(mainBranch)) -- __AUTO_GENERATED_PRINT_VAR_END__
   local gitroot = require("utils.path").get_root_directory()
   -- __AUTO_GENERATED_PRINT_VAR_START__
+  local current_file = current_file:gsub(gitroot .. "/?", "")
+  print([==[testGit2 current_file gsub:]==], vim.inspect(current_file)) -- __AUTO_GENERATED_PRINT_VAR_END__
   print([==[testGit2 gitroot:]==], vim.inspect(gitroot)) -- __AUTO_GENERATED_PRINT_VAR_END__
   local currentBranch = require("lazy.util").git_info(gitroot)
   -- __AUTO_GENERATED_PRINT_VAR_START__
@@ -403,9 +408,24 @@ testGetlineExe = function()
   print([==[current_selected_line:]==], vim.inspect(current_selected_line)) -- __AUTO_GENERATED_PRINT_VAR_END__
   -- # why always empty
 end
+testGitMatch = function()
+  local hash = ""
+  hash = "af3d91ef"
+  hash = "81cda3728d4a25037acd2391902a9a021597d37b"
+
+  local isT = hash:match("[0-9a-fA-F]{1,100}") --  not work using {1,100}
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[function isT:]==], vim.inspect(isT)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local isT2 = hash:match("^[0-9a-fA-F]+$")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[function isT2:]==], vim.inspect(isT2)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local isT3 = #hash >= 7 and #hash <= 40 and hash:match("^[0-9a-fA-F]+$")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[function isT3:]==], vim.inspect(isT3)) -- __AUTO_GENERATED_PRINT_VAR_END__
+end
 
 local function main()
-  get_pythonpath()
+  -- get_pythonpath()
   -- getGitList()
   -- buffers()
   -- errorHandling()
@@ -413,11 +433,12 @@ local function main()
   -- filesys()
   -- getArrListConfig()
   -- testGetlineExe()
+  testGitMatch()
   if false then
+    testGit2()
     stringTest()
     printVariables()
     checkPyVenv()
-    testGit2()
     testGit()
     print(table.concat({ 1, 2, 3 }, ","))
     vim.opt_local.timeoutlen = 1000 -- setlocal can used (still not found any differences when set)

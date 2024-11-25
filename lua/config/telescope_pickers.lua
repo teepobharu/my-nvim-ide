@@ -1,16 +1,15 @@
 local M = {}
 local gitUtil = require("utils.git")
+local pathUtil = require("utils.path")
 M.telescope = {}
 
 local get_git_pickers_fn = function()
+  -- need here since once open fzf the current buffer will not be avail
   local file_path = vim.fn.expand("%:p")
 
-  local function get_git_root()
-    local git_root = vim.fn.system("git rev-parse --show-toplevel"):gsub("\n", "")
-    return git_root
-  end
-
-  local function get_branch_url(branch)
+  ---@param ref : string
+  ---@param mode "file" | "commit"
+  local open_remote = function(ref, mode)
     local function remove_remote_prefix(ref)
       local sanitized_ref = ref:gsub("^%s*(.-)%s*$", "%1")
       sanitized_ref = sanitized_ref:gsub(" ", "")
@@ -19,19 +18,28 @@ local get_git_pickers_fn = function()
       return sanitized_ref
     end
 
-    local remote_name = branch:match("([^/]+)")
-    branch = branch:gsub("^[^/]+/", "") -- remove remote
-    local sanitized_branch = remove_remote_prefix(branch)
+    local remote_name = ref:match("([^/]+)")
+    ref = ref:gsub("^[^/]+/", "") -- remove remote
+    ref = remove_remote_prefix(ref)
     local remote_path = gitUtil.get_remote_path(remote_name)
+    local isCommit = ref:match("^[0-9a-fA-F]+$") and (#ref == 7 or #ref == 40)
+
+    -- same as myeditor.fzf logic
     local line_number = vim.fn.line(".")
-    local git_file_path = file_path:gsub(get_git_root() .. "/", "")
+
+    local gitroot = pathUtil.get_git_root()
+    local git_file_path = file_path:gsub(gitroot .. "/?", "")
     local url_pattern = "https://%s/blob/%s/%s#L%d"
-
-    if git_file_path == "" or git_file_path:gsub(" ", "") == "" then
-      return remote_path
+    local urlF = string.format(url_pattern, remote_path, ref, git_file_path, line_number)
+    -- else
+    local urlC = string.format("https://%s/commit/%s", remote_path, ref)
+    -- end
+    vim.fn.jobstart({ "open", urlF }, { detach = true })
+    if not isCommit then
+      vim.fn.setreg("+", urlF)
+    else
+      vim.fn.jobstart({ "open", urlC }, { detach = true })
     end
-
-    return string.format(url_pattern, remote_path, sanitized_branch, git_file_path, line_number)
   end
 
   local function diff_ref(branch)
@@ -40,27 +48,26 @@ local get_git_pickers_fn = function()
     vim.cmd("Gitsigns diffthis " .. branch)
   end
 
-  local function open_branch_url(branch)
-    local url = get_branch_url(branch)
-    vim.fn.setreg("+", url)
-    vim.fn.jobstart({ "open", url }, { detach = true })
-    require("lazy.util").open(url)
-  end
-
   local function get_remote_branches_name()
     local results = {}
     local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||' | uniq")
-
     for branch in remote_branches:gmatch("[^\r\n]+") do
       table.insert(results, { value = branch })
+    end
+    -- Adding hash handle error exit skip adding if erorr
+    local ok, main_branch = pcall(gitUtil.git_main_branch)
+    local ok2, origin_commits = pcall(vim.fn.system, "git log --format='%H' origin/" .. main_branch)
+    if ok and ok2 then
+      for commit in origin_commits:gmatch("[^\r\n]+") do
+        table.insert(results, { value = commit })
+      end
     end
     return results
   end
   return {
     get_remote_branches_name = get_remote_branches_name,
-    get_branch_url = get_branch_url,
     diff_ref = diff_ref,
-    open_branch_url = open_branch_url,
+    open_branch_url = open_remote,
   }
 end
 
@@ -258,9 +265,17 @@ M.telescope.getPickers = function(opts)
     local get_branch_url = fn_list.get_branch_url
     local diff_ref = fn_list.diff_ref
     local open_branch_url = fn_list.open_branch_url
+    local current_word = vim.fn.expand("<cword>")
+    local hash = current_word
+    -- hash should be at leat 7 characters and not more than 40
+    local isHash = #hash >= 7 and #hash <= 40 and hash:match("^[0-9a-fA-F]+$")
+    if not isHash then
+      current_word = "origin/" .. gitUtil.git_main_branch()
+    end
     return pickers
       .new(opts, {
         prompt_title = "Open Branch URL (c-s to diff, c-c to copy) >",
+        default_text = current_word,
         finder = finders.new_table({
           results = get_remote_branches_name(),
           entry_maker = function(entry)
@@ -276,9 +291,19 @@ M.telescope.getPickers = function(opts)
         sorter = conf.generic_sorter(opts),
         attach_mappings = function(prompt_bufnr, map)
           actions.select_default:replace(function()
-            local selection = action_state.get_selected_entry()
+            local picker = action_state.get_current_picker(prompt_bufnr)
+            local firstMultiSelection = picker:get_multi_selection()[1]
+            local current_line = action_state.get_current_line()
+            current_line = current_line:gsub("%s+$", "")
+            local input_or_multi = firstMultiSelection or current_line
+            -- __AUTO_GENERATED_PRINT_VAR_START__
+            print([==[function#function#function#function input_or_multi:]==], vim.inspect(input_or_multi)) -- __AUTO_GENERATED_PRINT_VAR_END__
+            -- __AUTO_GENERATED_PRINT_VAR_START__
+            print([==[function#function#function#function selection:]==], vim.inspect(selection)) -- __AUTO_GENERATED_PRINT_VAR_END__
+            local selection = action_state.get_selected_entry().value or input_or_multi
+
             if selection then
-              open_branch_url(selection.value)
+              open_branch_url(selection)
             end
           end)
           map("i", "<C-s>", function()

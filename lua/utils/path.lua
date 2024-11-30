@@ -29,74 +29,84 @@ function M.get_root_directory()
 end
 
 -- Function to get the Python path.
+-- @param pipenvFallback boolean: If true, falls back to pipenv --py if pyrightconfig.json is not found.
 -- @param isLog boolean: If true, logs the Python path using vim.notify.
-function M.get_pythonpath(isLog)
+function M.get_pythonpath(pipenvFallback, isLog)
+  -- check for current dir if pyyrgithconfig.json exists and get python path
+  local function readpyrightconfig(filepath, pyrightConfigname)
+    print([==[M.get_pythonpath#readpyrightconfig filepath:]==], vim.inspect(filepath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    local filepathconfig = filepath .. "/" .. (pyrightConfigname or "pyrightconfig.json")
+    local content = ""
+    if vim.fn.filereadable(filepathconfig) then
+      local config_content = vim.fn.readfile(filepathconfig)
+      content = vim.fn.json_decode(table.concat(config_content, "\n"))
+    end
+    return content
+  end
+  local config = readpyrightconfig(vim.fn.getcwd())
   local root_dir = M.get_root_directory()
-  local pyrightconfig = root_dir .. "/pyrightconfig.json"
+  config = config or readpyrightconfig(root_dir)
 
-  if vim.fn.filereadable(pyrightconfig) == 1 then
-    local config_content = vim.fn.readfile(pyrightconfig)
-    local config = vim.fn.json_decode(table.concat(config_content, "\n"))
-
-    if config == nil then
-      vim.notify("pyrightconfig exists but not able to read", vim.log.levels.WARN)
+  if not config then
+    vim.notify("pyrightconfig exists but not able to read", vim.log.levels.WARN)
+  else
+    local venvPath = config.venvPath
+    if venvPath == nil or vim.fn.empty(venvPath) == 1 then
+      vim.notify("pyrightconfig exists but venvPath not found", vim.log.levels.ERROR)
     else
-      local venvPath = config.venvPath
-      if venvPath == nil or vim.fn.empty(venvPath) == 1 then
-        vim.notify("pyrightconfig exists but venvPath not found", vim.log.levels.ERROR)
-      else
-        local pythonExeDir = "/bin/python"
-        local isVenvAbsPath = string.sub(venvPath, 1, 1) == "/"
+      local pythonExeDir = "/bin/python"
+      local isVenvAbsPath = string.sub(venvPath, 1, 1) == "/"
 
-        if isVenvAbsPath then
-          -- print([==[M.get_pythonpath#if#if#if#if isVenvAbsPath:]==], vim.inspect(isVenvAbsPath)) -- __AUTO_GENERATED_PRINT_VAR_END__
-          -- print([==[M.get_pythonpath#if#if#if#if venvPath .. pythonExeDir):]==], vim.inspect(venvPath .. pythonExeDir))
-          -- print(
-          --   [==[M.get_pythonpath#if#if#if#if#if vim.fn.filereadable(venvPath .. pythonExeDir):]==],
-          if vim.fn.filereadable(venvPath .. pythonExeDir) == 1 then
-            -- __AUTO_GENERATED_PRINT_VAR_START__
-            if isLog then
-              vim.notify("Using absolute path from pyrightconfig.json: " .. venvPath, vim.log.levels.INFO)
-            end
-            return venvPath .. pythonExeDir
-          end
-        else
-          -- Check if venvPath is relative to root_dir
-          venvPath = string.gsub(venvPath, root_dir, "")
-          if string.sub(venvPath, 1, 1) == "/" then
-            venvPath = string.sub(venvPath, 2)
-          end
-          if string.sub(venvPath, -1) == "/" then
-            venvPath = string.sub(venvPath, 1, -2)
-          end
-          local python_path = root_dir .. "/" .. venvPath .. pythonExeDir
+      if isVenvAbsPath then
+        -- print([==[M.get_pythonpath#if#if#if#if isVenvAbsPath:]==], vim.inspect(isVenvAbsPath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+        -- print([==[M.get_pythonpath#if#if#if#if venvPath .. pythonExeDir):]==], vim.inspect(venvPath .. pythonExeDir))
+        -- print(
+        --   [==[M.get_pythonpath#if#if#if#if#if vim.fn.filereadable(venvPath .. pythonExeDir):]==],
+        if vim.fn.filereadable(venvPath .. pythonExeDir) == 1 then
+          -- __AUTO_GENERATED_PRINT_VAR_START__
           if isLog then
-            vim.notify("Using relative path from pyrightconfig.json: " .. python_path, vim.log.levels.INFO)
+            vim.notify("Using absolute path from pyrightconfig.json: " .. venvPath, vim.log.levels.INFO)
           end
-          if vim.fn.filereadable(python_path) == 1 then
-            return python_path
-          end
+          return venvPath .. pythonExeDir
+        end
+      else
+        -- Check if venvPath is relative to root_dir
+        venvPath = string.gsub(venvPath, root_dir, "")
+        if string.sub(venvPath, 1, 1) == "/" then
+          venvPath = string.sub(venvPath, 2)
+        end
+        if string.sub(venvPath, -1) == "/" then
+          venvPath = string.sub(venvPath, 1, -2)
+        end
+        local python_path = root_dir .. "/" .. venvPath .. pythonExeDir
+        if isLog then
+          vim.notify("Using relative path from pyrightconfig.json: " .. python_path, vim.log.levels.INFO)
+        end
+        if vim.fn.filereadable(python_path) == 1 then
+          return python_path
         end
       end
     end
   end
 
   -- Fallback to pipenv --py
-  local outputpipenvpy = vim.fn.systemlist("pipenv --py")
+  if pipenvFallback then
+    local outputpipenvpy = vim.fn.systemlist("pipenv --py")
 
-  if vim.v.shell_error == 0 then
-    local python_path = ""
-    for _, line in ipairs(outputpipenvpy) do
-      if line:match("^/") then
-        python_path = line
-        break
+    if vim.v.shell_error == 0 then
+      local python_path = ""
+      for _, line in ipairs(outputpipenvpy) do
+        if line:match("^/") then
+          python_path = line
+          break
+        end
       end
-    end
-    if isLog then
-      vim.notify("python_path from (pipenv --py) = " .. vim.inspect(python_path), vim.log.levels.INFO)
-    end
-    if vim.fn.filereadable(python_path) == 1 then
-      return python_path
+      if isLog then
+        vim.notify("python_path from (pipenv --py) = " .. vim.inspect(python_path), vim.log.levels.INFO)
+      end
+      if vim.fn.filereadable(python_path) == 1 then
+        return python_path
+      end
     end
   end
   -- Fallback to default python executable

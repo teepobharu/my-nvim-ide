@@ -1,5 +1,6 @@
 local opts = { noremap = true, silent = true }
 local keymap = vim.keymap.set
+local Cmd = require("utils.cmd")
 -- ===========================
 -- LAZY NVIM ====================
 -- =======================
@@ -97,7 +98,6 @@ keymap("v", "<A-d>", duplicateselected, { desc = "Duplicate line and preserve ya
 -- copy to nvim only not system clipboard
 vim.opt.clipboard = ""
 
-keymap("n", "Y", '"+y', { desc = "Copy to system clipboard" })
 keymap("n", "YY", '"+yy', { desc = "Copy to system clipboard" })
 keymap("v", "Y", '"+y', { desc = "Copy to system clipboard" })
 keymap("v", "<C-c>", '"+y', { desc = "Copy to system clipboard" })
@@ -393,11 +393,14 @@ local function addNvimConfigInRoot()
   vim.notify("nvim-config.lua created at: " .. nvim_config, vim.log.levels.INFO)
 end
 
+-- ===============
+-- LSP
+-- ===============
 local function addVenvPyrightConfig()
   local pathUtil = require("utils.path")
   local git_dir = pathUtil.get_git_root() or vim.fn.getcwd()
 
-  local venv_path = vim.fn.input("Enter venv path: ", git_dir .. "/.venv")
+  local venv_path = vim.fn.input("Enter config venv path: ", git_dir .. "/.venv")
   local config = { venvPath = venv_path, venv = ".venv" }
   if vim.fn.isdirectory(venv_path) == 0 then
     vim.notify("Venv path not exists, please run pipenv install", vim.log.levels.WARN)
@@ -418,6 +421,41 @@ local function addVenvPyrightConfig()
   local configStr = vim.fn.json_encode(config)
   vim.fn.writefile({ configStr }, pyrightconfig)
 end
+
+-- Restart LSP client by name
+Cmd.create_cmd("RestartLspClient", function()
+  -- List all active clients
+  local clients = vim.lsp.get_clients()
+  local items = {}
+  for _, client in ipairs(clients) do
+    table.insert(items, client.name)
+  end
+
+  -- Show list of clients with ui select
+  vim.ui.select(items, {
+    prompt = "Select LSP client to stop",
+  }, function(choice)
+    -- TODO: is it possible to restart and attach root at the current dir ?
+    if choice ~= nil then
+      for _, client in ipairs(clients) do
+        if client.name:lower():match("copilot") then
+          vim.notify("restarting copilot : " .. client.name)
+          vim.fn.execute("Copilot restart")
+          return
+        end
+        if client.name == choice then
+          vim.notify("stop and starting " .. client.name)
+          vim.lsp.stop_client(client.id, true)
+          vim.lsp.start_client(client.config)
+          return
+        end
+      end
+    end
+  end)
+end, { nargs = 0 })
+
+keymap("n", "<leader>lr", ":RestartLspClient<CR>", { desc = "LSPRestart", noremap = true, silent = true })
+
 --   # which key migrate .nvim $HOME/.config/nvim/keys/which-key.vim
 keymap("n", "<c-q>", ":q<CR>", { desc = "Close", noremap = true, silent = true })
 keymap("n", "<localleader>q", ":q<CR>", { desc = "Close", noremap = true, silent = true })
@@ -502,10 +540,6 @@ keymap({ "n", "v" }, "gx", function()
   if url_or_word ~= "" then
     vim.fn.setreg("+", url_or_word)
   end
-  -- fallback to send gx if not a link or files
-  -- vim.cmd("normal! gx")
-  -- print("!" .. open_command .. " " .. url_repo())
-  -- vim.cmd("!" .. open_command .. " " .. url_repo())
 end, { silent = true, desc = "Copy word / Open url" })
 
 set_opfunc = vim.fn[vim.api.nvim_exec(

@@ -37,7 +37,7 @@ function M.get_pythonpath(pipenvFallback, isLog)
     print([==[M.get_pythonpath#readpyrightconfig filepath:]==], vim.inspect(filepath)) -- __AUTO_GENERATED_PRINT_VAR_END__
     local filepathconfig = filepath .. "/" .. (pyrightConfigname or "pyrightconfig.json")
     local content = ""
-    if vim.fn.filereadable(filepathconfig) then
+    if vim.fn.filereadable(filepathconfig) == 1 then
       local config_content = vim.fn.readfile(filepathconfig)
       content = vim.fn.json_decode(table.concat(config_content, "\n"))
     end

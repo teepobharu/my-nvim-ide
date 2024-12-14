@@ -122,7 +122,7 @@ return {
   },
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    enabled = false,
+    enabled = true,
   },
   {
     dir = IS_DEV and "~/Projects/research/codecompanion.nvim" or nil,

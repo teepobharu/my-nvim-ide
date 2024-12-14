@@ -431,6 +431,7 @@ return {
   },
   {
     "CopilotC-Nvim/CopilotChat.nvim",
+    enabled = true,
     keys = {
       {
         "<leader>aE",

@@ -107,3 +107,4 @@ end
 --  =========================
 vim.g.maplocalleader = ","
 vim.g.lazygit_config = true
+vim.g.ai_prefix_key = "<leader>A" -- see: lua/plugins/extras/codecompanion.lua

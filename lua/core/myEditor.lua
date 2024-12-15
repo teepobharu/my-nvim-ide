@@ -440,7 +440,7 @@ return {
       },
     },
     opts = {
-      model = "", -- override claude-sonnet model since not support on my copilot (get ereror)
+      model = "gpt-4o", -- override claude-sonnet model since not support on my copilot (get ereror)
       -- debug = true, -- add to debug message by calling l-a-d and  see in file using <gf> or check :messages in the logfile name else see only error (not prompt and embedding used)
       mappings = {
         complete = {

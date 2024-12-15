@@ -18,10 +18,10 @@ local prompts = {
 }
 
 function setupPrompts(initialPrompts)
-  local sysp = require("CopilotChat.prompts") -- see default prompts here
+  -- local sysp = require("CopilotChat.prompts") -- see default prompts here
   ---@class CopilotChat.config.prompt
   return vim.tbl_extend("force", initialPrompts, {
-    DocAlgo = "Please provide brief documentation for the following algorithm, if code does not summarize pitfalls briefly and add simple breaking case sample finnaly analyze the time and space complexity.",
+    DocAlgo = "Please provide brief documentation for the following algorithm, if code does not summarize pitfalls briefly and add simple breaking case sample finally analyze the time and space complexity.",
     ReactTestingLibraryConvert = {
       prompt = [[
       Please convert the React component testing code to not use enzyme related library,
@@ -31,16 +31,6 @@ function setupPrompts(initialPrompts)
       selection = function(source)
         return require("CopilotChat.select").visual(source) or require("CopilotChat.select").buffer(source)
       end,
-      system_prompt = sysp.COPILOT_WORKSPACE
-        .. [[
-
-Specific Guidelines:
-Using great typescript is more preferable over js make sure the typing is correct and the test is working as expected.
-Try to use data-testid instead of class or id for the selector.
-If the implementation uses data-component-name or some other tag please setup the RTL to use the data-component-name as a default testid selector before test run in a file
-Example: configure({ testIdAttribute: 'data-component-name' }); 
-But it is more preferable to use data-testid as a default testid selector.
-    ]],
     },
     ReactBestPractices = {
       prompt = [[

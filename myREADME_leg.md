@@ -220,6 +220,10 @@ Neo Tree
 
 Overseer - task manangement (leader + o)
 
+- support and read ./.vscode/tasks.json by default
+- can extend by https://github.com/stevearc/overseer.nvim/blob/master/doc/guides.md#custom-tasks
+- rerun last task with <leader>>or
+
 Hurl - HTTP client runner (leader + h)
 
 https://github.com/jellydn/hurl.nvim?tab=readme-ov-file#swappable-environment

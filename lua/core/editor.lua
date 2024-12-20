@@ -411,6 +411,32 @@ return {
   {
     "folke/trouble.nvim",
     opts = {
+      keys = {
+        J = {
+          -- https://github.com/folke/trouble.nvim?tab=readme-ov-file#api
+          action = function(view)
+            -- cycle to older quickfix list
+            local success, _ = pcall(vim.cmd, "colder") --  swallow error
+            if not success then
+              vim.notify("End of older list", vim.log.levels.WARN)
+            end
+            view:refresh()
+          end,
+          desc = "Cycle to older quickfix list and refresh",
+        },
+        K = {
+          action = function(view)
+            -- cycle to newer quickfix list
+            local success, _ = pcall(vim.cmd, "cnewer") --  swallow error
+            if not success then
+              vim.notify("End of newer list", vim.log.levels.WARN)
+            end
+            -- refresh
+            view:refresh()
+          end,
+          desc = "Cycle to newer quickfix",
+        },
+      },
       modes = {
         -- Diagnostics for the current buffer and errors from the current project
         errors = {

@@ -298,6 +298,7 @@ end
 -- if you only want these mappings for toggle term use term://*toggleterm#* instead
 vim.cmd("autocmd! TermOpen term://* lua set_toggleterm_keymaps()")
 keymap("n", ";", ":", { desc = "CMD enter command mode" })
+
 vim.api.nvim_create_user_command("OpenTerminalInSplitWithCwd", function()
   local cwd = vim.fn.expand("%:p:h")
 
@@ -551,6 +552,36 @@ set_opfunc = vim.fn[vim.api.nvim_exec(
 ]],
   true
 )]
+
+-- ==================================================
+-- MY Autocommands
+local function augroup(name)
+  return vim.api.nvim_create_augroup("nvim_ide_my_" .. name, { clear = true })
+end
+-- local function set_mappings()
+-- Map J and K in quickfix window
+local quickfixAndTroubleGroup = augroup("QuickfixAndTroubleMappings")
+vim.api.nvim_create_autocmd("FileType", {
+  group = quickfixAndTroubleGroup,
+  pattern = "qf",
+  callback = function()
+    vim.api.nvim_buf_set_keymap(0, "n", "H", ":colder<CR>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(0, "n", "L", ":cnewer<CR>", { noremap = true, silent = true })
+  end,
+})
+
+-- -- Map J and K in trouble window with refresh
+-- vim.api.nvim_create_autocmd("FileType", {
+--   group = quickfixAndTroubleGroup,
+--   pattern = {
+--     "Trouble",
+--     "trouble",
+--   },
+--   callback = function()
+--     vim.api.nvim_buf_set_keymap(0, "n", "H", ":colder | Trouble qflist refresh<CR>", { noremap = true, silent = true })
+--     vim.api.nvim_buf_set_keymap(0, "n", "L", ":cnewer | Trouble qflist refresh<CR>", { noremap = true, silent = true })
+--   end,
+-- })
 
 -- ===============================================
 -- DELETE MAP ==========================

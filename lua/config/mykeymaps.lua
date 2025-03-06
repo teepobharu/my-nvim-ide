@@ -295,8 +295,6 @@ function _G.set_toggleterm_keymaps()
   -- vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
   -- vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], opts)
 end
--- if you only want these mappings for toggle term use term://*toggleterm#* instead
-vim.cmd("autocmd! TermOpen term://* lua set_toggleterm_keymaps()")
 keymap("n", ";", ":", { desc = "CMD enter command mode" })
 
 vim.api.nvim_create_user_command("OpenTerminalInSplitWithCwd", function()
@@ -587,9 +585,13 @@ vim.api.nvim_create_autocmd("FileType", {
 -- DELETE MAP ==========================
 -- ===============================================
 -- disabled in keymaps.lua (original)
-vim.api.nvim_del_keymap("i", "<A-j>")
-vim.api.nvim_del_keymap("i", "<A-k>")
-vim.api.nvim_del_keymap("n", "<C-c>")
+-- if you only want these mappings for toggle term use term://*toggleterm#* instead
+if not vim.g.vscode then
+  vim.cmd("autocmd! TermOpen term://* lua set_toggleterm_keymaps()")
+  vim.api.nvim_del_keymap("i", "<A-j>")
+  vim.api.nvim_del_keymap("i", "<A-k>")
+  vim.api.nvim_del_keymap("n", "<C-c>")
+end
 -- OVERRIDE MAP ==========================
 keymap("n", "zj", "zj")
 keymap("n", "zk", "zk")

@@ -1,0 +1,1777 @@
+{
+  "vim.statusBarColorControl": false, // bad impact the performance
+  "vim.timeout": 600, // Delay per mapped command
+  "vim.foldfix": true,
+  "vim.sneakReplacesF": true,
+  // Use leader leader (default //)
+  "vim.easymotion": true,
+  // Usage
+  // - change surround quote : cs"
+  // - change slect <tag>  - c s t t then type new tag enter , Visual - S - t  + tag to wrap)
+  // - from word to <word> ysiw> instead of <
+  // - delete surround ds"
+  // - yank ysiw]
+  // - surround with ysiw}
+  // - yssb suorround whole line with bracketj
+  // - . works with ds cs ys
+  "vim.surround": true,
+  "vim.startInInsertMode": true,
+  "vim.overrideCopy": false,
+  "vim.useCtrlKeys": true,
+  "vim.incsearch": true,
+  "vim.sneak": true,
+  // s or S with char (FIND)
+  // operator z/Z char char ( like df(char) - find )
+  "vim.useSystemClipboard": false,
+  // Enable native Select and find
+  // - false = not enabled - use -> remap with leader (space + A)
+  // use bash seq 1 10 g <C-A>
+  "vim.handleKeys": {
+    "<C-a>": true, // dec vim not working ??
+    "<C-f>": false,
+    "<C-d>": true,
+    "<C-i>": true,
+    "<C-c>": false,
+    "<C-x>": true, // inc vim
+    "<C-v>": true,
+    "<C-r>": true,
+    "<C-w>": true,
+  },
+  "vim.leader": "<space>",
+  "vim.visualModeKeyBindings": [
+    // 
+    {
+      "before": [
+        "<C-[>"
+      ],
+      "after": [
+        "<C-v>"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "x"
+      ],
+      "after": [
+        "<C-x>"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "a"
+      ],
+      "after": [
+        "<C-a>"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "b"
+      ],
+      "after": [
+        "g",
+        "<C-a>"
+      ]
+    },
+    {
+      "before": [
+        "j",
+        "k"
+      ],
+      "after": [
+        "<Esc>"
+      ]
+    },
+    // AI
+    {
+      "before": [
+        "<leader>",
+        "a",
+        "q"
+      ],
+      "commands": [
+        "inlineChat.start",
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "a",
+        "v"
+      ],
+      "commands": [
+        "workbench.action.chat.openInSidebar",
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "a",
+        "V"
+      ],
+      "commands": [
+        "workbench.action.chat.openEditSession",
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "a",
+        "a"
+      ],
+      "commands": [
+        // "workbench.action.chat.openInSidebar"
+        "continue.focusContinueInputWithoutClear",
+      ]
+    },
+    // CODE 
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "a"
+      ],
+      "commands": [
+        "editor.action.quickFix"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "A"
+      ],
+      "commands": [
+        "editor.action.fixAll"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "f"
+      ],
+      "commands": [
+        "editor.action.formatSelection"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "F"
+      ],
+      "commands": [
+        "editor.action.formatSelection.multiple"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "j",
+        "j"
+      ],
+      "after": [
+        "leader",
+        "leader",
+        "s"
+      ]
+    },
+    {
+      "before": [
+        "<C-space>",
+      ],
+      "commands": [
+        "editor.action.smartSelect.expand"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "j",
+        "l"
+      ],
+      "after": [
+        "leader",
+        "leader",
+        "leader",
+        "b",
+        "d",
+        "j",
+        "k"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "j",
+        "w"
+      ],
+      "after": [
+        "leader",
+        "leader",
+        "leader",
+        "b",
+        "d",
+        "w"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "x",
+        "s"
+      ],
+      "commands": [
+        "editor.action.sortLinesAscending"
+      ]
+    },
+    // EDIT
+    {
+      "before": [
+        "<",
+      ],
+      "commands": [
+        "editor.action.outdentLines"
+      ]
+    },
+    {
+      "before": [
+        ">",
+      ],
+      "commands": [
+        "editor.action.indentLines"
+      ]
+    },
+    {
+      "before": [
+        "<Tab>",
+      ],
+      "commands": [
+        "editor.action.indentLines"
+      ]
+    },
+    {
+      "before": [
+        "<S-Tab>",
+      ],
+      "commands": [
+        "editor.action.outdentLines"
+      ]
+    },
+  ],
+  "vim.normalModeKeyBindings": [
+    // AI
+    {
+      "before": [
+        "<leader>",
+        "a",
+        "v"
+      ],
+      "commands": [
+        "workbench.action.chat.openInSidebar",
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "a",
+        "V"
+      ],
+      "commands": [
+        "workbench.action.chat.openEditSession",
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "A",
+        "v"
+      ],
+      "commands": [
+        // "workbench.action.chat.openInSidebar"
+        "continue.continueGUIView.focus",
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "a",
+        "m"
+      ],
+      "commands": [
+        "gitlens.generateCommitMessage",
+      ]
+    },
+    // CODE
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "o"
+      ],
+      "commands": [
+        "editor.action.organizeImports"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "a"
+      ],
+      "commands": [
+        "editor.action.quickFix"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "A"
+      ],
+      "commands": [
+        "editor.action.fixAll"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "f"
+      ],
+      "commands": [
+        "editor.action.formatDocument"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "c",
+        "F"
+      ],
+      "commands": [
+        "editor.action.formatDocument.multiple"
+      ]
+    },
+    { // Remap Ctrl V to do visual mode
+      "before": [
+        "<C-[>"
+      ],
+      "after": [
+        "<C-v>"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "x"
+      ],
+      "after": [
+        "<C-x>"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "a"
+      ],
+      "after": [
+        "<C-a>"
+      ]
+    }, // END REMAP Conflict
+    // EDIT VIM MAP
+    {
+      "before": [
+        "<space>",
+        "/"
+      ],
+      "commands": [
+        "editor.action.addCommentLine"
+      ]
+    },
+    {
+      "before": [
+        "<C-h>"
+      ],
+      "after": [
+        "<C-w>",
+        "h"
+      ]
+    },
+    {
+      "before": [
+        "<C-l>"
+      ],
+      "after": [
+        "<C-w>",
+        "l"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "<leader>",
+        "i",
+        "s"
+      ],
+      "commands": [
+        "editor.action.insertSnippet"
+      ]
+    },
+    { // find next char after
+      "before": [
+        "leader",
+        "j",
+        "j"
+      ],
+      "after": [
+        "leader",
+        "leader",
+        "s"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "j",
+        "l"
+      ],
+      "after": [
+        "leader",
+        "leader",
+        "l",
+      ]
+    },
+    // DEBUG VIM MAP
+    {
+      "before": [
+        "leader",
+        "d",
+        "r"
+      ],
+      "commands": [
+        "workbench.action.debug.start"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "d"
+      ],
+      "commands": [
+        "editor.debug.action.toggleBreakpoint"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "j"
+      ],
+      "commands": [
+        "workbench.action.debug.stepInto"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "c"
+      ],
+      "commands": [
+        "workbench.debug.action.toggleRepl"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "b"
+      ],
+      "commands": [
+        "workbench.debug.action.focusBreakpointsView"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "t"
+      ],
+      "commands": [
+        "extension.js-debug.createDebuggerTerminal"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "l"
+      ],
+      "commands": [
+        "workbench.action.debug.continue"
+        // "editor.debug.action.goToNextBreakpoint"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "h"
+      ],
+      "commands": [
+        "workbench.action.debug.continue"
+        // "editor.debug.action.goToPreviousBreakpoint"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "n"
+      ],
+      "commands": [
+        "editor.debug.action.goToNextBreakpoint"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "k"
+      ],
+      "commands": [
+        "editor.debug.action.stepOut"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "j"
+      ],
+      "commands": [
+        "editor.debug.action.stepInto"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "n"
+      ],
+      "commands": [
+        "editor.debug.action.stepOver"
+      ]
+    },
+    {
+      "before": [
+        "leader",
+        "d",
+        "e"
+      ],
+      "commands": [
+        "workbench.debug.action.toggleRepl"
+      ]
+    },
+    // Navigation VIM MAP
+    {
+      "before": [
+        "<S-Tab>"
+      ],
+      "commands": [
+        ":tabprev"
+      ]
+    },
+    // tabs
+    {
+      "before": [
+        "<leader>",
+        "<Tab>",
+        "d"
+      ],
+      "commands": [
+        "workbench.action.closeEditorsInGroup"
+      ]
+    },
+    {
+      "before": [
+        "<Tab>"
+      ],
+      "commands": [
+        ":tabnext"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "1"
+      ],
+      "commands": [
+        "workbench.action.focusFirstEditorGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "2"
+      ],
+      "commands": [
+        "workbench.action.focusSecondEditorGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "b",
+        "e"
+      ],
+      "commands": [
+        "workbench.action.showAllEditors"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        ",",
+      ],
+      "commands": [
+        "workbench.action.showAllEditors"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "b",
+        "d"
+      ],
+      "commands": [
+        "workbench.action.closeActiveEditor"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "b",
+        "<C-d>"
+      ],
+      "commands": [
+        "workbench.action.closeOtherEditors"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "b",
+        "n"
+      ],
+      "commands": [
+        "workbench.action.nextEditor"
+      ]
+    },
+    {
+      "before": [
+        "L"
+      ],
+      "commands": [
+        "workbench.action.nextEditor"
+      ]
+    },
+    {
+      "before": [
+        "H"
+      ],
+      "commands": [
+        "workbench.action.previousEditor"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "b",
+        "p"
+      ],
+      "commands": [
+        "workbench.action.previousEditor"
+      ]
+    },
+    // Navigate VIM MAP
+    {
+      "before": [
+        "<leader>",
+        "f",
+        "y"
+      ],
+      "commands": [
+        "workbench.action.files.copyPathOfActiveFile"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "r"
+      ],
+      "commands": [
+        "editor.action.peekDefinition"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "f",
+        "f"
+      ],
+      "commands": [
+        "workbench.action.quickOpen"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "f",
+        "k"
+      ],
+      "commands": [
+        "workbench.action.openGlobalKeybindings"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "q",
+        "r"
+      ],
+      "commands": [
+        "workbench.action.reloadWindow"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "s",
+        "b"
+      ],
+      "commands": [
+        "bookmarksExplorer.focus"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "b",
+        "j"
+      ],
+      "commands": [
+        "bookmarks.jumpToNext"
+      ]
+    },
+    { // require in normal + visual to consecutive 
+      "before": [
+        "<C-space>",
+      ],
+      "commands": [
+        "editor.action.smartSelect.expand"
+      ]
+    },
+    {
+      "before": [
+        "<C-space>",
+      ],
+      "commands": [
+        "editor.action.smartSelect.expand"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "b",
+        "k"
+      ],
+      "commands": [
+        "bookmarks.jumpToPrevious"
+      ]
+    },
+    {
+      "before": [
+        "g",
+        "R",
+      ],
+      "commands": [
+        "references-view.findReferences"
+      ]
+    },
+    // GIT Vim MAP
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "<"
+      ],
+      "commands": [
+        "gitlens.diffWithPrevious"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        ">"
+      ],
+      "commands": [
+        "gitlens.diffWithNext"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "o"
+      ],
+      "commands": [
+        "git.checkout"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "w"
+      ],
+      "commands": [
+        "gitlens.views.worktrees.focus"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "g"
+      ],
+      "commands": [
+        "workbench.view.scm"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "b"
+      ],
+      "commands": [
+        "gitlens.toggleFileBlame"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "'"
+      ],
+      "commands": [
+        "gitlens.showQuickFileHistory"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "c"
+      ],
+      "commands": [
+        "git.commit"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "f"
+      ],
+      "commands": [
+        "git.fetch"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "i"
+      ],
+      "commands": [
+        "git.init"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "l"
+      ],
+      "commands": [
+        "gitlens.showGraphPage"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "m"
+      ],
+      "commands": [
+        "gitlens.gitCommands"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "p"
+      ],
+      "commands": [
+        "git.publish"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "s"
+      ],
+      "commands": [
+        "workbench.view.scm"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "S"
+      ],
+      "commands": [
+        "git.stage"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "h",
+        "S"
+      ],
+      "commands": [
+        "git.stage"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "h",
+        "d"
+      ],
+      "commands": [
+        "gitlens.openFileRevisionFrom"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "h",
+        "D"
+      ],
+      "commands": [
+        "gitlens.compareHeadWith"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "U"
+      ],
+      "commands": [
+        "git.unstage"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "g",
+        "h",
+        "U"
+      ],
+      "commands": [
+        "git.unstage"
+      ]
+    },
+    // Preference VIM MAP
+    {
+      "before": [
+        "<leader>",
+        "h",
+        "d"
+      ],
+      "commands": [
+        "workbench.action.openGlobalKeybindings"
+      ]
+    },
+    // Jest: Setup Extension to configure command and dir : https://github.com/jest-community/vscode-jest#jestcommandline
+    {
+      "before": [
+        "<leader>",
+        "t",
+        "T"
+      ],
+      "commands": [
+        "testing.runCurrentFile"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "t",
+        "t"
+      ],
+      "commands": [
+        "testing.runAtCursor"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "t",
+        "s"
+      ],
+      "commands": [
+        "workbench.view.testing.focus"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "t",
+        "o"
+      ],
+      "commands": [
+        "workbench.panel.testResults.view.focus"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "t",
+        "r"
+      ],
+      "commands": [
+        "workbench.panel.testResults.view.focus"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "t",
+        "b"
+      ],
+      "commands": [
+        "workbench.action.tasks.build"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "l",
+        "d"
+      ],
+      "commands": [
+        "workbench.action.closeFolder"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "p",
+        "f"
+      ],
+      "commands": [
+        "workbench.action.quickOpen"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "p",
+        "g"
+      ],
+      "commands": [
+        "workbench.action.showEditorsInActiveGroup"
+      ]
+    },
+    {
+      "before": [
+        "R",
+      ],
+      "commands": [
+        "editor.action.refactor"
+      ]
+    },
+    {
+      "before": [
+        "<S-r>",
+      ],
+      "commands": [
+        "editor.action.rename"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "s",
+        "e"
+      ],
+      "commands": [
+        "editor.action.rename"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "s",
+        "j"
+      ],
+      "commands": [
+        "workbench.action.gotoSymbol"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "s",
+        "P"
+      ],
+      "after": [
+        "v",
+        "i",
+        "w",
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "T",
+        "F"
+      ],
+      "commands": [
+        "workbench.action.toggleFullScreen"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "T",
+        "m"
+      ],
+      "commands": [
+        "workbench.action.toggleMenuBar"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "T",
+        "s"
+      ],
+      "commands": [
+        "workbench.action.selectTheme"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "T",
+        "t"
+      ],
+      "commands": [
+        "workbench.action.toggleActivityBarVisibility"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "v"
+      ],
+      "commands": [
+        "editor.action.smartSelect.grow"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "V"
+      ],
+      "commands": [
+        "editor.action.smartSelect.shrink"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "-"
+      ],
+      "commands": [
+        "workbench.action.splitEditorDown"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "/"
+      ],
+      "commands": [
+        "workbench.action.splitEditorRight"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "d"
+      ],
+      "commands": [
+        "workbench.action.closeEditorsInGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "h"
+      ],
+      "commands": [
+        "workbench.action.moveEditorToLeftGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "H"
+      ],
+      "commands": [
+        "workbench.action.moveActiveEditorGroupLeft"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "j"
+      ],
+      "commands": [
+        "workbench.action.moveEditorToBelowGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "J"
+      ],
+      "commands": [
+        "workbench.action.moveActiveEditorGroupDown"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "k"
+      ],
+      "commands": [
+        "workbench.action.moveEditorToAboveGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "K"
+      ],
+      "commands": [
+        "workbench.action.moveActiveEditorGroupUp"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "l"
+      ],
+      "commands": [
+        "workbench.action.moveEditorToRightGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "L"
+      ],
+      "commands": [
+        "workbench.action.moveActiveEditorGroupRight"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "m"
+      ],
+      "commands": [
+        "workbench.action.toggleEditorWidths"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "s"
+      ],
+      "commands": [
+        "workbench.action.splitEditorDown"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "v"
+      ],
+      "commands": [
+        "workbench.action.splitEditor"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "w"
+      ],
+      "commands": [
+        "workbench.action.focusNextGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "W"
+      ],
+      "commands": [
+        "workbench.action.focusPreviousGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "x",
+        "s"
+      ],
+      "commands": [
+        "editor.action.sortLinesAscending"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "x",
+        "w"
+      ],
+      "commands": [
+        "editor.action.trimTrailingWhitespace"
+      ]
+    }
+  ],
+  "vim.insertModeKeyBindings": [
+    {
+      "before": [
+        "j",
+        "k"
+      ],
+      "after": [
+        "<Esc>"
+      ]
+    },
+    {
+      "before": [
+        "k",
+        "j"
+      ],
+      "after": [
+        "<Esc>"
+      ]
+    }
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": [
+        "z",
+        "v",
+      ],
+      "commands": [
+        "editor.foldAllExcept"
+      ]
+    },
+    {
+      "before": [
+        "z",
+        "j",
+      ],
+      "commands": [
+        "editor.gotoNextFold"
+      ]
+    },
+    {
+      "before": [
+        "z",
+        "k",
+      ],
+      "commands": [
+        "editor.gotoPreviousFold"
+      ]
+    },
+    {
+      "before": [
+        "z",
+        "m",
+      ],
+      "commands": [
+        "editor.foldRecursively"
+      ]
+    }, // Zzo, M and zc ZC already worked 
+    {
+      "before": [
+        "z",
+        "r",
+      ],
+      "commands": [
+        "editor.unfoldRecursively"
+      ]
+    },
+    {
+      "before": [
+        "z",
+        "R",
+      ],
+      "commands": [
+        "editor.unfoldAll"
+      ]
+    },
+    // {
+    //     "before": [
+    //         "<ESC>"
+    //     ],
+    //     "commands": [
+    //         "editor.toggleFold"
+    //     ]
+    // },
+    {
+      "before": [
+        "<Space><Space>"
+      ],
+      "commands": [
+        "editor.toggleFold"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        ";"
+      ],
+      "commands": [
+        {
+          "command": "editor.emmet.action.matchTag"
+        }
+      ]
+    },
+    // Visibility / Windows VIM MAP
+    {
+      "before": [
+        ",",
+        "e",
+      ],
+      "commands": [
+        "workbench.view.explorer"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "r"
+      ],
+      "commands": [
+        "workbench.view.extension.references-view"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "s",
+        "s"
+      ],
+      "commands": [
+        "outline.focus"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "w",
+        "o"
+      ],
+      "commands": [
+        "outline.focus"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "e",
+      ],
+      "commands": [
+        "workbench.action.toggleSidebarVisibility"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "-",
+      ],
+      "commands": [
+        "workbench.action.showCommands"
+      ]
+    },
+    { // search current group
+      "before": [
+        "<leader>",
+        "<tab>"
+      ],
+      "commands": [
+        "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "f",
+        "f"
+      ],
+      "commands": [
+        "fzf-picker.findFiles",
+        // "workbench.action.quickOpenNavigateNextInFilePicker"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "f",
+        "x"
+      ],
+      "commands": [
+        "fzf-picker.findTodoFixme"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "f",
+        "R"
+      ],
+      "commands": [
+        "fzf-picker.resumeSearch"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "s",
+        "w"
+      ],
+      "commands": [
+        "editor.action.addSelectionToNextFindMatch",
+        "fzf-picker.findWithinFiles"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "s",
+        "W"
+      ],
+      "commands": [
+        "editor.action.addSelectionToNextFindMatch",
+        "fzf-picker.findWithinFilesWithType"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        ".",
+      ],
+      "commands": [
+        "fzf-picker.findFiles"
+        // "find-it-faster.pickFileFromGitStatus"
+        // "workbench.action.quickOpenNavigateNextInFilePicker"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "f",
+        "g"
+      ],
+      "commands": [
+        "fzf-picker.pickFileFromGitStatus"
+        // "quick-open-git-status.open"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "p",
+        "o"
+      ],
+      "commands": [
+        "workbench.action.files.openFolder"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "f",
+        "p"
+      ],
+      "commands": [
+        "workbench.action.openRecent"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "q",
+        "q",
+      ],
+      "commands": [
+        "workbench.action.closeOtherEditors"
+      ]
+    },
+    // NAVIGATE VIM MAP
+    // - Error
+    {
+      "before": [
+        "<leader>",
+        "x",
+        "x",
+      ],
+      "commands": [
+        "workbench.actions.view.problems"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "e",
+        "l"
+      ],
+      "commands": [
+        "workbench.actions.view.problems"
+      ]
+    },
+    {
+      "before": [
+        "[",
+        "e",
+      ],
+      "commands": [
+        "editor.action.marker.prev"
+      ]
+    },
+    {
+      "before": [
+        "]",
+        "e",
+      ],
+      "commands": [
+        "editor.action.marker.nextInFiles"
+      ]
+    },
+    {
+      "before": [
+        "]",
+        "q",
+      ],
+      "commands": [
+        "editor.action.marker.next"
+      ]
+    },
+    {
+      "before": [
+        "[",
+        "q",
+      ],
+      "commands": [
+        "editor.action.marker.prev"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "e",
+        "n"
+      ],
+      "commands": [
+        "editor.action.marker.next"
+      ]
+    },
+    {
+      "before": [
+        "<leader>",
+        "e",
+        "p"
+      ],
+      "commands": [
+        "editor.action.marker.prev"
+      ]
+    },
+    {
+      "before": [
+        "L",
+        "j"
+      ],
+      "commands": [
+        {
+          "command": "editor.action.marker.nextInFiles"
+        }
+      ]
+    },
+    {
+      "before": [
+        "L",
+        "k"
+      ],
+      "commands": [
+        {
+          "command": "editor.action.marker.prevInFiles"
+        }
+      ]
+    }
+  ]
+}

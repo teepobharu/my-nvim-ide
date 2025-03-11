@@ -522,7 +522,7 @@ if vim.fn.has("mac") == 1 then
 end
 
 local function url_repo()
-  local cursorword = vim.fn.expand("<cfile>")
+  local cursorword = vim.fn.mode() == "v" and vim.fn.getreg("v") or vim.fn.expand("<cfile>")
   -- __AUTO_GENERATED_PRINT_VAR_START__
   print([==[url_repo cursorword:]==], vim.inspect(cursorword)) -- __AUTO_GENERATED_PRINT_VAR_END__
   if string.find(cursorword, "^[a-zA-Z0-9-_.]*/[a-zA-Z0-9-_.]*$") then
@@ -532,14 +532,93 @@ local function url_repo()
   return cursorword or ""
 end
 
+local function url_repo(tryParseGit)
+  local cursorword = vim.fn.expand("<cfile>")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[url_repo cursorword:]==], vim.inspect(cursorword)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  if tryParseGit and string.find(cursorword, "^[a-zA-Z0-9-_.]*/[a-zA-Z0-9-_.]*$") then
+    cursorword = "https://github.com/" .. cursorword
+  end
+  print(cursorword or "")
+  return cursorword or ""
+end
+
+local function run_command(command, callback)
+  callback = callback or {}
+  callback.success = callback.success or function() end
+  callback.fail = callback.fail or function() end
+  -- callback.out = callback.out or false
+  -- callback.stderr = callback.stderr or false
+
+  vim.fn.jobstart(command, {
+    on_stdout = callback.out and function(_, data, _)
+      print("[stdout " .. vim.inspect(command) .. "]:", vim.inspect(data))
+    end or nil,
+    on_stderr = callback.stderr and function(_, data, _)
+      print("[stderr " .. vim.inspect(command) .. "]:", vim.inspect(data))
+    end or nil,
+    on_exit = function(_, code, _)
+      print("[exit " .. vim.inspect(command) .. " ] code =", data)
+      if code ~= 0 then
+        callback.success(_, code, _)
+      else
+        callback.fail(_, code, _)
+      end
+    end,
+    detach = true,
+  })
+end
 keymap({ "n", "v" }, "gx", function()
-  local url_or_word = url_repo()
+  local url_or_word = url_repo(true)
   -- copy to register + if not empty
-  vim.fn.jobstart({ open_command, url_or_word }, { detach = true }) -- not work in tmux
+  run_command({ open_command, url_or_word })
+  --   vim.fn.jobstart({ open_command, url_or_word }, { detach = true }) -- not work in tmux
   if url_or_word ~= "" then
     vim.fn.setreg("+", url_or_word)
   end
 end, { silent = true, desc = "Copy word / Open url" })
+
+-- map gX to open in code editor
+keymap({ "n", "v" }, "gX", function()
+  local url_or_word = url_repo()
+  -- copy to register + if not empty
+  -- if extension is in .log or .xlsx or .pdf .powerpoint .docx ,... use normal open function
+  local normal_ext_open = vim.fn.match(url_or_word, [[\.\(log\|pdf\|docx\|pptx\|xlsx\)$]]) > -1
+  -- use one regex matcher
+
+  local callback = nil
+  if normal_ext_open then
+    command_run = open_command
+  else
+    command_run = "code --goto"
+    callback = {
+      fail = function(_, code, _)
+        print("code cmd fail try again with cmd: ", open_command)
+        vim.fn.jobstart({ open_command, url_or_word }, { detach = true })
+      end,
+    }
+
+    -- /Users/tharutaipree/.config/nvim2_jelly_lzmigrate/lua/config/mykeymaps.lua
+    -- vim.fn.jobstart("echo 'hello' && some error here", {
+    -- vim.fn.jobstart({ open_command, "-a", "code", url_or_word }, { -- get error command not found
+    -- vim.fn.jobstart(open_command .. " -a " .. "code " .. url_or_word ,{
+    -- local callback = {
+    --     success = function(_, code, _)
+    --         print("success code=", code)
+    --     end,
+    --     fail = function(_, code, _)
+    --         print("fail code=", code)
+    --     end,
+    -- }
+    -- vim.fn.jobstart("env && code " .. url_or_word ,{
+
+    -- get error code is not executable how to make code a known command
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    -- local code_command = open_command .. "-a code"
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+  end
+  run_command(command_run .. url_or_word, callback)
+end, { silent = true, desc = "Open in vscode" })
 
 set_opfunc = vim.fn[vim.api.nvim_exec(
   [[

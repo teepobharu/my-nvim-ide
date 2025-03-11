@@ -11,6 +11,11 @@ local enabled = {
   "nvim-ts-context-commentstring",
   "vim-repeat",
 }
+-- use to fix vim.fn.start not found
+
+-- print(vim.expand("$PATH"))
+vim.env.PATH = vim.env.PATH .. ":/opt/homebrew/bin"
+-- print(vim.expand("$PATH"))
 
 local Config = require("lazy.core.config")
 Config.options.checker.enabled = false
@@ -18,9 +23,10 @@ Config.options.change_detection.enabled = false
 Config.options.defaults.cond = function(plugin)
   return vim.tbl_contains(enabled, plugin.name) or plugin.vscode
 end
-
+-- /Users/tharutaipree/.config/nvim2_jelly_lzmigrate/lua/config/mykeymaps.lua:500:10
+-- /Users/tharutaipree/.config/nvim2_jelly_lzmigrate/lua/config
 -- Add some vscode specific keymaps
--- Refer to https://github.com/vscode-neovim/vscode-neovim#code-navigation-bindings for default keymaps
+-- Refer to https://github.com/vscode-neovim/vscode-neovim#code-navigation-bindings
 vim.api.nvim_create_autocmd("User", {
   pattern = "NvimIdeKeymaps", -- This pattern will be called when the plugin is loaded
   callback = function()
@@ -29,13 +35,26 @@ vim.api.nvim_create_autocmd("User", {
     -- Find file
     vim.keymap.set("n", "<leader><space>", "<cmd>Find<cr>")
 
+    vim.keymap.set("n", "<leader><space>", function()
+      -- show all editors
+      vscode.action("workbench.action.showAllEditors")
+    end)
+    vim.keymap.set("n", "<leader>be", function()
+      vscode.action("workbench.action.showAllEditors")
+    end)
+    vim.keymap.set("n", "<leader>,", function()
+      vscode.action("workbench.action.showAllEditors")
+    end)
+    vim.keymap.set("n", "<leader>b<C-d>", function()
+      vscode.action("workbench.action.closeOtherEditors")
+    end)
     -- Find recent open files
     vim.keymap.set("n", "<leader>fr", function()
       vscode.action("workbench.action.showAllEditorsByMostRecentlyUsed")
     end)
 
     -- Need to install https://github.com/jellydn/vscode-fzf-picker
-    vim.keymap.set("n", "<leader>ff", function()
+    vim.keymap.set("n", "<leader>fF", function()
       vscode.action("fzf-picker.findFiles")
     end)
     -- Find word
@@ -117,6 +136,18 @@ vim.api.nvim_create_autocmd("User", {
     vim.keymap.set("n", "<leader>cf", function()
       vscode.action("editor.action.formatDocument")
     end)
+    vim.keymap.set("v", "<leader>cf", function()
+      vscode.action("editor.action.formatSelection")
+    end)
+    vim.keymap.set("n", "<leader>cF", function()
+      vscode.action("editor.action.formatChanges")
+    end)
+    vim.keymap.set("n", "<leader>cS", function()
+      vscode.action("workbench.action.files.saveWithoutFormatting")
+    end)
+    vim.keymap.set("v", "<leader>cF", function()
+      vscode.action("editor.action.formatSelection.multiple")
+    end)
     -- Refactor
     vim.keymap.set("n", "<leader>cR", function()
       vscode.action("editor.action.refactor")
@@ -126,6 +157,54 @@ vim.api.nvim_create_autocmd("User", {
     -- Open terminal
     vim.keymap.set("n", "<leader>ft", function()
       vscode.action("workbench.action.terminal.focus")
+    end)
+
+    -- DEBUG
+    vim.keymap.set("n", "<leader>sna", function()
+      vscode.action("workbench.panel.output.focus")
+      vim.cmd("messages")
+    end)
+    vim.keymap.set("n", "<leader>snx", function()
+      vscode.action("workbench.output.action.clearOutput")
+    end)
+    vim.keymap.set("n", "<leader>dr", function()
+      vscode.action("workbench.action.debug.start")
+    end)
+    vim.keymap.set("n", "<leader>dd", function()
+      vscode.action("editor.debug.action.toggleBreakpoint")
+    end)
+    vim.keymap.set("n", "<leader>dj", function()
+      vscode.action("workbench.action.debug.stepInto")
+    end)
+    vim.keymap.set("n", "<leader>dc", function()
+      vscode.action("workbench.debug.action.toggleRepl")
+    end)
+    vim.keymap.set("n", "<leader>db", function()
+      vscode.action("workbench.debug.action.focusBreakpointsView")
+    end)
+    vim.keymap.set("n", "<leader>dt", function()
+      vscode.action("extension.js-debug.createDebuggerTerminal")
+    end)
+    vim.keymap.set("n", "<leader>dl", function()
+      vscode.action("workbench.action.debug.continue")
+    end)
+    vim.keymap.set("n", "<leader>dh", function()
+      vscode.action("workbench.action.debug.continue")
+    end)
+    vim.keymap.set("n", "<leader>dn", function()
+      vscode.action("editor.debug.action.goToNextBreakpoint")
+    end)
+    vim.keymap.set("n", "<leader>dk", function()
+      vscode.action("editor.debug.action.stepOut")
+    end)
+    vim.keymap.set("n", "<leader>dj", function()
+      vscode.action("editor.debug.action.stepInto")
+    end)
+    vim.keymap.set("n", "<leader>dn", function()
+      vscode.action("editor.debug.action.stepOver")
+    end)
+    vim.keymap.set("n", "<leader>de", function()
+      vscode.action("workbench.debug.action.toggleRepl")
     end)
 
     -- +LSP
@@ -147,6 +226,16 @@ vim.api.nvim_create_autocmd("User", {
     end)
 
     -- +Git
+    -- toggle gitlab <l>gg
+    vim.keymap.set("n", "<leader>gag", function()
+      vscode.action("workbench.view.extension.gitlab-workflow")
+    end)
+    vim.keymap.set("n", "<leader>gal", function()
+      vscode.action("gl.advancedSearch")
+    end)
+    vim.keymap.set("n", "<leader>gac", function()
+      vscode.action("workbench.action.focusCommentsPanel")
+    end)
     -- Git status
     vim.keymap.set("n", "<leader>gs", function()
       vscode.action("workbench.view.scm")
@@ -231,6 +320,7 @@ vim.api.nvim_create_autocmd("User", {
     vim.keymap.set({ "n", "x", "i" }, "<C-m>", function()
       require("vscode-multi-cursor").addSelectionToNextFindMatch()
     end)
+    my_vscode_keymaps(vscode)
   end,
 })
 
@@ -242,198 +332,432 @@ if vim.g.vscode then
   --   require("config.mykeymaps")
 end
 
-vim.api.nvim_create_autocmd("User", {
-  pattern = "NvimIdeKeymaps", -- This pattern will be called when the plugin is loaded
-  callback = function()
-    -- api : https://github.com/vscode-neovim/vscode-neovim?tab=readme-ov-file#%EF%B8%8F-api
-    local vscode = require("vscode")
+function my_vscode_keymaps(vscode)
+  -- api : https://github.com/vscode-neovim/vscode-neovim?tab=readme-ov-file#%EF%B8%8F-api
+  -- local vscode = vscode or require("vscode")
 
-    local QuickOnboardKeyInstructions = [[
+  local QuickOnboardKeyInstructions = [[
     <l> = leader 
     -----------------------------
-    \n ?+? WhichKey search 
-    <l>ls Stop plugin
-    <l>lr Restart neovim plugin 
+    \n ?+?      WhichKey search 
+    <l>ls / qq  Stop plugin
+    <l>lr       Restart neovim plugin 
     -----------------------------
-    <l>to Open output tab
+    <l>sna Open output + messages
     <l>oo Open test results
-    <l><space> Find file
+    <space><space> Find file
+    -- Config
+    ,e Edit config file
     -- Git
     <l>gb Git blame
     <l>gf Git file history
     <l>gC Git compare diff
     <l>gi Toggle inline diff
     <l>g< diff with previously
-    -- 
-    <l>fr Find recent open files
-    <l>ff Find files using fzf-picker
+    -- Files and search
     <l>fw Find word within files
+    <l>ff Find files using fzf-picker
+    <l>fr Find recent open files
     <l>fg Find file from git status
     <l>fR Resume last search
     <l>fx Find todo/fixme
     <l>, Open other files
     <l>/ Find in files
-    <l>e Open file explorer in left sidebar
-    <l>ss Open symbol
     <l>sw Search word under cursor
     <l>sb Search word in current buffer
+    <l>e Open file explorer in left sidebar
+    <l>ss Open symbol
+    -- Code
     <l>ca Code action
     <l>cA Source action
     <l>cr Code rename
     <l>. Quickfix shortcut
     <l>cf Code format
     <l>cR Refactor
+    -- 
+    n  <l>dv Print below variables
+    n  <l>rB Extract block to file
+    n  <l>rI Inline function
+    n  <l>ri Inline variable
+    n  <l>rb Extract block
+    n  <l>cjd JsDoc
+    n  <l>cjf JsDocFormat
+    -- Views
+    <l>1 Toggle sidebar
+    <l>2 togglge secondary
+    -- Windows
     <l>ft Open terminal
     <l>xx View problems
+    <C-q> Close window group
+    <l>wv Split window
+    <l>wL Close editors to the right
+    <l>wH Close editors to the left
+    <l>wh Split editor down
+    ** <leader>sna to see all keybind / prior messages **
 ]]
 
-    vim.notify(QuickOnboardKeyInstructions)
-    -- vscode.notify(QuickOnboardKeyInstructions)
-    -- Helper
-    vim.keymap.set("n", "?", function()
-      vscode.action("whichkey.show")
-    end)
+  print(QuickOnboardKeyInstructions)
+  -- vscode.notify(QuickOnboardKeyInstructions)
+  -- Helper
+  vim.keymap.set("n", "?", function()
+    vscode.action("whichkey.show")
+  end)
+  --
+  vim.keymap.set("n", "<localleader>le", function()
+    -- local currentfiledir = vim.fn.expand("<sfile>:p:h")
+    local initFile = vim.fn.expand("$HOME/.config/$NVIM_APPNAME/init.lua")
+    local configFile = vim.fn.expand("$HOME/.config/$NVIM_APPNAME/lua/plugins/vscode.lua")
+    local keymapFile = vim.fn.expand("$HOME/.config/$NVIM_APPNAME/lua/config/mykeymaps.lua")
+    --   local configFile = vim.fn.expand("$HOME/.config/nvim2_jelly_lzmigrate/init.lua")
+    vim.fn.jobstart("code " .. initFile, { detach = true })
+    vim.fn.jobstart("code " .. configFile, { detach = true })
+    vim.fn.jobstart("code " .. keymapFile, { detach = true })
+    vim.notify("Open file: " .. configFile .. " and " .. initFile .. " and " .. keymapFile)
+  end)
+
+  -- View
+  vim.keymap.set("n", "<leader>1", function()
+    vscode.action("workbench.action.toggleSidebarVisibility")
+  end)
+  vim.keymap.set("n", "<leader>2", function()
+    vscode.action("workbench.action.toggleAuxiliaryBar")
+  end)
+  -- Preferences
+  vim.keymap.set("n", "<leader>sk", function()
+    vscode.action("workbench.action.openGlobalKeybindings")
+  end)
+  vim.keymap.set("n", "<leader>sK", function()
+    vscode.action("workbench.action.openGlobalKeybindingsFile")
+  end)
+  vim.keymap.set("n", "<leader>qr", function()
+    vscode.action("workbench.action.reloadWindow")
+  end)
+  -- +Window
+  -- vs / sp split
+  vim.keymap.set("n", "<leader>wv", function()
+    vscode.action("workbench.action.splitEditor")
+  end)
+  -- Ctrl Q - close window group
+  vim.keymap.set("n", "<C-q>", function()
+    vscode.action("workbench.action.closeEditorsAndGroup")
+  end)
+  vim.keymap.set("n", "<leader>wL", function()
+    vscode.action("workbench.action.closeEditorsToTheRight")
+  end)
+  vim.keymap.set("n", "<leader>wH", function()
+    vscode.action("workbench.action.closeEditorsToTheLeft")
+  end)
+  vim.keymap.set("n", "<leader>wh", function()
+    vscode.action("workbench.action.splitEditorDown")
+  end)
+  vim.keymap.set("n", "<leader><Tab>d", function()
+    vscode.action("workbench.action.closeEditorsInGroup")
+  end)
+  vim.keymap.set("n", "<leader><Tab>o", function()
+    vscode.action("workbench.action.closeEditorsInOtherGroups")
+  end)
+  vim.keymap.set("n", "Q", function()
+    -- close file
+    vscode.action("workbench.action.closeActiveEditor")
+  end)
+  -- since bd have some problem that open output file
+  vim.keymap.set("n", "L", function()
+    vscode.action("workbench.action.nextEditorInGroup")
+  end)
+  vim.keymap.set("n", "H", function()
+    vscode.action("workbench.action.previousEditorInGroup")
+  end)
+  vim.keymap.set("n", "<leader>sne", function()
+    vscode.action("workbench.panel.output.focus")
+  end)
+  -- TODO : fix folding
+  -- +Git
+  vim.keymap.set("n", "<leader>gb", function()
+    -- blame
+    vscode.action("gitlens.toggleFileBlame")
+  end)
+  vim.keymap.set({ "n", "v" }, "<leader>ghs", function()
+    vscode.action("git.stageSelectedRanges")
+  end)
+  vim.keymap.set("n", "<leader>ghS", function()
+    vscode.action("git.stage")
+  end)
+
+  vim.keymap.set("n", "<leader>ghU", function()
+    vscode.action("git.unstageAll")
+  end)
+  vim.keymap.set({ "n", "v" }, "<leader>ghu", function()
+    vscode.action("git.unstage")
+  end)
+  -- open file history
+  vim.keymap.set("n", "<leader>gf", function()
+    vscode.action("gitlens.views.fileHistory.focus")
+  end)
+  -- open compare diff
+  vim.keymap.set("n", "<leader>ghD", function()
+    vscode.action("gitlens.compareHeadWith")
+  end)
+  vim.keymap.set("n", "<leader>ghd", function()
+    vscode.action("gitlens.openFileRevisionFrom")
+  end)
+  vim.keymap.set("n", "<leader>gC", function()
+    vscode.action("gitlens.compareHeadWith")
+    vscode.notify("use cmd+down browse sections")
+  end)
+  vim.keymap.set("n", "<leader>gi", function()
+    vscode.action("toggle.diff.renderSideBySide")
+  end)
+  -- dup ?
+  vim.keymap.set("n", "<leader>g<", function()
+    vscode.action("gitlens.diffWithPreviousInDiffLeft")
+    --   vscode.action("gitlens.diffWithPrevious")
+  end)
+  vim.keymap.set("n", "<leader>g>", function()
+    vscode.action("gitlens.diffWithNext")
+  end)
+  vim.keymap.set("n", "<leader>go", function()
+    vscode.action("git.checkout")
+  end)
+  vim.keymap.set("n", "<leader>gw", function()
+    vscode.action("gitlens.views.worktrees.focus")
+  end)
+  vim.keymap.set("n", "<leader>g'", function()
+    vscode.action("gitlens.showQuickFileHistory")
+  end)
+  vim.keymap.set("n", "<leader>gc", function()
+    vscode.action("git.commit")
+  end)
+  vim.keymap.set("n", "<leader>gF", function()
+    vscode.action("git.fetch")
+  end)
+  vim.keymap.set("n", "<leader>gi", function()
+    vscode.action("git.init")
+  end)
+  vim.keymap.set("n", "<leader>gl", function()
+    vscode.action("gitlens.showGraphPage")
+  end)
+  vim.keymap.set("n", "<leader>gm", function()
+    vscode.action("gitlens.gitCommands")
+  end)
+  vim.keymap.set("n", "<leader>gp", function()
+    vscode.action("git.publish")
+  end)
+  -- +File
+
+  -- LSP and code
+  -- vscode-neovim.restart with <leader>ls (stop vim)
+  vim.keymap.set("n", "<leader>ls", function()
+    vscode.action("vscode-neovim.stop")
+  end)
+  -- typescript.restartTsServer with <leader>ls (stop vim)
+  -- set j k and k j to enter normal mode - not work use in settings.json
+  -- vim.keymap.set("i", "jk", "<esc>")
+  -- vim.keymap.set("i", "kj", "<esc>")
+  -- send selected text / lline to terminal in n\v mode
+  -- open shortcuts key json in vscode
+  vim.keymap.set({ "n", "v" }, "<localleader>t", function()
+    -- vscode.notify("Before wrun WAIT")
+    vscode.action("workbench.action.terminal.runSelectedText")
+    -- vscode.call("_wait", { args = { 1000 }, 100 })
+    -- vscode.notify("AFFTER WAIT NEVER RUN !!")
+    -- vscode.call("workbench.action.terminal.focus", {}, 100)
+  end)
+
+  vim.keymap.set({ "n", "v" }, "<leader>lr", function()
+    vscode.action("vscode-neovim.restart")
+    vscode.action("workbench.panel.output.focus")
+  end)
+  -- Errors
+  vim.keymap.set("n", "<leader>el", function()
+    vscode.action("workbench.actions.view.problems")
+  end)
+  vim.keymap.set("n", "]q", function()
+    vscode.action("editor.action.marker.nextInFiles")
+  end)
+  vim.keymap.set("n", "[q", function()
+    vscode.action("editor.action.marker.prevInFiles")
+  end)
+  -- Tests and tasks
+
+  -- AI ai
+  vim.keymap.set({ "n", "v" }, "<leader>aq", function()
+    vscode.action("inlineChat.start")
+  end)
+  vim.keymap.set({ "n", "v" }, "<leader>av", function()
+    vscode.action("workbench.action.chat.openInSidebar")
+  end)
+  vim.keymap.set("n", "<leader>aa", function()
+    vscode.action("github.copilot.chat.attachFile")
+  end)
+  vim.keymap.set("v", "<leader>aa", function()
+    vscode.action("github.copilot.chat.attachSelection")
+  end)
+  --
+  vim.keymap.set("n", "<leader>aA", function()
+    vscode.action("github.copilot.edits.attachFile")
+  end)
+  vim.keymap.set("v", "<leader>aA", function()
+    vscode.action("github.copilot.edits.attachFile")
+  end)
+
+  vim.keymap.set("n", "<leader>at", function()
+    vscode.action("github.copilot.terminal.explainTerminalLastCommand")
+  end)
+
+  vim.keymap.set("v", "<leader>at", function()
+    vscode.action("github.copilot.terminal.explainTerminalSelection")
+  end)
+
+  vim.keymap.set("n", "<leader>aT", function()
+    vscode.action("github.copilot.terminal.explainTerminalLastCommand")
+  end)
+
+  vim.keymap.set("v", "<leader>aT", function()
+    vscode.action("github.copilot.terminal.explainTerminalSelection")
+  end)
+
+  vim.keymap.set("n", "<leader>aV", function()
+    vscode.action("workbench.action.chat.openEditSession")
+  end)
+  vim.keymap.set("v", "<leader>aV", function()
+    vscode.action("github.copilot.edits.attachSelection")
+    vscode.action("workbench.panel.chat.view.edits.focus")
+  end)
+
+  vim.keymap.set({ "n", "v" }, "<leader>Aa", function()
+    vscode.action("continue.focusContinueInputWithoutClear")
+  end)
+  -- Av - v mode "continue.focusContinueInputWithoutClear"
+  vim.keymap.set("v", "<leader>Av", function()
+    vscode.action("continue.focusContinueInputWithoutClear")
+  end)
+  -- Av - n mode "continue.continueGUIView.focus"
+  vim.keymap.set("n", "<leader>Av", function()
+    vscode.action("continue.continueGUIView.focus")
+  end)
+  --
+  -- WIP
+  vim.keymap.set({ "n", "v" }, "<leader>sf", function()
+    vscode.action("editor.action.addSelectionToNextFindMatch")
+    vscode.action("editor.action.startFindReplaceAction")
+  end)
+
+  vim.keymap.set("n", "<leader>sa", function()
+    vscode.action("workbench.action.showCommands")
+  end)
+
+  vim.keymap.set("n", "<leader>fl", function()
+    -- FIX: why settings.json field does not include task yet ?
+    -- live grep
+    vscode.action("fzf-picker.runCustomTask")
+  end)
+
+  vim.keymap.set({ "n", "v" }, "<leader>sF", function()
+    local currentDir = vim.fn.expand("%:p:h")
+    -- if v mode then use the selection text
+    local query = vim.fn.getreg("v") or vim.fn.expand("<cword>")
+    print([==[function#function vim.fn.expand("<cword>"):]==], vim.inspect(vim.fn.expand("<cword>"))) -- __AUTO_GENERATED_PRINT_VAR_END__
+    print([==[function#function vim.fn.getreg("v"):]==], vim.inspect(vim.fn.getreg("v"))) -- __AUTO_GENERATED_PRINT_VAR_END__
+    print([==[function#function query:]==], vim.inspect(query)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    vscode.action("workbench.action.findInFiles", {
+      args = { query = query, filesToInclude = currentDir .. "/../**" },
+    })
+  end)
+
+  -- TO MIGRATE -------------------- =============
+  -- Navigation
+
+  -- Jest : TODO: make sure it ru njest test
+  vim.keymap.set("n", "<leader>tT", function()
+    vscode.action("extension.runJestFile")
+    vscode.action("testing.runCurrentFile")
+  end)
+  vim.keymap.set("n", "<leader>tt", function()
+    vscode.action("extension.runJest")
+    vscode.action("testing.runAtCursor")
+  end)
+  vim.keymap.set("n", "<leader>ts", function()
+    vscode.action("workbench.view.testing.focus")
+  end)
+  vim.keymap.set("n", "<leader>to", function()
+    vscode.action("workbench.panel.testResults.view.focus")
+  end)
+  vim.keymap.set("n", "<leader>tr", function()
+    vscode.action("workbench.panel.testResults.view.focus")
+  end)
+  vim.keymap.set("n", "<leader>tb", function()
+    vscode.action("workbench.action.tasks.build")
+  end)
+  -- Navigation
+  vim.keymap.set("n", "<leader>fY", function()
+    vscode.action("workbench.action.files.copyPathOfActiveFile")
+  end)
+  vim.keymap.set("n", "<leader>fy", function()
+    -- access clipboard
+    vscode.action("copyRelativeFilePath")
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    -- local vscode.eval("await vscode.env.clipboard.writeText(args.text)", { args = { text = "some text" } })
+
     --
-    -- FIX: no output or anything in vscode
-    vim.keymap.set("n", "<localleader>le", function()
-      local configFile = vim.fn.expand("$HOME/.config/nvim2_jelly_lzmigrate/init.lua")
-      vim.notify("Open file: " .. configFile)
-      -- edit file in vscode
-      vim.fn.jobstart("code " .. configFile, { detach = true })
+    -- Callback function to handle the result of an asynchronous operation.
+    -- @param err string|nil: Error message if an error occurred, or nil if no error.
+    -- @param ret any: The result of the asynchronous operation.
+    local callback = function(err, ret)
+      if err then
+        print("cb Error: ", vim.inspect(err))
+      else
+        print("cb Result: ", vim.inspect(ret))
+      end
+    end
+    -- ex: https://github.com/vscode-neovim/vscode-neovim/blob/c095de724ed0aeb3d94f9bc8552fffedc4dbecff/runtime/vscode/clipboard.lua#L6
+    local currText = vscode.eval("await vscode.env.clipboard.readText()", { args = { callback = callback } }, 200)
+    vscode.notify("Copied relative file path")
+  end)
+  vim.keymap.set("n", "<leader>sb", function()
+    vscode.action("bookmarksExplorer.focus")
+  end)
+  vim.keymap.set("n", "<leader>fb", function()
+    vscode.action("")
+  end)
+  vim.keymap.set("n", "<leader>fB", function()
+    vscode.action("bookmarks.listFromAllFiles")
+  end)
+  vim.keymap.set("n", "<leader>bj", function()
+    vscode.action("bookmarks.jumpToNext")
+  end)
+  vim.keymap.set("n", "<leader>bk", function()
+    vscode.action("bookmarks.jumpToPrevious")
+  end)
+  -- vim.keymap.set("n", "gr", function()
+  --   vscode.action("editor.action.peekDefinition")
+  -- end)
+  -- vim.keymap.set("n", "gR", function()
+  --   vscode.action("references-view.findReferences")
+  -- end)
 
-      -- local currentfiledir = vim.fn.expand("<sfile>:p:h")
-      -- vscode.notify("currdir" .. currentfiledir) -- empty
-      -- vim.fn.jobstart("code " .. currentfiledir, { detach = true })
-    end)
+  -- to be revisited ?
+  vim.keymap.set("n", "<leader>en", function()
+    vscode.action("editor.action.marker.next")
+  end)
+  vim.keymap.set("n", "<leader>ep", function()
+    vscode.action("editor.action.marker.prev")
+  end)
+  vim.keymap.set("n", "Lj", function()
+    vscode.action("editor.action.marker.nextInFiles")
+  end)
+  vim.keymap.set("n", "Lk", function()
+    vscode.action("editor.action.marker.prevInFiles")
+  end)
 
-    -- +Window
-    -- vs / sp split
-    vim.keymap.set("n", "<leader>wv", function()
-      vscode.action("workbench.action.splitEditor")
-    end)
-    -- Ctrl Q - close window group
-    vim.keymap.set("n", "<C-q>", function()
-      vscode.action("workbench.action.closeEditorsAndGroup")
-    end)
-    vim.keymap.set("n", "<leader>wL", function()
-      vscode.action("workbench.action.closeEditorsToTheRight")
-    end)
-    vim.keymap.set("n", "<leader>wH", function()
-      vscode.action("workbench.action.closeEditorsToTheLeft")
-    end)
-    vim.keymap.set("n", "<leader>wh", function()
-      vscode.action("workbench.action.splitEditorDown")
-    end)
-
-    vim.keymap.set("n", "Q", function()
-      -- close file
-      vscode.action("workbench.action.closeActiveEditor")
-    end)
-    -- since bd have some problem that open output file
-    vim.keymap.set("n", "L", function()
-      vscode.action("workbench.action.nextEditorInGroup")
-    end)
-    vim.keymap.set("n", "H", function()
-      vscode.action("workbench.action.previousEditorInGroup")
-    end)
-    vim.keymap.set("n", "<leader>to", function()
-      vscode.action("workbench.panel.output.focus")
-    end)
-
-    -- +Git
-    vim.keymap.set("n", "<leader>gb", function()
-      -- blame
-      vscode.action("gitlens.toggleFileBlame")
-    end)
-
-    -- open file history
-    vim.keymap.set("n", "<leader>gf", function()
-      vscode.action("gitlens.views.fileHistory.focus")
-    end)
-
-    -- open compare diff
-    vim.keymap.set("n", "<leader>gC", function()
-      vscode.action("gitlens.compareHeadWith")
-      vscode.notify("use cmd+down browse sections")
-    end)
-    vim.keymap.set("n", "<leader>gi", function()
-      vscode.action("toggle.diff.renderSideBySide")
-    end)
-    vim.keymap.set("n", "<leader>g<", function()
-      vscode.action("gitlens.diffWithPreviousInDiffLeft")
-    end)
-
-    -- +File
-
-    -- LSP and code
-    -- vscode-neovim.restart with <leader>ls (stop vim)
-    vim.keymap.set("n", "<leader>ls", function()
-      vscode.action("vscode-neovim.stop")
-    end)
-    -- typescript.restartTsServer with <leader>ls (stop vim)
-    -- set j k and k j to enter normal mode - not work use in settings.json
-    -- vim.keymap.set("i", "jk", "<esc>")
-    -- vim.keymap.set("i", "kj", "<esc>")
-    -- send selected text / lline to terminal in n\v mode
-    -- open shortcuts key json in vscode
-    vim.keymap.set({ "n", "v" }, "<localleader>t", function()
-      -- vscode.notify("Before wrun WAIT")
-      vscode.action("workbench.action.terminal.runSelectedText")
-      -- vscode.call("_wait", { args = { 1000 }, 100 })
-      -- vscode.notify("AFFTER WAIT NEVER RUN !!")
-      -- vscode.call("workbench.action.terminal.focus", {}, 100)
-    end)
-
-    vim.keymap.set({ "n", "v" }, "<leader>lr", function()
-      vscode.action("vscode-neovim.restart")
-      -- open output tab vscode l;og
-      vscode.action("workbench.panel.output.focus")
-    end)
-    --
-
-    -- Tests
-    vim.keymap.set("n", "<leader>oo", function()
-      vscode.action("workbench.panel.testResults.view.focus")
-    end)
-
-    -- AI
-    vim.keymap.set({ "n", "v" }, "<leader>aq", function()
-      vscode.action("inlineChat.start")
-    end)
-    vim.keymap.set({ "n", "v" }, "<leader>av", function()
-      vscode.action("workbench.action.chat.openInSidebar")
-    end)
-
-    vim.keymap.set("n", "<leader>at", function()
-      vscode.action("github.copilot.terminal.attachTerminalSelection")
-    end)
-
-    vim.keymap.set({ "n", "v" }, "<leader>sf", function()
-      vscode.action("editor.action.addSelectionToNextFindMatch")
-      vscode.action("editor.action.startFindReplaceAction")
-    end)
-
-    vim.keymap.set({ "n", "v" }, "<leader>sF", function()
-      local currentDir = vim.fn.expand("%:p:h")
-      -- if v mode then use the selection text
-      local query = vim.fn.getreg("v") or vim.fn.expand("<cword>")
-      vscode.action("workbench.action.findInFiles", {
-        args = { query = query, filesToInclude = currentDir .. "/**" },
-      })
-    end)
-
-    vim.keymap.set("n", "<leader>aV", function()
-      vscode.action("workbench.action.chat.openEditSession")
-    end)
-    vim.keymap.set("v", "<leader>aV", function()
-      vscode.action("github.copilot.edits.attachSelection")
-      vscode.action("workbench.panel.chat.view.edits.focus")
-    end)
-    vim.keymap.set({ "n", "v" }, "<leader>aa", function()
-      vscode.action("continue.focusContinueInputWithoutClear")
-    end)
-  end,
-})
+  -- Add some vscode specific keymaps
+  -- Refer to
+  --
+end
+-- vim.api.nvim_create_autocmd("User", {
+--   pattern = "NvimIdeKeymaps", -- This pattern will be called when the plugin is loaded
+--   callback = function()
+--   end,
+-- })
 
 return {
   {

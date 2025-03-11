@@ -15,9 +15,11 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        -- remove if in vscode
         pyright = {
+          enabled = not vim.g.vscode,
           settings = {
-            python = {
+            python = not vim.g.vscode and {
               -- make sure to get python inside venv if available
               -- https://stackoverflow.com/a/75509259
               -- get project root and read from pyrightconfig.json else use default

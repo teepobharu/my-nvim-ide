@@ -424,7 +424,86 @@ testGitMatch = function()
   print([==[function isT3:]==], vim.inspect(isT3)) -- __AUTO_GENERATED_PRINT_VAR_END__
 end
 
+vim_process_callback = function()
+  print("vim_process_callback")
+  local commandTables = {
+    -- "which code", -- not executable
+    -- "&&", -- this now work
+    -- "env",
+    -- "&&",
+    -- "echo",
+    -- "hello",
+    -- "&&",
+    -- "123",
+  }
+  -- chode not found
+  -- commandTables = "env && which code && 123" -- this works code path output
+  -- join table with space
+  -- vim.fn.jobstart(table.concat(commandTables, " ", {
+  vim.fn.jobstart(commandTables, {
+    -- vim.fn.jobstart("env && which code && echo 'hello' && code . && some error here", {
+    on_stdout = function(_, data, _)
+      -- print("stdout", data)
+      -- __AUTO_GENERATED_PRINT_VAR_START__
+      print([==[cmdall functionout#function data:]==], vim.inspect(data)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    end,
+    on_stderr = function(_, data, _)
+      -- print("stderr", data)
+      -- __AUTO_GENERATED_PRINT_VAR_START__
+      print([==[cmdall functioerrn#function data:]==], vim.inspect(data)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    end,
+    on_exit = function(_, code, _)
+      print("exit", code)
+    end,
+    detach = true,
+  })
+  local open_command = "open"
+  local open_command = "code"
+  print([==[function open_command:]==], vim.inspect(open_command)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  -- local open_command = "open -a code"
+  local url_or_word = "/Users/tharutaipree/dotfiles/.config/nvim2_jelly_lzmigrate/lua/config/mykeymaps.lua"
+
+  -- vim.fn.jobstart({ open_command, "-a" , "code"}, { -- not work
+  -- vim.fn.jobstart(open_command .. " -a " .. "code"}, { -- not work
+  vim.fn.jobstart({ open_command, url_or_word }, {
+    on_stdout = function(_, data, _)
+      --   print("stdout", data)
+      -- __AUTO_GENERATED_PRINT_VAR_START__
+      print([==[functionout#if#function data:]==], vim.inspect(data)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    end,
+    on_stderr = function(_, data, _)
+      --   print("stderr", data)
+      print([==[function#err#function data:]==], vim.inspect(data)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    end,
+    on_exit = function(_, code, _)
+      print("exit code=", code)
+      if code == 0 then
+        print("open success")
+      else
+        print("open failed")
+      end
+    end,
+    detach = true,
+  })
+end
+
+local function testExpand()
+  local current_file = vim.fn.expand("%:p")
+  print([==[testExpand current_file:]==], vim.inspect(current_file)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local cfile = vim.fn.expand("<cfile>") --// asdasd end
+  print([==[testExpand cfile:]==], vim.inspect(cfile)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local currline = vim.fn.getline(".")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testExpand currline:]==], vim.inspect(currline)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local selline = vim.fn.getline("`<", "`>")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[testExpand selline:]==], vim.inspect(selline)) -- __AUTO_GENERATED_PRINT_VAR_END__
+end
 local function main()
+  -- call :messages
+  testExpand()
+  vim_process_callback()
   -- get_pythonpath()
   -- getGitList()
   -- buffers()
@@ -433,7 +512,7 @@ local function main()
   -- filesys()
   -- getArrListConfig()
   -- testGetlineExe()
-  testGitMatch()
+  -- testGitMatch()
   if false then
     testGit2()
     stringTest()

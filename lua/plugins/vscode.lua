@@ -33,12 +33,11 @@ vim.api.nvim_create_autocmd("User", {
     local vscode = require("vscode")
     -- +File
     -- Find file
-    vim.keymap.set("n", "<leader><space>", "<cmd>Find<cr>")
-
     vim.keymap.set("n", "<leader><space>", function()
       -- show all editors
       vscode.action("workbench.action.showAllEditors")
     end)
+    vim.keymap.set("n", "<leader>ff", "<cmd>Find<cr>")
     vim.keymap.set("n", "<leader>be", function()
       vscode.action("workbench.action.showAllEditors")
     end)
@@ -249,7 +248,7 @@ vim.api.nvim_create_autocmd("User", {
     end)
 
     -- Revert change
-    vim.keymap.set("v", "<leader>ghr", function()
+    vim.keymap.set({ "n","v" }, "<leader>ghr", function()
       vscode.action("git.revertSelectedRanges")
     end)
 
@@ -470,8 +469,33 @@ function my_vscode_keymaps(vscode)
   vim.keymap.set("n", "<leader>sne", function()
     vscode.action("workbench.panel.output.focus")
   end)
-  -- TODO : fix folding
-  -- +Git
+  vim.keymap.set("n", "zC", function()
+      vscode.action("editor.foldAll")
+  end)
+  vim.keymap.set("n", "zc", function()
+      vscode.action("editor.foldRecursively")
+  end)
+  vim.keymap.set("n", "zO", function()
+      vscode.action("editor.unfoldAll")
+  end)
+  vim.keymap.set("n", "zo", function()
+      vscode.action("editor.unfoldRecursively")
+  end)
+  vim.keymap.set("n", "zv", function()
+      vscode.action("editor.unfold")
+      vscode.action("editor.foldAllExcept")
+  end)
+  vim.keymap.set("n", "zV", function()
+      vscode.action("editor.unfoldRecursively")
+      vscode.action("editor.foldAllExcept")
+  end)
+  vim.keymap.set("n", "zj", function()
+      vscode.action("editor.gotoNextFold")
+  end)
+  vim.keymap.set("n", "zk", function()
+      vscode.action("editor.gotoPreviousFold")
+  end)
+-- +Git
   vim.keymap.set("n", "<leader>gb", function()
     -- blame
     vscode.action("gitlens.toggleFileBlame")
@@ -668,6 +692,10 @@ function my_vscode_keymaps(vscode)
   -- Navigation
 
   -- Jest : TODO: make sure it ru njest test
+  -- toggle wrap tw
+  vim.keymap.set("n", "<leader>tw", function()
+      vscode.action("editor.action.toggleWordWrap")
+  end)
   vim.keymap.set("n", "<leader>tT", function()
     vscode.action("extension.runJestFile")
     vscode.action("testing.runCurrentFile")
@@ -728,12 +756,38 @@ function my_vscode_keymaps(vscode)
   vim.keymap.set("n", "<leader>bk", function()
     vscode.action("bookmarks.jumpToPrevious")
   end)
-  -- vim.keymap.set("n", "gr", function()
-  --   vscode.action("editor.action.peekDefinition")
-  -- end)
-  -- vim.keymap.set("n", "gR", function()
-  --   vscode.action("references-view.findReferences")
-  -- end)
+  -- TODO : verify
+-- <leader>fh+<key> for bookmark l=related 
+-- j , k for next and previous bookmarks.jumpToNext bookmarks.jumpToPrevious
+-- a add bookmark bookmarks.toggle
+-- A add bookmark with label bookmarks.toggleLabeled
+-- m for open menu bookmarks.listFromAllFiles
+    vim.keymap.set("n", "<leader>fhj", function()
+        vscode.action("bookmarks.jumpToNext")
+    end)
+    vim.keymap.set("n", "<leader>fhk", function()
+        vscode.action("bookmarks.jumpToPrevious")
+    end)
+    vim.keymap.set("n", "<leader>fha", function()
+        vscode.action("bookmarks.toggle")
+    end)
+    vim.keymap.set("n", "<leader>fhA", function()
+        vscode.action("bookmarks.toggleLabeled")
+    end)
+    vim.keymap.set("n", "<leader>fhm", function()
+        vscode.action("bookmarks.listFromAllFiles")
+    end)    
+    vim.keymap.set("n", "<leader>fhl", function()
+        vscode.action("bookmarks.listFromAllFiles")
+    end)
+  --
+  -- 
+  vim.keymap.set("n", "gr", function()
+    vscode.action("editor.action.peekDefinition")
+  end)
+  vim.keymap.set("n", "gR", function()
+    vscode.action("references-view.findReferences")
+  end)
 
   -- to be revisited ?
   vim.keymap.set("n", "<leader>en", function()

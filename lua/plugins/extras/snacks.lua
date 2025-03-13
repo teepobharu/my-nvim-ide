@@ -76,12 +76,10 @@ return {
   },
   {
     "ibhagwan/fzf-lua",
-    enabled = enabled_fzf,
     optional = true,
   },
   {
     "stevearc/oil.nvim",
-    enabled = enable_oil,
     optional = true,
   },
   -- Layout management
@@ -843,7 +841,7 @@ return {
       },
     },
   } or {},
-  not enabled_fzf and {
+  not not enabled_fzf and {
     "folke/trouble.nvim",
     optional = true,
     specs = {

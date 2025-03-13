@@ -5,6 +5,9 @@
 local Util = require("lazy.core.util")
 local Path = require("utils.path")
 
+local isSnackEnabled = vim.g.enable_plugins and vim.g.enable_plugins.snacks == "yes"
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+
 function openGitRemote(state)
   local node = state.tree:get_node()
   -- __AUTO_GENERATED_PRINT_VAR_START__
@@ -117,9 +120,26 @@ return {
       {
         "<leader>fE",
         function()
-          require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
+          if isSnackEnabled then
+              Snacks.picker.explorer({
+                cwd = vim.fn.expand("%:p:h"),
+                auto_close = true,
+                layout = {
+                  preset = "vertical",
+                },
+                win = {
+                  list = {
+                    keys = {
+                      ["-"] = "explorer_up",
+                    },
+                  },
+                },
+              })
+          else
+            require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
+          end
         end,
-        desc = "Explorer NeoTree (cwd)",
+        desc = isSnackEnabled and "Snack Explorer" or "NeoTree Explorer",
       },
       {
         "<leader>ge",

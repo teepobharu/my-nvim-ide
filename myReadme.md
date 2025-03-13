@@ -26,6 +26,27 @@ Features
 
 - \_cp / \_cr (select) = open code pad (not work with lua - vim and require)
 
+
+### 2025 13 Mar
+Major
+- Snacks - search replacement
+- Blink - cmp relplacement
+- LSPSaga - keymap changes 
+- snacks instead of fzf-lua (Help key with ?)
+  - support filter with file:.lua
+- move myeditor override after extra plugins
+Not supported
+- snacks: git bcommits 
+
+Issues
+- error cursor autocommands and textchanged : disable blink 
+- error import touble esnacks : disable line
+- why fzf override snacks ?
+Resolved
+- fix keymap jk escape
+
+
+
 2024 ...
 
 - disabled some plugins with disabled

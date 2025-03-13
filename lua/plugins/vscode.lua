@@ -1,6 +1,23 @@
 if not vim.g.vscode then
   return {}
 end
+local function get_visual_selection()
+    local isVmode = vim.fn.mode() == 'v'       
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    print([==[get_visual_selection isVmode:]==], vim.inspect(isVmode)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    if not isVmode then
+        -- __AUTO_GENERATED_PRINT_VAR_START__
+        print([==[get_visual_selection#if vim.fn.expand("<cword>"):]==], vim.inspect(vim.fn.expand("<cword>"))) -- __AUTO_GENERATED_PRINT_VAR_END__
+        return vim.fn.expand("<cword>")
+    end
+    local vstart = vim.fn.getpos("'<")
+    local vend = vim.fn.getpos("'>")
+    local line_start = vstart[2]
+    local line_end = vend[2]
+    local lines = vim.fn.getline(line_start, line_end)
+    print([==[my_vscode_keymaps#function#get_visual_selection lines:]==], vim.inspect(lines)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    return lines
+end
 
 local enabled = {
   "lazy.nvim",
@@ -676,16 +693,43 @@ function my_vscode_keymaps(vscode)
     vscode.action("fzf-picker.runCustomTask")
   end)
 
+  vim.keymap.set({"v", "n"}, "<leader>sw", function()
+    -- vscode.action("editor.action.addSelectionToNextFindMatch")
+    -- vscode.action("workbench.action.findInFiles")
+    vscode.action("workbench.action.findInFiles", { args = { query = get_visual_selection() , filesToInclude = "" }})
+    vscode.action("search.action.focusSearchList")
+end)
+-- vim.keymap.set("v"  "<leader>sw", function()
+--     -- vscode.action("workbench.action.findInFiles")
+--     vscode.action("workbench.action.findInFiles", { args = { query = vim.fn.expand("<cword>"), filesToInclude = "" }})
+--   end)
+  
   vim.keymap.set({ "n", "v" }, "<leader>sF", function()
     local currentDir = vim.fn.expand("%:p:h")
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    print([==[my_vscode_keymaps#function currentDir:]==], vim.inspect(currentDir)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    local current_file = vscode.eval("return vscode.window.activeTextEditor.document.fileName")
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    print([==[my_vscode_keymaps#function current_file:]==], vim.inspect(current_file)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    local activeEditor = vscode.eval("return vscode.window.activeTextEditor")
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    print([==[my_vscode_keymaps#function activeEditor:]==], vim.inspect(activeEditor)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+
+    -- https://code.visualstudio.com/api/references/commands
     -- if v mode then use the selection text
-    local query = vim.fn.getreg("v") or vim.fn.expand("<cword>")
-    print([==[function#function vim.fn.expand("<cword>"):]==], vim.inspect(vim.fn.expand("<cword>"))) -- __AUTO_GENERATED_PRINT_VAR_END__
-    print([==[function#function vim.fn.getreg("v"):]==], vim.inspect(vim.fn.getreg("v"))) -- __AUTO_GENERATED_PRINT_VAR_END__
-    print([==[function#function query:]==], vim.inspect(query)) -- __AUTO_GENERATED_PRINT_VAR_END__
-    vscode.action("workbench.action.findInFiles", {
-      args = { query = query, filesToInclude = currentDir .. "/../**" },
-    })
+    -- local query = vim.fn.getreg("v") or vim.fn.expand("<cword>")
+    -- local vscode_selected_text = vscode.eval("await vscode")
+    -- print([==[function#function vim.fn.expand("<cword>"):]==], vim.inspect(vim.fn.expand("<cword>"))) -- __AUTO_GENERATED_PRINT_VAR_END__
+    -- print([==[function#function vim.fn.getreg("v"):]==], vim.inspect(vim.fn.getreg("v"))) -- __AUTO_GENERATED_PRINT_VAR_END__
+    -- print([==[function#function query:]==], vim.inspect(query)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    -- vscode.action("workbench.action.findInFiles", { ]]
+    vscode.action("workbench.action.findInFiles", { args = { query = get_visual_selection() , currentDir = current_file .. "/../**"}})
+    -- vscode.action("workbench.action.replaceInFiles", {
+    --     args = { query = get_visual_selection(), filesToInclude = currentDir .. "/../**" },
+    -- })
+    vscode.notify("cmd+enter to open result in editor")
+    vscode.action("search.action.focusSearchList")
   end)
 
   -- TO MIGRATE -------------------- =============

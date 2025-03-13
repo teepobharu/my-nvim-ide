@@ -9,7 +9,7 @@ vim.g.enable_plugins = {
 
 -- __AUTO_GENERATED_PRINT_VAR_START__
 vim.g.enable_langs = {
-  go = "no",
+  go = "yes",
   rust = "no",
   python = "yes",
   tailwind = "no",

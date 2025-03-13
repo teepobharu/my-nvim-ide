@@ -87,6 +87,8 @@ for lang_name, enabled in pairs(enable_extra_langs) do
   end
 end
 
+-- TODO: add if want to override later , why now myeditor shortcut override snacks ?
+-- table.insert(spec , { import = "core.myEditor" })
 require("lazy").setup({
   spec = spec,
   checker = { enabled = true }, -- automatically check for plugin updates

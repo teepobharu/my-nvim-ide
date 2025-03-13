@@ -9,6 +9,115 @@ local function symbols_filter(entry, ctx)
   end
   return vim.tbl_contains(ctx.symbols_filter, entry.kind)
 end
+local isSnackEnabled = vim.g.enable_plugins and vim.g.enable_plugins.snacks == "yes"
+
+local function get_prefix_key(key)
+  if isSnackEnabled then
+    return key:upper()
+  else
+    return key:lower()
+  end
+end
+
+local key_f = get_prefix_key("f")
+local key_s = get_prefix_key("s")
+local key_g = get_prefix_key("g")
+
+local fzfLuaMe = {
+    "ibhagwan/fzf-lua",
+    enabled = true,
+    opts = {
+      git = {
+        branches = {
+          -- add actions that open remote the the file at current line remotely
+          actions = {
+            ["ctrl-o"] = function(selected)
+              -- Custom action to open remote file
+
+              local ref = selected[1]
+              ref = ref:gsub("^[^/]+/", "")
+              local sanitized_ref = ref:match("([^%s]+)$") -- remove all space nonrelated ref prefixes
+              open_remote(sanitized_ref, "file")
+              open_remote(sanitized_ref, "branch")
+            end,
+          },
+        },
+        bcommits = {
+          actions = {
+            ["ctrl-o"] = function(selected)
+              -- Custom action to open remote file
+              local commit_hash = selected[1]:match("%w+")
+              open_remote(commit_hash, "file")
+              open_remote(commit_hash, "commit")
+            end,
+          },
+        },
+        blame = {
+          actions = {
+            ["ctrl-o"] = function(selected)
+              -- Custom action to open remote file
+              local commit_hash = selected[1]:match("%w+")
+              open_remote(commit_hash, "file")
+              open_remote(commit_hash, "commit")
+            end,
+          },
+        },
+        commits = {
+          actions = {
+            -- ["default"] = function(selected)
+            --   -- Default action (e.g., open commit diff)
+            -- end,
+            ["ctrl-o"] = function(selected)
+              -- Custom action to open remote file
+              local commit_hash = selected[1]:match("%w+")
+              open_remote(commit_hash, "file")
+              open_remote(commit_hash, "commit")
+              -- local file_path = vim.fn.expand("%:p")
+              -- local line_number = vim.fn.line(".")
+              --
+              -- local gitroot = pathUtil.get_git_root()
+              -- local remote_path = gitUtil.get_remote_path("origin")
+              -- local git_file_path = file_path:gsub(gitroot .. "/?", "")
+              -- local url_pattern = "https://%s/blob/%s/%s#L%d"
+              -- local url = string.format(url_pattern, remote_path, commit_hash, git_file_path, line_number)
+              -- vim.fn.jobstart({ "open", url }, { detach = true })
+              --
+              -- vim.cmd("e " .. file_path)
+            end,
+          },
+        },
+      },
+    },
+    keys = {
+      -- opts.desc = "Git branch FZF"
+      -- keymap("n", "<localleader>gO", function()
+      --   require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
+      -- end, opts)
+      {
+        "<leader>" .. key_g .. "S",
+        "<cmd> :FzfLua git_blame<CR>",
+        desc = "FZF Git Blame",
+        mode = "n",
+      },
+      {
+        "<leader>" .. key_g .. "o",
+        function()
+          require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
+        end,
+        desc = "Git branch FZF",
+        mode = "n",
+      },
+      -- session_pickers leader-fS
+      {
+        "<leader>" .. key_f .. "s",
+        function()
+          require("config.telescope_pickers").fzf.pickers.session_picker()
+        end,
+        desc = "Session FZF",
+      },
+    },
+};
+
 
 return {
   {
@@ -17,6 +126,8 @@ return {
       require("project_nvim").setup(opts)
     end,
   },
+  -- vim.tbl_deep_extend("force", fzfLuaMe, and Util.merge does not work
+  fzfLuaMe,
   {
     "ibhagwan/fzf-lua",
     event = "VeryLazy",
@@ -149,12 +260,12 @@ return {
       { "<c-j>", "<Down>", ft = "fzf", mode = "t", nowait = true },
       { "<c-k>", "<Up>", ft = "fzf", mode = "t", nowait = true },
       -- Find file by grep
-      {
+      not isSnackEnabled and {
         "<C-g>",
         "<cmd> :FzfLua grep_project<CR>",
         desc = "Find Grep",
       },
-      {
+      not isSnackEnabled and {
         "<C-g>",
         function()
           -- Grep visual selection in the current directory or lsp root or git root
@@ -171,7 +282,7 @@ return {
         mode = "v",
       },
       {
-        "<leader>sw",
+        "<leader>" .. key_s .. "w",
         function()
           local root_dir = require("utils.root").git()
           local fzf_lua = require("fzf-lua")
@@ -186,13 +297,13 @@ return {
         mode = "v",
       },
       {
-        "<leader>fg",
+        "<leader>" .. key_f .. "g",
         "<cmd> :FzfLua grep_project --cmd 'git grep --line-number --column --color=always'<CR>",
         desc = "Find Git Grep",
       },
       -- Find open buffers
       {
-        "<leader>fb",
+        "<leader>" .. key_f .. "b",
         "<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>",
         desc = "Find Buffers",
       },
@@ -203,7 +314,7 @@ return {
       },
       -- Find recent files
       {
-        "<leader>fr",
+        "<leader>" .. key_f .. "r",
         function()
           local root_dir = require("utils.root").git()
           require("fzf-lua").oldfiles({ cwd = root_dir })
@@ -212,13 +323,13 @@ return {
       },
       -- Resume last fzf command
       {
-        "<leader>fR",
+        "<leader>" .. key_f .. "R",
         "<cmd> :FzfLua resume<CR>",
         desc = "Resume Fzf",
       },
       -- File file by live grep, better for large projects
       {
-        "<leader>fl",
+        "<leader>" .. key_f .. "l",
         function()
           local root_dir = require("utils.root").git()
           local fzf_lua = require("fzf-lua")
@@ -231,8 +342,8 @@ return {
         desc = "Find Live Grep (including hidden files)",
       },
       -- Find files at the current working directory
-      {
-        "<C-e>", -- <leader>e is used by oil.nvim for open file explorer in float window
+     isSnackEnabled and {
+        "<C-e>",
         function()
           local root_dir = require("utils.root").get()
           require("fzf-lua").files({
@@ -242,7 +353,7 @@ return {
         end,
         desc = "Find Files at project directory",
       },
-      {
+     not isSnackEnabled and {
         "<leader><space>",
         function()
           local root_dir = require("utils.root").git()
@@ -252,48 +363,34 @@ return {
           })
         end,
         desc = "Find Files at project directory",
-      },
-      -- File files by live grep in the current directory or LSP root or git root
-      {
+      } or {},
+      not isSnackEnabled and {
         "<leader>/",
         function()
           local root_dir = require("utils.root").get()
           require("fzf-lua").live_grep({ cwd = root_dir, multiprocess = true })
         end,
         desc = "Grep Files at current directory",
-      },
-      -- Find file in git
+      } or {},
       {
-        "<leader>ff",
+        "<leader>" .. key_f .. "f",
         function()
-          -- Live grep in the current directory or LSP root or git root
           local root_dir = require("utils.root").git()
           require("fzf-lua").git_files({ cwd = root_dir })
         end,
         desc = "Find Git Files",
       },
-      -- Find nvim config file
       {
-        "<leader>fc",
+        "<leader>" .. key_f .. "c",
         function()
           require("fzf-lua").files({ cwd = "~/.config/nvim" })
         end,
         desc = "Find Neovim Configs",
       },
-
-      -- Search in current buffer with grep
+      { "<leader>" .. key_s .. "b", "<cmd> :FzfLua grep_curbuf<CR>", desc = "Search Current Buffer" },
+      { "<leader>" .. key_s .. "B", "<cmd> :FzfLua lines<CR>", desc = "Search Lines in Open Buffers" },
       {
-        "<leader>sb",
-        "<cmd> :FzfLua grep_curbuf<CR>",
-        desc = "Search Current Buffer",
-      },
-      {
-        "<leader>sB",
-        "<cmd> :FzfLua lines<CR>",
-        desc = "Search Lines in Open Buffers",
-      },
-      {
-        "<leader>sw",
+        "<leader>" .. key_s .. "w",
         function()
           local root_dir = require("utils.root").git()
           require("fzf-lua").grep_cword({ cwd = root_dir, multiprocess = true })
@@ -301,63 +398,30 @@ return {
         desc = "Search word under cursor (git root)",
       },
       {
-        "<leader>sW",
+        "<leader>" .. key_s .. "W",
         function()
           local root_dir = require("utils.root").git()
           require("fzf-lua").grep_cWORD({ cwd = root_dir, multiprocess = true })
         end,
         desc = "Search WORD under cursor (git root)",
       },
-
-      -- Git related keymaps
-      -- Search in git status
       {
-        "<leader>gs",
+        "<leader>" .. key_g .. "s",
         function()
           local root_dir = require("utils.root").git()
           require("fzf-lua").git_status({ cwd = root_dir })
         end,
         desc = "Git Status",
       },
+      { "<leader>" .. key_g .. "c", "<cmd> :FzfLua git_commits<CR>", desc = "Git Commits" },
+      { "<leader>" .. key_g .. "b", "<cmd> :FzfLua git_branches<CR>", desc = "Git Branches" },
+      { "<leader>" .. key_g .. "B", "<cmd> :FzfLua git_bcommits<CR>", desc = "Git Buffer Commits" },
+      { "<leader>" .. key_s .. "a", "<cmd> :FzfLua commands<CR>", desc = "Find Actions" },
+      { "<leader>" .. key_s .. "d", "<cmd>FzfLua diagnostics_document<cr>", desc = "Document Diagnostics" },
+      { "<leader>" .. key_s .. "D", "<cmd>FzfLua diagnostics_workspace<cr>", desc = "Workspace Diagnostics" },
+      { "<leader>" .. key_s .. ":", "<cmd> :FzfLua command_history<CR>", desc = "Find Command History" },
       {
-        "<leader>gc",
-        "<cmd> :FzfLua git_commits<CR>",
-        desc = "Git Commits",
-      },
-      {
-        "<leader>gb",
-        "<cmd> :FzfLua git_branches<CR>",
-        desc = "Git Branches",
-      },
-      {
-        "<leader>gB",
-        "<cmd> :FzfLua git_bcommits<CR>",
-        desc = "Git Buffer Commits",
-      },
-
-      -- Search keymaps
-      {
-        "<leader>sa",
-        "<cmd> :FzfLua commands<CR>",
-        desc = "Find Actions",
-      },
-      {
-        "<leader>sd",
-        "<cmd>FzfLua diagnostics_document<cr>",
-        desc = "Document Diagnostics",
-      },
-      {
-        "<leader>sD",
-        "<cmd>FzfLua diagnostics_workspace<cr>",
-        desc = "Workspace Diagnostics",
-      },
-      {
-        "<leader>s:",
-        "<cmd> :FzfLua command_history<CR>",
-        desc = "Find Command History",
-      },
-      {
-        "<leader>ss",
+        "<leader>" .. key_s .. "s",
         function()
           require("fzf-lua").lsp_document_symbols({
             regex_filter = symbols_filter,
@@ -366,7 +430,7 @@ return {
         desc = "Goto Symbol",
       },
       {
-        "<leader>sS",
+        "<leader>" .. key_s .. "S",
         function()
           require("fzf-lua").lsp_live_workspace_symbols({
             regex_filter = symbols_filter,
@@ -374,51 +438,16 @@ return {
         end,
         desc = "Goto Symbol (Workspace)",
       },
+      { "<leader>" .. key_s .. "i", "<cmd> :FzfLua lsp_incoming_calls<CR>", desc = "LSP Incoming Calls" },
+      { "<leader>" .. key_s .. "o", "<cmd> :FzfLua lsp_outgoing_calls<CR>", desc = "LSP Outgoing Calls" },
+      { "<leader>" .. key_s .. "k", "<cmd> :FzfLua keymaps<CR>", desc = "Search Keymaps" },
+      { "<leader>" .. key_s .. "m", "<cmd> :FzfLua marks<CR>", desc = "Search Marks" },
+      { "<leader>" .. key_s .. "c", "<cmd> :FzfLua colorschemes<CR>", desc = "Search colorschemes" },
+      { "<leader>" .. key_s .. "h", "<cmd> :FzfLua help_tags<CR>", desc = "Search Help" },
+      { "<leader>" .. key_s .. "j", "<cmd>FzfLua jumps<cr>", desc = "Search Jumplist" },
+      { "<leader>" .. key_s .. "q", "<cmd> :FzfLua quickfix<CR>", desc = "Search Quickfix" },
       {
-        "<leader>si",
-        "<cmd> :FzfLua lsp_incoming_calls<CR>",
-        desc = "LSP Incoming Calls",
-      },
-      {
-        "<leader>so",
-        "<cmd> :FzfLua lsp_outgoing_calls<CR>",
-        desc = "LSP Outgoing Calls",
-      },
-      {
-        "<leader>sk",
-        "<cmd> :FzfLua keymaps<CR>",
-        desc = "Search Keymaps",
-      },
-      {
-        "<leader>sm",
-        "<cmd> :FzfLua marks<CR>",
-        desc = "Search Marks",
-      },
-      {
-        "<leader>sc",
-        "<cmd> :FzfLua colorschemes<CR>",
-        desc = "Search colorschemes",
-      },
-      {
-        "<leader>sh",
-        "<cmd> :FzfLua help_tags<CR>",
-        desc = "Search Help",
-      },
-      {
-        "<leader>sj",
-        "<cmd>FzfLua jumps<cr>",
-        desc = "Search Jumplist",
-      },
-      {
-        "<leader>sq",
-        "<cmd> :FzfLua quickfix<CR>",
-        desc = "Search Quickfix",
-      },
-
-      -- Switch project
-      -- Find in recent projects
-      {
-        "<leader>fp",
+        "<leader>" .. key_f .. "p",
         function()
           local fzf_lua = require("fzf-lua")
 
@@ -443,20 +472,22 @@ return {
         desc = "Search Recent Projects",
       },
     },
-  },
+  }
+  -- )
+  ,
   {
     "folke/todo-comments.nvim",
     optional = true,
     keys = {
       {
-        "<leader>st",
+        "<leader>" .. key_s .. "t",
         function()
           require("todo-comments.fzf").todo()
         end,
         desc = "Todo",
       },
       {
-        "<leader>sT",
+        "<leader>" .. key_s .. "T",
         function()
           require("todo-comments.fzf").todo({ keywords = { "TODO", "FIX", "FIXME" } })
         end,
@@ -465,3 +496,7 @@ return {
     },
   },
 }
+
+-- __AUTO_GENERATED_PRINT_VAR_START__
+-- print([==[ output:]==], vim.inspect(output)) -- __AUTO_GENERATED_PRINT_VAR_END__
+-- return output

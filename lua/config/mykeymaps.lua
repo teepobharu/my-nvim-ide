@@ -19,6 +19,7 @@ keymap("n", "<leader>ll", "<cmd>Lazy<CR>", { desc = "Lazy" })
 keymap("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move Down", silent = true })
 keymap("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move Up", silent = true })
 keymap("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down", silent = true })
+keymap("i", "jk", "<esc>", { desc = "Exit Insert Mode", silent = true })
 opts.desc = "Comment Line"
 keymap("i", "<A-/>", "<esc>mt<cmd>normal gcc<cr>`tji", opts)
 -- keymap("v", "A-/", "gc", opts) -- v mode not work
@@ -453,7 +454,7 @@ Cmd.create_cmd("RestartLspClient", function()
   end)
 end, { nargs = 0 })
 
-keymap("n", "<leader>lr", ":RestartLspClient<CR>", { desc = "LSPRestart", noremap = true, silent = true })
+keymap("n", "<leader>Llr", ":RestartLspClient<CR>", { desc = "LSPRestart", noremap = true, silent = true })
 
 --   # which key migrate .nvim $HOME/.config/nvim/keys/which-key.vim
 keymap("n", "<c-q>", ":q<CR>", { desc = "Close", noremap = true, silent = true })

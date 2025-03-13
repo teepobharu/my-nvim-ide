@@ -1,12 +1,19 @@
 ----- MY OVERRIDE SETTINGS END ------
 -- TO OVERRIDE USE THIS
+-- load order follow the order define in the key unless it was define as deps ?
 vim.g.enable_plugins = {
-  codecompanion = "yes",
-  ["no-neck-pain"] = "yes",
-  lspsaga = "no",
+  ["no-neck-pain"] = "no",
+  -- lspsaga = "no",
   wakatime = "no",
+  avante = "no",
+  codecompanion = "yes",
+  blink = "no",
+  magazine = "no",
+  lspsaga = "yes",
+  fzf = "yes", -- will still import after snacks -> need overide in snacks.nvim
+  snacks = "yes",
+  ["fold-preview"] = "yes",
 }
-
 -- __AUTO_GENERATED_PRINT_VAR_START__
 vim.g.enable_langs = {
   go = "yes",

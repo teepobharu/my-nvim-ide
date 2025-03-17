@@ -26,26 +26,81 @@ Features
 
 - \_cp / \_cr (select) = open code pad (not work with lua - vim and require)
 
-
 ### 2025 13 Mar
-Major
-- Snacks - search replacement
+
+🎊 Major
+
+- **Snacks** - search replacement, git browse open
 - Blink - cmp relplacement
-- LSPSaga - keymap changes 
+- LSPSaga - keymap changes
 - snacks instead of fzf-lua (Help key with ?)
   - support filter with file:.lua
+  - file EXPLORER
+    - open terminal C-T
+    - grep inner scope when CD (c-c) + grep with <space> /
 - move myeditor override after extra plugins
-Not supported
-- snacks: git bcommits 
+- tab UI changes
 
-Issues
-- error cursor autocommands and textchanged : disable blink 
+🔧 Adjustment
+
+- bakup keys s,f,g,e -> S,F,G (Fzf) ,E (neotree)
+- add overriden extras to be on top of snacks : fzf-lua, neotree, toggleterm
+
+⌨️ Keys
+C\_ - toggle term
+ft - snacks term
+sr - resume from fzf - fr
+fp - open new project dir not file in that project anymore
+
+🚫 Not supported, Dropped Features
+
+- Snacks: git bcommits
+  - terminal - lack prior custom shortcut to send visual
+  - explorer snacks copy no autocomplete and require manual type (neotree more convenient + support custom cmd in search within dir)
+
+🔥 Issues
+
+- [ ] Lazygit not load profile + open in vscode instead of vim
+- [ ] Toggleterm also toggle snacks and override snacks terminal
+- someimtes toggleterm load before / fater snacks (since its lazy it will activate after some keys)
+- error cursor autocommands and textchanged : disable blink
 - error import touble esnacks : disable line
 - why fzf override snacks ?
+  - cannot have nil or empty {} obj inside key settings
+  - add enabled extras plugin for fzf-lua after also override the key for snacks
+
+🐛 Debugging
+
+- see lazy Debug (which key is pending lazy) - sometimes toggleterm not appear here even put it as enabled plugin at last
+
+> sample issue key not shown for fzf
+
+```lua
+ -- NOT WORKING
+ -- this made key in fzf not available
+{
+      not isSnackEnabled and {
+        "<C-e>",
+        function()
+          local root_dir = require("utils.root").get()
+          require("fzf-lua").files({
+            cwd = root_dir,
+            cwd_prompt = false,
+          })
+        end,
+        desc = "Find Files at project directory",
+      } or {},
+},
+ -- Working
+{
+  not isSnackEnabled and "<C-e>" or "<localleader><C-e>",
+}
+
+```
+
 Resolved
+
 - fix keymap jk escape
-
-
 
 2024 ...
 

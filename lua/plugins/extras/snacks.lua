@@ -1,3 +1,5 @@
+local keyutil = require("utils.keyutil")
+local isToggleTermEnabled = keyutil.isToggleTermEnabled
 local logo = [[
       ██╗████████╗    ███╗   ███╗ █████╗ ███╗   ██╗
       ██║╚══██╔══╝    ████╗ ████║██╔══██╗████╗  ██║
@@ -27,7 +29,7 @@ return {
   -- Disable toggle term and use Snacks terminal instead
   {
     "akinsho/toggleterm.nvim",
-    enabled = false,
+    enabled = isToggleTermEnabled,
   },
   -- Disable mini buffer remove and use Snacks buffer delete instead
   {

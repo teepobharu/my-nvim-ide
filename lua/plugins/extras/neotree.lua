@@ -4,9 +4,11 @@
 -- open spectre search and live grep telescope : https://www.reddit.com/r/neovim/comments/17o6g2n/comment/k7wf2wp/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 local Util = require("lazy.core.util")
 local Path = require("utils.path")
+local KeyUtils = require("utils.keyutil")
+local key_f = KeyUtils.key_f
+local key_g = KeyUtils.key_g
 
 local isSnackEnabled = vim.g.enable_plugins and vim.g.enable_plugins.snacks == "yes"
-  -- __AUTO_GENERATED_PRINT_VAR_START__
 
 function openGitRemote(state)
   local node = state.tree:get_node()
@@ -104,37 +106,44 @@ return {
     },
     keys = {
       {
-        "<leader>e",
+        isSnackEnabled and "<leader>E" or "<leader>e",
         function()
           require("neo-tree.command").execute({ toggle = true, dir = Path.get_root_directory() })
         end,
         desc = "Explorer NeoTree (Root)",
       },
       {
-        "<leader>E",
+        "<localleader>e",
+        function()
+          require("neo-tree.command").execute({ toggle = true, dir = Path.get_root_directory() })
+        end,
+        desc = "Explorer NeoTree (Root)",
+      },
+      {
+        isSnackEnabled and "<localleader>E" or "<leader>E",
         function()
           require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
         end,
         desc = "Explorer NeoTree (CWD)",
       },
       {
-        "<leader>fE",
+        "<leader>" .. key_f .. "E",
         function()
           if isSnackEnabled then
-              Snacks.picker.explorer({
-                cwd = vim.fn.expand("%:p:h"),
-                auto_close = true,
-                layout = {
-                  preset = "vertical",
-                },
-                win = {
-                  list = {
-                    keys = {
-                      ["-"] = "explorer_up",
-                    },
+            Snacks.picker.explorer({
+              cwd = vim.fn.expand("%:p:h"),
+              auto_close = true,
+              layout = {
+                preset = "vertical",
+              },
+              win = {
+                list = {
+                  keys = {
+                    ["-"] = "explorer_up",
                   },
                 },
-              })
+              },
+            })
           else
             require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
           end
@@ -142,7 +151,7 @@ return {
         desc = isSnackEnabled and "Snack Explorer" or "NeoTree Explorer",
       },
       {
-        "<leader>ge",
+        "<leader>" .. key_g .. "e",
         function()
           require("neo-tree.command").execute({ source = "git_status", toggle = true })
         end,
@@ -156,7 +165,8 @@ return {
         desc = "Buffer Explorer",
       },
       {
-        "<leader>fe",
+
+        "<leader>" .. key_f .. "e",
         function()
           require("neo-tree.command").execute({ toggle = true, dir = Path.get_root_directory() })
         end,

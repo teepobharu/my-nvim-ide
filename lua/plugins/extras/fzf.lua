@@ -1,4 +1,9 @@
 local Lsp = require("utils.lsp")
+local keyutil = require("utils.keyutil")
+local isSnackEnabled = keyutil.isSnackEnabled
+local key_f = keyutil.key_f
+local key_s = keyutil.key_s
+local key_g = keyutil.key_g
 
 local function symbols_filter(entry, ctx)
   if ctx.symbols_filter == nil then
@@ -9,115 +14,6 @@ local function symbols_filter(entry, ctx)
   end
   return vim.tbl_contains(ctx.symbols_filter, entry.kind)
 end
-local isSnackEnabled = vim.g.enable_plugins and vim.g.enable_plugins.snacks == "yes"
-
-local function get_prefix_key(key)
-  if isSnackEnabled then
-    return key:upper()
-  else
-    return key:lower()
-  end
-end
-
-local key_f = get_prefix_key("f")
-local key_s = get_prefix_key("s")
-local key_g = get_prefix_key("g")
-
-local fzfLuaMe = {
-    "ibhagwan/fzf-lua",
-    enabled = true,
-    opts = {
-      git = {
-        branches = {
-          -- add actions that open remote the the file at current line remotely
-          actions = {
-            ["ctrl-o"] = function(selected)
-              -- Custom action to open remote file
-
-              local ref = selected[1]
-              ref = ref:gsub("^[^/]+/", "")
-              local sanitized_ref = ref:match("([^%s]+)$") -- remove all space nonrelated ref prefixes
-              open_remote(sanitized_ref, "file")
-              open_remote(sanitized_ref, "branch")
-            end,
-          },
-        },
-        bcommits = {
-          actions = {
-            ["ctrl-o"] = function(selected)
-              -- Custom action to open remote file
-              local commit_hash = selected[1]:match("%w+")
-              open_remote(commit_hash, "file")
-              open_remote(commit_hash, "commit")
-            end,
-          },
-        },
-        blame = {
-          actions = {
-            ["ctrl-o"] = function(selected)
-              -- Custom action to open remote file
-              local commit_hash = selected[1]:match("%w+")
-              open_remote(commit_hash, "file")
-              open_remote(commit_hash, "commit")
-            end,
-          },
-        },
-        commits = {
-          actions = {
-            -- ["default"] = function(selected)
-            --   -- Default action (e.g., open commit diff)
-            -- end,
-            ["ctrl-o"] = function(selected)
-              -- Custom action to open remote file
-              local commit_hash = selected[1]:match("%w+")
-              open_remote(commit_hash, "file")
-              open_remote(commit_hash, "commit")
-              -- local file_path = vim.fn.expand("%:p")
-              -- local line_number = vim.fn.line(".")
-              --
-              -- local gitroot = pathUtil.get_git_root()
-              -- local remote_path = gitUtil.get_remote_path("origin")
-              -- local git_file_path = file_path:gsub(gitroot .. "/?", "")
-              -- local url_pattern = "https://%s/blob/%s/%s#L%d"
-              -- local url = string.format(url_pattern, remote_path, commit_hash, git_file_path, line_number)
-              -- vim.fn.jobstart({ "open", url }, { detach = true })
-              --
-              -- vim.cmd("e " .. file_path)
-            end,
-          },
-        },
-      },
-    },
-    keys = {
-      -- opts.desc = "Git branch FZF"
-      -- keymap("n", "<localleader>gO", function()
-      --   require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
-      -- end, opts)
-      {
-        "<leader>" .. key_g .. "S",
-        "<cmd> :FzfLua git_blame<CR>",
-        desc = "FZF Git Blame",
-        mode = "n",
-      },
-      {
-        "<leader>" .. key_g .. "o",
-        function()
-          require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
-        end,
-        desc = "Git branch FZF",
-        mode = "n",
-      },
-      -- session_pickers leader-fS
-      {
-        "<leader>" .. key_f .. "s",
-        function()
-          require("config.telescope_pickers").fzf.pickers.session_picker()
-        end,
-        desc = "Session FZF",
-      },
-    },
-};
-
 
 return {
   {
@@ -126,8 +22,6 @@ return {
       require("project_nvim").setup(opts)
     end,
   },
-  -- vim.tbl_deep_extend("force", fzfLuaMe, and Util.merge does not work
-  fzfLuaMe,
   {
     "ibhagwan/fzf-lua",
     event = "VeryLazy",
@@ -259,13 +153,12 @@ return {
       { "<esc>", "<cmd>close<cr>", ft = "fzf", mode = "t", nowait = true },
       { "<c-j>", "<Down>", ft = "fzf", mode = "t", nowait = true },
       { "<c-k>", "<Up>", ft = "fzf", mode = "t", nowait = true },
-      -- Find file by grep
-      not isSnackEnabled and {
+      {
         "<C-g>",
         "<cmd> :FzfLua grep_project<CR>",
         desc = "Find Grep",
       },
-      not isSnackEnabled and {
+      {
         "<C-g>",
         function()
           -- Grep visual selection in the current directory or lsp root or git root
@@ -308,7 +201,7 @@ return {
         desc = "Find Buffers",
       },
       {
-        "<leader>,",
+        not isSnackEnabled and "<localleader>," or "<leader>,",
         "<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>",
         desc = "Switch Buffer",
       },
@@ -341,9 +234,8 @@ return {
         end,
         desc = "Find Live Grep (including hidden files)",
       },
-      -- Find files at the current working directory
-     isSnackEnabled and {
-        "<C-e>",
+      {
+        not isSnackEnabled and "<C-e>" or "<localleader><C-e>",
         function()
           local root_dir = require("utils.root").get()
           require("fzf-lua").files({
@@ -353,8 +245,8 @@ return {
         end,
         desc = "Find Files at project directory",
       },
-     not isSnackEnabled and {
-        "<leader><space>",
+      {
+        not isSnackEnabled and "<leader><space>" or "<localleader><space>",
         function()
           local root_dir = require("utils.root").git()
           require("fzf-lua").files({
@@ -363,15 +255,15 @@ return {
           })
         end,
         desc = "Find Files at project directory",
-      } or {},
-      not isSnackEnabled and {
-        "<leader>/",
+      },
+      {
+        not isSnackEnabled and "<localleader>/" or "<leader>/",
         function()
           local root_dir = require("utils.root").get()
           require("fzf-lua").live_grep({ cwd = root_dir, multiprocess = true })
         end,
         desc = "Grep Files at current directory",
-      } or {},
+      },
       {
         "<leader>" .. key_f .. "f",
         function()
@@ -472,9 +364,10 @@ return {
         desc = "Search Recent Projects",
       },
     },
-  }
-  -- )
-  ,
+  },
+  -- vim.tbl_deep_extend("force", fzfLuaMe, and Util.merge does not work
+  --  fzfLuaMe,
+  --  mywhichkey,
   {
     "folke/todo-comments.nvim",
     optional = true,

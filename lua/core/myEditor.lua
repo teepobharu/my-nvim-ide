@@ -1,90 +1,14 @@
 local pathUtil = require("utils.path")
 local gitUtil = require("utils.git")
+local keyutil = require("utils.keyutil")
+
+local isSnackEnabled = keyutil.isSnackEnabled
+local key_f = keyutil.key_f
+local key_s = keyutil.key_s
+local key_g = keyutil.key_g
+local open_remote = gitUtil.open_remote
 
 local mapping_key_prefix = vim.g.ai_prefix_key or "<leader>A" -- orginal from codecompanion.lua
-function sentSelectedToTerminal()
-  local mode = vim.fn.mode()
-  if mode == "V" then
-    -- print("in V mode")
-    require("toggleterm").send_lines_to_terminal("visual_lines", true, { args = vim.v.count })
-  elseif mode == "\22" then -- "\22" is the ASCII representation for CTRL-V
-    -- print("in ^V mode")
-    require("toggleterm").send_lines_to_terminal("visual_selection", true, { args = vim.v.count })
-  elseif mode == "v" then
-    -- print("in v mode")
-    require("toggleterm").send_lines_to_terminal("visual_selection", true, { args = vim.v.count })
-  else
-    require("toggleterm").send_lines_to_terminal("single_line", true, {})
-  end
-end
-
-local lazygitTerm = {}
----@param termOpts TermCreateArgs?
----@param name string
-local isToggleCurrentLazyTerm = function(name, termOpts)
-  if lazygitTerm and lazygitTerm.term and name == lazygitTerm.name then
-    lazygitTerm.term:toggle()
-  else
-    local lazygitBaseTerm = {
-      on_open = function(term)
-        vim.cmd("startinsert!")
-        vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
-
-        -- Allow to make it work for lazygit for Esc and ctrl + hjkl
-        vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = term.bufnr, nowait = true })
-        vim.keymap.set("t", "<c-j>", "<c-j>", { buffer = term.bufnr, nowait = true })
-        vim.keymap.set("t", "<c-k>", "<c-k>", { buffer = term.bufnr, nowait = true })
-        vim.keymap.set("t", "<c-l>", "<c-l>", { buffer = term.bufnr, nowait = true })
-        vim.keymap.set("t", "<esc>", "<esc>", { buffer = term.bufnr, nowait = true })
-      end,
-      -- function to run on closing the terminal
-      on_close = function(_)
-        vim.cmd("startinsert!")
-      end,
-    }
-    require("utils.lazygit").open() -- overide nvim edit set key config for lazygit
-    termOpts.on_open = lazygitBaseTerm.on_open
-    termOpts.on_close = lazygitBaseTerm.on_close
-    local lazygit = require("toggleterm.terminal").Terminal:new(termOpts)
-    lazygitTerm = {
-      name = name,
-      term = lazygit,
-    }
-    lazygitTerm.term:toggle()
-  end
-end
-
----@param ref : string
----@param mode "file" | "commit" | "branch"
-local open_remote = function(ref, mode)
-  -- print([==[function mode:]==], vim.inspect(mode)) -- __AUTO_GENERATED_PRINT_VAR_END__
-  local file_path = vim.fn.expand("%:p")
-  local line_number = vim.fn.line(".")
-
-  local gitroot = pathUtil.get_git_root()
-  local remote_name = ref:match("([^/]+)")
-  -- print([==[function remote_name:]==], vim.inspect(remote_name)) -- __AUTO_GENERATED_PRINT_VAR_END__
-  local remote_path = gitUtil.get_remote_path(remote_name)
-  local ref_no_remote = ref:gsub("^[^/]+/", "") -- remove remote
-  -- print([==[function ref_no_remote:]==], vim.inspect(ref_no_remote)) -- __AUTO_GENERATED_PRINT_VAR_END__
-  local git_file_path = file_path:gsub(gitroot .. "/?", "")
-  local url_pattern = "https://%s/blob/%s/%s#L%d"
-  local url = ""
-  local is_commit = ref_no_remote:match("[0-9a-fA-F]+$") ~= nil and (#ref_no_remote == 40 or #ref_no_remote == 7)
-  -- print([==[function is_commit:]==], vim.inspect(is_commit))
-
-  if mode == "file" then
-    url = string.format(url_pattern, remote_path, ref_no_remote, git_file_path, line_number)
-  else
-    if mode == "commit" then
-      url = string.format("https://%s/commit/%s", remote_path, ref_no_remote)
-    else
-      -- remove remote parts
-      url = string.format("https://%s/tree/%s", remote_path, ref_no_remote)
-    end
-  end
-  vim.fn.jobstart({ "open", url }, { detach = true })
-end
 
 return {
   -- Disabled list
@@ -158,128 +82,6 @@ return {
           -- ["zl"] = "IncreaseAllDetail",
           -- ["zh"] = "DecreaseAllDetail",
         },
-      },
-    },
-  },
-  {
-    "akinsho/toggleterm.nvim",
-    opts = {
-      persist_size = false,
-      persist_mode = false,
-    },
-    keys = {
-      {
-        "<c-_>",
-        desc = "Toggle term",
-      },
-      {
-        "<leader><c-_>",
-        "<cmd>:ToggleTermSendCurrentLine<cr>",
-        desc = "Send current line to terminal",
-      },
-      {
-        -- "<leader><c-_>",
-        "<localleader>ta",
-        function()
-          set_opfunc(function(motion_type)
-            require("toggleterm").send_lines_to_terminal(motion_type, false, { args = vim.v.count })
-          end)
-          vim.api.nvim_feedkeys("ggg@G''", "n", false)
-        end,
-        desc = "Send visual selection to terminal",
-      },
-      {
-        "<localleader>t",
-        sentSelectedToTerminal,
-        desc = "Send visual selection to terminal",
-        mode = "v",
-      },
-      {
-        "<localleader>t",
-        sentSelectedToTerminal,
-        desc = "Send visual selection to terminal",
-      },
-      {
-        "<localleader>tf",
-        "<cmd>:ToggleTerm direction=float<cr>",
-        desc = "Toggle term Float",
-      },
-      {
-        "<localleader>th",
-        "<cmd>:ToggleTerm direction=horizontal<cr>",
-        desc = "Toggle term Horiz",
-      },
-      {
-        "<localleader>tv",
-        "<cmd>:ToggleTerm direction=vertical<cr>",
-        desc = "Toggle term vertical",
-      },
-      {
-        "<localleader>t2",
-        "<cmd>:2ToggleTerm<cr>",
-        desc = "Find Terminal",
-      },
-      {
-        "<localleader>tr",
-        "<cmd>:ToggleTermSetName<cr>",
-        desc = "Set Terminal Name",
-      },
-      {
-        "<localleader>ts",
-        "<cmd>:TermSelect<cr>",
-        desc = "Find Term",
-      },
-      {
-        "<localleader>gl",
-        function()
-          require("utils.lazygit").blame_line()
-        end,
-        desc = "Git Blame Line",
-        mode = "n",
-      },
-
-      {
-        "<leader>lc",
-        function()
-          local dotfilescwd = vim.fn.expand("$DOTFILES_DIR")
-          isToggleCurrentLazyTerm("_lc", {
-            cmd = "lazygit",
-            dir = dotfilescwd,
-            direction = "float",
-          })
-        end,
-        desc = "Lazygit Config Toggle",
-        mode = "n",
-      },
-      -- see: https://github.com/LazyVim/LazyVim/blob/b8bdebe5be7eba91db23e43575fc1226075f6a56/lua/lazyvim/util/lazygit.lua#L64
-      --       map("n", "<leader>gg", function() LazyVim.lazygit( { cwd = LazyVim.root.git() }) end, { desc = "Lazygit (Root Dir)" })
-      -- map("n", "<leader>gG", function() LazyVim.lazygit() end, { desc = "Lazygit (cwd)" })
-      -- map("n", "<leader>gb", LazyVim.lazygit.blame_line, { desc = "Git Blame Line" })
-      -- map("n", "<leader>gB", LazyVim.lazygit.browse, { desc = "Git Browse" })
-      {
-        "<leader>gG",
-        function()
-          local lazycwd = require("utils.root").cwd()
-          isToggleCurrentLazyTerm("_gG", {
-            cmd = "lazygit",
-            dir = lazycwd,
-            direction = "float",
-          })
-        end,
-        desc = "Lazygit Toggle (CWD)",
-        mode = "n",
-      },
-      {
-        "<leader>gg",
-        function()
-          isToggleCurrentLazyTerm("_gg", {
-            cmd = "lazygit",
-            dir = "git_dir",
-            direction = "float",
-          })
-        end,
-        desc = "Lazygit Toggle",
-        mode = "n",
       },
     },
   },
@@ -440,11 +242,123 @@ return {
       },
     },
   },
-  -- { import = "plugins.extras.copilot-chat-v2" },
+  {
+    "ibhagwan/fzf-lua",
+    enabled = true,
+    opts = {
+      git = {
+        branches = {
+          -- add actions that open remote the the file at current line remotely
+          actions = {
+            ["ctrl-o"] = function(selected)
+              -- Custom action to open remote file
+
+              local ref = selected[1]
+              ref = ref:gsub("^[^/]+/", "")
+              local sanitized_ref = ref:match("([^%s]+)$") -- remove all space nonrelated ref prefixes
+              open_remote(sanitized_ref, "file")
+              open_remote(sanitized_ref, "branch")
+            end,
+          },
+        },
+        bcommits = {
+          actions = {
+            ["ctrl-o"] = function(selected)
+              -- Custom action to open remote file
+              local commit_hash = selected[1]:match("%w+")
+              open_remote(commit_hash, "file")
+              open_remote(commit_hash, "commit")
+            end,
+          },
+        },
+        blame = {
+          actions = {
+            ["ctrl-o"] = function(selected)
+              -- Custom action to open remote file
+              local commit_hash = selected[1]:match("%w+")
+              open_remote(commit_hash, "file")
+              open_remote(commit_hash, "commit")
+            end,
+          },
+        },
+        commits = {
+          actions = {
+            -- ["default"] = function(selected)
+            --   -- Default action (e.g., open commit diff)
+            -- end,
+            ["ctrl-o"] = function(selected)
+              -- Custom action to open remote file
+              local commit_hash = selected[1]:match("%w+")
+              open_remote(commit_hash, "file")
+              open_remote(commit_hash, "commit")
+              -- local file_path = vim.fn.expand("%:p")
+              -- local line_number = vim.fn.line(".")
+              --
+              -- local gitroot = pathUtil.get_git_root()
+              -- local remote_path = gitUtil.get_remote_path("origin")
+              -- local git_file_path = file_path:gsub(gitroot .. "/?", "")
+              -- local url_pattern = "https://%s/blob/%s/%s#L%d"
+              -- local url = string.format(url_pattern, remote_path, commit_hash, git_file_path, line_number)
+              -- vim.fn.jobstart({ "open", url }, { detach = true })
+              --
+              -- vim.cmd("e " .. file_path)
+            end,
+          },
+        },
+      },
+    },
+    keys = {
+      -- opts.desc = "Git branch FZF"
+      -- keymap("n", "<localleader>gO", function()
+      --   require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
+      -- end, opts)
+      {
+        "<leader>" .. key_g .. "S",
+        "<cmd> :FzfLua git_blame<CR>",
+        desc = "FZF Git Blame",
+        mode = "n",
+      },
+      {
+        "<leader>" .. key_g .. "o",
+        function()
+          require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
+        end,
+        desc = "Git branch FZF",
+        mode = "n",
+      },
+      -- session_pickers leader-fS
+      {
+        "<leader>" .. key_f .. "s",
+        function()
+          require("config.telescope_pickers").fzf.pickers.session_picker()
+        end,
+        desc = "Session FZF",
+      },
+      -- session_pickers leader-fS
+      {
+        "<leader>" .. "f" .. "s",
+        function()
+          require("config.telescope_pickers").fzf.pickers.session_picker()
+        end,
+        desc = "Session FZF",
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    optional = true,
+    opts = {
+      spec = isSnackEnabled and {
+        { "<leader>" .. key_f, group = "Find(Fzf)", mode = { "n" } },
+        { "<leader>" .. key_g, group = "Git(Fzf)", mode = { "n", "v" } },
+        { "<leader>" .. key_s, group = "Search(Fzf)", mode = { "n", "v" } },
+      } or {},
+    },
+  }, -- { import = "plugins.extras.copilot-chat-v2" },
   -- { import = "plugins.extras.telescope-lazy" },
-  { import = "plugins.extras.neotree" },
   { import = "plugins.extras.myNoice" },
-  -- { import = "plugins.extras.fzf" },
   { import = "plugins.extras.telescope" },
+  -- { import = "plugins.extras.neotree" },
+  -- { import = "plugins.extras.fzf" },
   -- { import = "plugins.extras.telescope-map-essntials" },
 }

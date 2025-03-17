@@ -4,15 +4,17 @@
 vim.g.enable_plugins = {
   ["no-neck-pain"] = "no",
   -- lspsaga = "no",
-  wakatime = "no",
+  wakatime = "yes",
   avante = "no",
   codecompanion = "yes",
-  blink = "no",
+  blink = "",
   magazine = "no",
   lspsaga = "yes",
+  neotree = "yes",
   fzf = "yes", -- will still import after snacks -> need overide in snacks.nvim
   snacks = "yes",
   ["fold-preview"] = "yes",
+  myToggleterm = "yes",
 }
 -- __AUTO_GENERATED_PRINT_VAR_START__
 vim.g.enable_langs = {

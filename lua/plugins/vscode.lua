@@ -2,21 +2,21 @@ if not vim.g.vscode then
   return {}
 end
 local function get_visual_selection()
-    local isVmode = vim.fn.mode() == 'v'       
+  local isVmode = vim.fn.mode() == "v"
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[get_visual_selection isVmode:]==], vim.inspect(isVmode)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  if not isVmode then
     -- __AUTO_GENERATED_PRINT_VAR_START__
-    print([==[get_visual_selection isVmode:]==], vim.inspect(isVmode)) -- __AUTO_GENERATED_PRINT_VAR_END__
-    if not isVmode then
-        -- __AUTO_GENERATED_PRINT_VAR_START__
-        print([==[get_visual_selection#if vim.fn.expand("<cword>"):]==], vim.inspect(vim.fn.expand("<cword>"))) -- __AUTO_GENERATED_PRINT_VAR_END__
-        return vim.fn.expand("<cword>")
-    end
-    local vstart = vim.fn.getpos("'<")
-    local vend = vim.fn.getpos("'>")
-    local line_start = vstart[2]
-    local line_end = vend[2]
-    local lines = vim.fn.getline(line_start, line_end)
-    print([==[my_vscode_keymaps#function#get_visual_selection lines:]==], vim.inspect(lines)) -- __AUTO_GENERATED_PRINT_VAR_END__
-    return lines
+    print([==[get_visual_selection#if vim.fn.expand("<cword>"):]==], vim.inspect(vim.fn.expand("<cword>"))) -- __AUTO_GENERATED_PRINT_VAR_END__
+    return vim.fn.expand("<cword>")
+  end
+  local vstart = vim.fn.getpos("'<")
+  local vend = vim.fn.getpos("'>")
+  local line_start = vstart[2]
+  local line_end = vend[2]
+  local lines = vim.fn.getline(line_start, line_end)
+  print([==[my_vscode_keymaps#function#get_visual_selection lines:]==], vim.inspect(lines)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  return lines
 end
 
 local enabled = {
@@ -110,11 +110,11 @@ vim.api.nvim_create_autocmd("User", {
     -- +Search
     -- Open symbol
     vim.keymap.set("n", "<leader>ss", function()
-        vscode.action("outline.focus")
-        -- vscode.action("workbench.action.gotoSymbol")
+      vscode.action("outline.focus")
+      -- vscode.action("workbench.action.gotoSymbol")
     end)
-     vim.keymap.set("n", "<leader>sS", function()
-        vscode.action("workbench.action.showAllSymbols")
+    vim.keymap.set("n", "<leader>sS", function()
+      vscode.action("workbench.action.showAllSymbols")
     end)
     -- Search word under cursor
     vim.keymap.set("n", "<leader>sw", function()
@@ -269,7 +269,7 @@ vim.api.nvim_create_autocmd("User", {
     end)
 
     -- Revert change
-    vim.keymap.set({ "n","v" }, "<leader>ghr", function()
+    vim.keymap.set({ "n", "v" }, "<leader>ghr", function()
       vscode.action("git.revertSelectedRanges")
     end)
 
@@ -498,29 +498,29 @@ function my_vscode_keymaps(vscode)
     -- vscode.action("editor.toggleFoldRecursively")
   end)
   vim.keymap.set("n", "zc", function()
-      vscode.action("editor.foldRecursively")
+    vscode.action("editor.foldRecursively")
   end)
   vim.keymap.set("n", "zO", function()
-      vscode.action("editor.unfoldAll")
+    vscode.action("editor.unfoldAll")
   end)
   vim.keymap.set("n", "zo", function()
-      vscode.action("editor.unfoldRecursively")
+    vscode.action("editor.unfoldRecursively")
   end)
   vim.keymap.set("n", "zv", function()
-      vscode.action("editor.unfold")
-      vscode.action("editor.foldAllExcept")
+    vscode.action("editor.unfold")
+    vscode.action("editor.foldAllExcept")
   end)
   vim.keymap.set("n", "zV", function()
-      vscode.action("editor.unfoldRecursively")
-      vscode.action("editor.foldAllExcept")
+    vscode.action("editor.unfoldRecursively")
+    vscode.action("editor.foldAllExcept")
   end)
   vim.keymap.set("n", "zj", function()
-      vscode.action("editor.gotoNextFold")
+    vscode.action("editor.gotoNextFold")
   end)
   vim.keymap.set("n", "zk", function()
-      vscode.action("editor.gotoPreviousFold")
+    vscode.action("editor.gotoPreviousFold")
   end)
--- +Git
+  -- +Git
   vim.keymap.set("n", "<leader>gb", function()
     -- blame
     vscode.action("gitlens.toggleFileBlame")
@@ -701,17 +701,43 @@ function my_vscode_keymaps(vscode)
     vscode.action("fzf-picker.runCustomTask")
   end)
 
-  vim.keymap.set({"v", "n"}, "<leader>sw", function()
+  vim.keymap.set({ "v", "n" }, "<leader>sw", function()
+    -- In action (workbench.action) not in api docs (vscode.api?)
+    --  - https://github.com/microsoft/vscode/blob/1.98.2/src/vs/workbench/contrib/search/browser/searchActionsFind.ts#L40
+    --  - https://code.visualstudio.com/api/references/commands
+    vscode.action(
+      "workbench.action.findInFiles",
+      { args = { query = get_visual_selection(), filesToInclude = "", onlyOpenEditors = false } }
+    )
+    vscode.action("search.action.focusSearchList")
+  end)
+
+  vim.keymap.set({ "v", "n" }, "<leader>sW", function()
     -- vscode.action("editor.action.addSelectionToNextFindMatch")
     -- vscode.action("workbench.action.findInFiles")
-    vscode.action("workbench.action.findInFiles", { args = { query = get_visual_selection() , filesToInclude = "" }})
+    vscode.action(
+      "workbench.action.findInFiles",
+      { args = { query = get_visual_selection(), filesToInclude = "", onlyOpenEditors = true } }
+    )
     vscode.action("search.action.focusSearchList")
-end)
--- vim.keymap.set("v"  "<leader>sw", function()
---     -- vscode.action("workbench.action.findInFiles")
---     vscode.action("workbench.action.findInFiles", { args = { query = vim.fn.expand("<cword>"), filesToInclude = "" }})
---   end)
-  
+  end)
+
+  vim.keymap.set({ "v", "n" }, "<leader>sb", function()
+    vscode.action(
+      "workbench.action.findInFiles",
+      { args = { query = get_visual_selection(), filesToInclude = "", onlyOpenEditors = true } }
+    )
+    vscode.action("search.action.focusSearchList")
+  end)
+
+  vim.keymap.set({ "v", "n" }, "<leader>sB", function()
+    vscode.action(
+      "workbench.action.findInFiles",
+      { args = { query = get_visual_selection(), filesToInclude = "", onlyOpenEditors = true } }
+    )
+    vscode.action("search.action.focusSearchList")
+  end)
+
   vim.keymap.set({ "n", "v" }, "<leader>sF", function()
     local currentDir = vim.fn.expand("%:p:h")
     -- __AUTO_GENERATED_PRINT_VAR_START__
@@ -723,8 +749,7 @@ end)
     -- __AUTO_GENERATED_PRINT_VAR_START__
     print([==[my_vscode_keymaps#function activeEditor:]==], vim.inspect(activeEditor)) -- __AUTO_GENERATED_PRINT_VAR_END__
 
-
-    -- https://code.visualstudio.com/api/references/commands
+    --
     -- if v mode then use the selection text
     -- local query = vim.fn.getreg("v") or vim.fn.expand("<cword>")
     -- local vscode_selected_text = vscode.eval("await vscode")
@@ -732,7 +757,10 @@ end)
     -- print([==[function#function vim.fn.getreg("v"):]==], vim.inspect(vim.fn.getreg("v"))) -- __AUTO_GENERATED_PRINT_VAR_END__
     -- print([==[function#function query:]==], vim.inspect(query)) -- __AUTO_GENERATED_PRINT_VAR_END__
     -- vscode.action("workbench.action.findInFiles", { ]]
-    vscode.action("workbench.action.findInFiles", { args = { query = get_visual_selection() , currentDir = current_file .. "/../**"}})
+    vscode.action(
+      "workbench.action.findInFiles",
+      { args = { query = get_visual_selection(), currentDir = current_file .. "/../**", onlyOpenEditors = false } }
+    )
     -- vscode.action("workbench.action.replaceInFiles", {
     --     args = { query = get_visual_selection(), filesToInclude = currentDir .. "/../**" },
     -- })
@@ -746,7 +774,7 @@ end)
   -- Jest : TODO: make sure it ru njest test
   -- toggle wrap tw
   vim.keymap.set("n", "<leader>tw", function()
-      vscode.action("editor.action.toggleWordWrap")
+    vscode.action("editor.action.toggleWordWrap")
   end)
   vim.keymap.set("n", "<leader>tT", function()
     vscode.action("extension.runJestFile")
@@ -809,29 +837,29 @@ end)
     vscode.action("bookmarks.jumpToPrevious")
   end)
   -- TODO : verify
--- <leader>fh+<key> for bookmark l=related 
--- j , k for next and previous bookmarks.jumpToNext bookmarks.jumpToPrevious
--- a add bookmark bookmarks.toggle
--- A add bookmark with label bookmarks.toggleLabeled
--- m for open menu bookmarks.listFromAllFiles
-    vim.keymap.set("n", "<leader>fhj", function()
-        vscode.action("bookmarks.jumpToNext")
-    end)
-    vim.keymap.set("n", "<leader>fhk", function()
-        vscode.action("bookmarks.jumpToPrevious")
-    end)
-    vim.keymap.set("n", "<leader>fha", function()
-        vscode.action("bookmarks.toggle")
-    end)
-    vim.keymap.set("n", "<leader>fhA", function()
-        vscode.action("bookmarks.toggleLabeled")
-    end)
-    vim.keymap.set("n", "<leader>fhL", function()
-        vscode.action("bookmarksExplorer.focus")
-    end)    
-    vim.keymap.set("n", "<leader>fhl", function()
-        vscode.action("bookmarks.listFromAllFiles")
-    end)
+  -- <leader>fh+<key> for bookmark l=related
+  -- j , k for next and previous bookmarks.jumpToNext bookmarks.jumpToPrevious
+  -- a add bookmark bookmarks.toggle
+  -- A add bookmark with label bookmarks.toggleLabeled
+  -- m for open menu bookmarks.listFromAllFiles
+  vim.keymap.set("n", "<leader>fhj", function()
+    vscode.action("bookmarks.jumpToNext")
+  end)
+  vim.keymap.set("n", "<leader>fhk", function()
+    vscode.action("bookmarks.jumpToPrevious")
+  end)
+  vim.keymap.set("n", "<leader>fha", function()
+    vscode.action("bookmarks.toggle")
+  end)
+  vim.keymap.set("n", "<leader>fhA", function()
+    vscode.action("bookmarks.toggleLabeled")
+  end)
+  vim.keymap.set("n", "<leader>fhL", function()
+    vscode.action("bookmarksExplorer.focus")
+  end)
+  vim.keymap.set("n", "<leader>fhl", function()
+    vscode.action("bookmarks.listFromAllFiles")
+  end)
   vim.keymap.set("n", "gr", function()
     vscode.action("editor.action.peekDefinition")
   end)

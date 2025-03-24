@@ -1,5 +1,16 @@
 return {
   "folke/noice.nvim",
+  opts = {
+    commands = {
+      history = {
+        -- require('noice')
+        filter_opts = { reverse = true },
+      },
+      all = {
+        filter_opts = { reverse = true },
+      },
+    },
+  },
   keys = {
     {
       "<leader>sna",

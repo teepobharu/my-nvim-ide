@@ -345,6 +345,22 @@ return {
     },
   },
   {
+    "folke/snacks.nvim",
+    opts = {
+      -- https://github.com/folke/snacks.nvim/blob/main/docs/gitbrowse.md
+      gitbrowse = {
+        url_patterns = {
+          ["gitlab%..*"] = {
+            branch = "/-/tree/{branch}",
+            file = "/-/blob/{branch}/{file}#L{line_start}-L{line_end}",
+            permalink = "/-/blob/{commit}/{file}#L{line_start}-L{line_end}",
+            commit = "/-/commit/{commit}",
+          },
+        },
+      },
+    },
+  },
+  {
     "folke/which-key.nvim",
     optional = true,
     opts = {

@@ -213,7 +213,7 @@ local function testGit()
   print(navigablePartSSH) -- Output: github.com/teepobharu/my-nvim-ide
   print(navigablePartHTTPS) -- Output: github.com/teepobharu/my-nvim-ide
 end
-function testGit2()
+function testGit2(path)
   local current_file = path or vim.fn.expand("%:p")
   -- __AUTO_GENERATED_PRINT_VAR_START__
   print([==[testGit2 current_file:]==], vim.inspect(current_file)) -- __AUTO_GENERATED_PRINT_VAR_END__
@@ -500,10 +500,26 @@ local function testExpand()
   -- __AUTO_GENERATED_PRINT_VAR_START__
   print([==[testExpand selline:]==], vim.inspect(selline)) -- __AUTO_GENERATED_PRINT_VAR_END__
 end
+
+local function git_replace_pathedgecase()
+  local a = "/Users/tharutaipree/AgodaGit/fe/messaging-client-messages"
+  local b = "/Users/tharutaipree/AgodaGit/fe/messaging-client-messages/CONTRIBUTING.md"
+  print([==[a:]==], vim.inspect(a))
+  local escaped_a = vim.pesc(a) -- Escape special characters in 'a'
+  print([==[main escaped_a:]==], vim.inspect(escaped_a)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  -- unesacpe version will  not work when contains char like '-' in the path
+  local escPath = b:gsub(escaped_a .. "/?", "")
+  local unesRelPath = b:gsub(a .. "/?", "")
+  print([==[main relPath:]==], vim.inspect(escPath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  print([==[unesRelPath:]==], vim.inspect(unesRelPath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+end
+
 local function main()
+  git_replace_pathedgecase()
+  -- __AUTO_GENERATED_PRINT_VAR_START__
   -- call :messages
-  testExpand()
-  vim_process_callback()
+  -- testExpand()
+  -- vim_process_callback()
   -- get_pythonpath()
   -- getGitList()
   -- buffers()
@@ -514,7 +530,6 @@ local function main()
   -- testGetlineExe()
   -- testGitMatch()
   if false then
-    testGit2()
     stringTest()
     printVariables()
     checkPyVenv()

@@ -318,10 +318,10 @@ keymap("v", "//", "\"+y/\\V<C-R>=escape(@\",'/\\')<CR><CR>", { desc = "Search se
 
 function gitsigns_jump_next_hunk()
   if vim.wo.diff then
-    return "[c"
+    return "]c"
   end
   vim.schedule(function()
-    require("gitsigns").next_hunk()
+    require("gitsigns").nav_hunk("next")
   end)
   return "<Ignore>"
 end
@@ -330,7 +330,7 @@ function gitsigns_jump_prev_hunk()
     return "[c"
   end
   vim.schedule(function()
-    require("gitsigns").prev_hunk()
+    require("gitsigns").nav_hunk("prev")
   end)
   return "<Ignore>"
 end

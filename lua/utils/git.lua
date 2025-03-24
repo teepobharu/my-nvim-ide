@@ -1,5 +1,7 @@
 local M = {}
 
+local pathUtil = require("utils.path")
+
 function M.git_main_branch()
   local git_dir = vim.fn.system("git rev-parse --git-dir 2> /dev/null")
   if vim.v.shell_error ~= 0 then
@@ -51,20 +53,19 @@ function M.get_remote_path(upstream)
   return path
 end
 
----@param ref : string
+---@param ref string
 ---@param mode "file" | "commit" | "branch"
-M.open_remote = function(ref, mode)
+function M.open_remote(ref, mode)
   -- print([==[function mode:]==], vim.inspect(mode)) -- __AUTO_GENERATED_PRINT_VAR_END__
   local file_path = vim.fn.expand("%:p")
   local line_number = vim.fn.line(".")
 
   local gitroot = pathUtil.get_git_root()
   local remote_name = ref:match("([^/]+)")
-  -- print([==[function remote_name:]==], vim.inspect(remote_name)) -- __AUTO_GENERATED_PRINT_VAR_END__
-  local remote_path = gitUtil.get_remote_path(remote_name)
+  local remote_path = M.get_remote_path(remote_name)
   local ref_no_remote = ref:gsub("^[^/]+/", "") -- remove remote
-  -- print([==[function ref_no_remote:]==], vim.inspect(ref_no_remote)) -- __AUTO_GENERATED_PRINT_VAR_END__
-  local git_file_path = file_path:gsub(gitroot .. "/?", "")
+  local gitrootescape = vim.pesc(gitroot)
+  local git_file_path = file_path:gsub(gitrootescape .. "/?", "")
   local url_pattern = "https://%s/blob/%s/%s#L%d"
   local url = ""
   local is_commit = ref_no_remote:match("[0-9a-fA-F]+$") ~= nil and (#ref_no_remote == 40 or #ref_no_remote == 7)

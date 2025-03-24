@@ -30,7 +30,7 @@ Features
 
 🎊 Major
 
-- **Snacks** - search replacement, git browse open
+- **Snacks** - search replacement, git browse open, search windows actions : edit on search
 - Blink - cmp relplacement
 - LSPSaga - keymap changes
 - snacks instead of fzf-lua (Help key with ?)
@@ -51,10 +51,14 @@ C\_ - toggle term
 ft - snacks term
 sr - resume from fzf - fr
 fp - open new project dir not file in that project anymore
+snacks panel
+
+- a-w : switch window can edit in preview
 
 🚫 Not supported, Dropped Features
 
 - Snacks: git bcommits
+  - search in buffers (Sb)
   - terminal - lack prior custom shortcut to send visual
   - explorer snacks copy no autocomplete and require manual type (neotree more convenient + support custom cmd in search within dir)
 
@@ -62,6 +66,8 @@ fp - open new project dir not file in that project anymore
 
 - [ ] Lazygit not load profile + open in vscode instead of vim
 - [ ] Toggleterm also toggle snacks and override snacks terminal
+- [x] Git browse
+  - open git (file open only works in github , custom domain only open proj)
 - someimtes toggleterm load before / fater snacks (since its lazy it will activate after some keys)
 - error cursor autocommands and textchanged : disable blink
 - error import touble esnacks : disable line

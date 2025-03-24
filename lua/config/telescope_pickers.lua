@@ -28,7 +28,8 @@ local get_git_pickers_fn = function()
     local line_number = vim.fn.line(".")
 
     local gitroot = pathUtil.get_git_root()
-    local git_file_path = file_path:gsub(gitroot .. "/?", "")
+    local gitrootesc = vim.pesc(gitroot)
+    local git_file_path = file_path:gsub(gitrootesc .. "/?", "")
     local url_pattern = "https://%s/blob/%s/%s#L%d"
     local urlF = string.format(url_pattern, remote_path, ref, git_file_path, line_number)
     -- else
@@ -124,8 +125,6 @@ M.fzf.pickers.open_git_pickers_telescope = function()
   results = vim.tbl_map(function(v)
     return v.value
   end, results)
-  -- __AUTO_GENERATED_PRINT_VAR_START__
-  print([==[function results:]==], vim.inspect(results)) -- __AUTO_GENERATED_PRINT_VAR_END__
   fzf_lua.fzf_exec(results, {
     prompt = "Open Branch URL (c-s to diff, c-y to copy url) >",
     actions = {
@@ -296,10 +295,6 @@ M.telescope.getPickers = function(opts)
             local current_line = action_state.get_current_line()
             current_line = current_line:gsub("%s+$", "")
             local input_or_multi = firstMultiSelection or current_line
-            -- __AUTO_GENERATED_PRINT_VAR_START__
-            print([==[function#function#function#function input_or_multi:]==], vim.inspect(input_or_multi)) -- __AUTO_GENERATED_PRINT_VAR_END__
-            -- __AUTO_GENERATED_PRINT_VAR_START__
-            print([==[function#function#function#function selection:]==], vim.inspect(selection)) -- __AUTO_GENERATED_PRINT_VAR_END__
             local selection = action_state.get_selected_entry().value or input_or_multi
 
             if selection then

@@ -125,6 +125,12 @@ return {
       -- Alt+a to toggle all
       fzf_lua.setup(options)
 
+      -- if snack not enable do below
+      if isSnackEnabled then
+        return
+      end
+      -- disable in favor of snacks since
+      -- avante and copilot chat can see multi select UI but still not work like fzf
       -- Automatic sizing of height/width of vim.ui.select
       fzf_lua.register_ui_select(function(_, items)
         local min_h, max_h = 0.60, 0.80

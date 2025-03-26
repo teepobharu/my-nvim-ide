@@ -367,13 +367,13 @@ https://github.com/CopilotC-Nvim/CopilotChat.nvim
 
 Copilot Chat
 
-| Key            | Description                                       |
-| -------------- | ------------------------------------------------- |
-| <leader>a      | toggle commands                                   |
-| - m/M          | get commit message from current diff / staged     |
-| C-t            | overriden auto complete since default not working |
-| <input> / or @ | /prompts or @context                              |
-| <enter>        | continue question enter chat                      |
+| Key             | Description                                          |
+| --------------- | ---------------------------------------------------- |
+| <leader>a       | toggle commands                                      |
+| - m/M           | get commit message from current diff / staged        |
+| <Tab> (default) | auto suggest / open popup can use after #file: <Tab> |
+| <input> / or @  | /prompts or @context                                 |
+| <enter>         | continue question enter chat                         |
 
 Code companion
 

@@ -175,12 +175,28 @@ return {
       },
     },
     opts = {
-      model = "gpt-4o", -- override claude-sonnet model since not support on my copilot (get ereror)
+      -- model = "", -- override claude-sonnet model since not support on my copilot (get ereror)
       -- debug = true, -- add to debug message by calling l-a-d and  see in file using <gf> or check :messages in the logfile name else see only error (not prompt and embedding used)
+      -- mappings = {
+      -- complete = { -- no difference copilot autocompl not see in chat anyway - 20250327
+      --   detail = "Use @<C-Tab> or /<C-Tab> to complete the suggestion.",
+      --   insert = "<C-t>",
+      -- },
+      -- },
+    },
+  },
+  {
+    "yetone/avante.nvim",
+    opts = {
       mappings = {
-        complete = {
-          detail = "Use @<C-Tab> or /<C-Tab> to complete the suggestion.",
-          insert = "<C-t>",
+        --- @class AvanteConflictMappings
+        sidebar = {
+          -- apply_all = "A",
+          -- apply_cursor = "a",
+          -- retry_user_request = "r",
+          -- edit_user_request = "e",
+          switch_windows = "<C-w>",
+          -- reverse_switch_windows = "<S-Tab>",
         },
       },
     },
@@ -347,6 +363,9 @@ return {
   {
     "folke/snacks.nvim",
     opts = {
+      picker = {
+        ui_select = true, -- boolean set `vim.ui.select` to a snacks picker, might conflict with fzf
+      },
       -- https://github.com/folke/snacks.nvim/blob/main/docs/gitbrowse.md
       gitbrowse = {
         url_patterns = {

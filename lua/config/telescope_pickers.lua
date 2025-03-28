@@ -10,31 +10,9 @@ local get_git_pickers_fn = function()
   ---@param ref : string
   ---@param mode "file" | "commit"
   local open_remote = function(ref, mode)
-    local function remove_remote_prefix(ref)
-      local sanitized_ref = ref:gsub("^%s*(.-)%s*$", "%1")
-      sanitized_ref = sanitized_ref:gsub(" ", "")
-      sanitized_ref = sanitized_ref:gsub("^[*|+]", "")
-      sanitized_ref = sanitized_ref:gsub("^remotes/[%w%p]+/", "")
-      return sanitized_ref
-    end
-
-    local remote_name = ref:match("([^/]+)")
-    ref = ref:gsub("^[^/]+/", "") -- remove remote
-    ref = remove_remote_prefix(ref)
-    local remote_path = gitUtil.get_remote_path(remote_name)
     local isCommit = ref:match("^[0-9a-fA-F]+$") and (#ref == 7 or #ref == 40)
-
-    -- same as myeditor.fzf logic
-    local line_number = vim.fn.line(".")
-
-    local gitroot = pathUtil.get_git_root()
-    local gitrootesc = vim.pesc(gitroot)
-    local git_file_path = file_path:gsub(gitrootesc .. "/?", "")
-    local url_pattern = "https://%s/blob/%s/%s#L%d"
-    local urlF = string.format(url_pattern, remote_path, ref, git_file_path, line_number)
-    -- else
-    local urlC = string.format("https://%s/commit/%s", remote_path, ref)
-    -- end
+    local urlF = gitUtil.get_branch_url(ref, "file")
+    local urlC = gitUtil.get_branch_url(ref, "commit")
     vim.fn.jobstart({ "open", urlF }, { detach = true })
     if not isCommit then
       vim.fn.setreg("+", urlF)
@@ -135,7 +113,12 @@ M.fzf.pickers.open_git_pickers_telescope = function()
         fn_list.diff_ref(selected[1])
       end,
       ["ctrl-y"] = function(selected)
-        vim.fn.setreg("+", fn_list.get_branch_url(selected[1]))
+        local file_url = gitUtil.get_branch_url(selected[1], "file")
+        vim.fn.setreg("+", file_url)
+        vim.fn.setreg("c", gitUtil.get_branch_url(selected[1], "commit"))
+        vim.fn.setreg("b", gitUtil.get_branch_url(selected[1], "branch"))
+        vim.fn.setreg("f", gitUtil.get_branch_url(file_url))
+        vim.notify("Copied and reg c,b,f (commit,file,branch)" .. file_url, vim.log.levels.INFO)
       end,
     },
   })
@@ -261,7 +244,7 @@ M.telescope.getPickers = function(opts)
   local git_branch_remote_n_diff_picker = function()
     local fn_list = get_git_pickers_fn()
     local get_remote_branches_name = fn_list.get_remote_branches_name
-    local get_branch_url = fn_list.get_branch_url
+    local get_branch_url = gitUtil.get_branch_url
     local diff_ref = fn_list.diff_ref
     local open_branch_url = fn_list.open_branch_url
     local current_word = vim.fn.expand("<cword>")
@@ -316,7 +299,12 @@ M.telescope.getPickers = function(opts)
           map("i", "<C-c>", function()
             local selection = action_state.get_selected_entry()
             if selection then
-              vim.fn.setreg("+", get_branch_url(selection.value))
+              local file_url = gitUtil.get_branch_url(selection.value, "file")
+              vim.fn.setreg("+", file_url)
+              vim.fn.setreg("c", gitUtil.get_branch_url(selection.value, "commit"))
+              vim.fn.setreg("b", gitUtil.get_branch_url(selection.value, "branch"))
+              vim.fn.setreg("f", file_url)
+              vim.notify("Copied and reg c,b,f (commit,file,branch)" .. file_url, vim.log.levels.INFO)
             end
           end)
           return true

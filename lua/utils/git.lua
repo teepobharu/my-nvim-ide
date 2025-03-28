@@ -55,7 +55,7 @@ end
 
 ---@param ref string
 ---@param mode "file" | "commit" | "branch"
-function M.open_remote(ref, mode)
+function M.get_branch_url(ref, mode)
   -- print([==[function mode:]==], vim.inspect(mode)) -- __AUTO_GENERATED_PRINT_VAR_END__
   local file_path = vim.fn.expand("%:p")
   local line_number = vim.fn.line(".")
@@ -81,6 +81,13 @@ function M.open_remote(ref, mode)
       url = string.format("https://%s/tree/%s", remote_path, ref_no_remote)
     end
   end
+  return url
+end
+
+---@param ref string
+---@param mode "file" | "commit" | "branch"
+function M.open_remote(ref, mode)
+  local url = M.get_branch_url(ref, mode)
   vim.fn.jobstart({ "open", url }, { detach = true })
 end
 

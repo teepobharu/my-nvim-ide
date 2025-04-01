@@ -422,8 +422,7 @@ local function addVenvPyrightConfig()
   vim.fn.writefile({ configStr }, pyrightconfig)
 end
 
--- Restart LSP client by name
-Cmd.create_cmd("RestartLspClient", function()
+local function processLspClients(action)
   -- List all active clients
   local clients = vim.lsp.get_clients()
   local items = {}
@@ -433,28 +432,38 @@ Cmd.create_cmd("RestartLspClient", function()
 
   -- Show list of clients with ui select
   vim.ui.select(items, {
-    prompt = "Select LSP client to stop",
+    prompt = "Select LSP client to " .. action,
   }, function(choice)
-    -- TODO: is it possible to restart and attach root at the current dir ?
     if choice ~= nil then
       for _, client in ipairs(clients) do
-        if client.name:lower():match("copilot") then
-          vim.notify("restarting copilot : " .. client.name)
-          vim.fn.execute("Copilot restart")
-          return
-        end
         if client.name == choice then
-          vim.notify("stop and starting " .. client.name)
-          vim.lsp.stop_client(client.id, true)
-          vim.lsp.start_client(client.config)
+          if action == "stop" then
+            vim.notify("Stopping " .. client.name)
+            vim.lsp.stop_client(client.id, true)
+          elseif action == "restart" then
+            vim.notify("Stopping and starting " .. client.name)
+            vim.lsp.stop_client(client.id, true)
+            vim.lsp.start_client(client.config)
+          end
           return
         end
       end
     end
   end)
+end
+
+-- Restart LSP client by name
+Cmd.create_cmd("RestartLspClients", function()
+  processLspClients("restart")
 end, { nargs = 0 })
 
-keymap("n", "<leader>Llr", ":RestartLspClient<CR>", { desc = "LSPRestart", noremap = true, silent = true })
+-- Stop LSP clients by name
+Cmd.create_cmd("StopLspClients", function()
+  processLspClients("stop")
+end, { nargs = 0 })
+
+keymap("n", "<leader>Llr", ":RestartLspClients<CR>", { desc = "LSPRestart", noremap = true, silent = true })
+keymap("n", "<leader>Lls", ":StopLspClients<CR>", { desc = "LSP Stop", noremap = true, silent = true })
 
 --   # which key migrate .nvim $HOME/.config/nvim/keys/which-key.vim
 keymap("n", "<c-q>", ":q<CR>", { desc = "Close", noremap = true, silent = true })

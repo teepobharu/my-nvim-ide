@@ -44,8 +44,35 @@ return {
     "stevearc/overseer.nvim",
     -- tutorials : https://github.com/stevearc/overseer.nvim/blob/master/doc/tutorials.md#run-a-file-on-save
     -- support on vscode tasks ?
+    keys = {
+      {
+        "<leader>ow",
+        function()
+          local overseer = require("overseer")
+          overseer.run_template({ name = "run script" }, function(task)
+            if task then
+              task:add_component({ "restart_on_save", paths = { vim.fn.expand("%:p") } })
+              local main_win = vim.api.nvim_get_current_win()
+              overseer.run_action(task, "open vsplit")
+              vim.api.nvim_set_current_win(main_win)
+            else
+              vim.notify("WatchRun not supported for filetype " .. vim.bo.filetype, vim.log.levels.ERROR)
+            end
+          end)
+        end,
+        desc = "WatchRun",
+      },
+    },
     opts = {
       -- default config: https://github.com/stevearc/overseer.nvim/blob/a2734d90c514eea27c4759c9f502adbcdfbce485/lua/overseer/config.lua#L4
+      templates = {
+        "builtin",
+        "user.run_script",
+        "common_shell.grep_async",
+        "agoda.android_client.and_build",
+        "agoda.android_client.and_test",
+        "agoda.android_client.and_pick",
+      },
       strategy = {
         "terminal",
         -- "toggleterm", -- https://github.com/stevearc/overseer.nvim/blob/master/doc/third_party.md#toggleterm

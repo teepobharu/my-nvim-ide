@@ -514,8 +514,99 @@ local function git_replace_pathedgecase()
   print([==[unesRelPath:]==], vim.inspect(unesRelPath)) -- __AUTO_GENERATED_PRINT_VAR_END__
 end
 
+local function overseertestTask()
+  -- Insert args at the '$*' in the grepprg
+  local function runGrep(params)
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    local cmd, num_subs = vim.o.grepprg:gsub("%$%*", params.args)
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    if num_subs == 0 then
+      cmd = cmd .. " " .. params.args
+    end
+    local overseer = require("overseer")
+    -- Define the type for overseer.new_task
+    ---@type fun(opts: overseer.TaskDefinition): overseer.Task
+    local new_task = overseer.new_task
+
+    local task = new_task({
+      cmd = cmd,
+      components = {
+        {
+          "on_output_quickfix", -- will output to quickfix
+          errorformat = vim.o.grepformat,
+          open = not params.bang,
+          open_height = 8,
+          items_only = true,
+        },
+        -- We don't care to keep this around as long as most tasks
+        { "on_complete_dispose", timeout = 30 },
+        { "on_complete_notify", system = "unfocused" },
+        "default",
+      },
+    })
+    task:start()
+  end
+
+  vim.api.nvim_create_user_command("OverseerGrep", function(params)
+    runGrep(params)
+  end, { nargs = "*", bang = true, complete = "file" })
+  local params = { args = "test", bang = false }
+  -- runGrep(params)
+end
+
+local function runGetVisual()
+  local text = require("utils.input").get_selected_or_cursor_word() --  mode n  cannot test since run with command ?
+  -- local text = get_selected_or_cursor_word()
+  print([==[runGetVisual text:]==], vim.inspect(text)) -- __AUTO_GENERATED_PRINT_VAR_END__
+end
+
+function get_selected_or_cursor_word()
+  -- Check the current mode
+  local mode = vim.api.nvim_get_mode().mode
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[M.get_selected_or_cursor_word mode:]==], vim.inspect(mode)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  if mode == "v" or mode == "V" or mode == "\22" then -- Check if the current mode is visual
+    -- Get the start and end positions of the visual selection
+    local s_start = vim.fn.getpos("'<")
+    local s_end = vim.fn.getpos("'>")
+    -- Retrieve the lines within the visual selection
+    local lines = vim.fn.getline(s_start[2], s_end[2])
+    -- Print the lines for debugging purposes
+    print([==[M.get_selected_or_cursor_word#lines:]==], vim.inspect(lines)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    local selection = ""
+
+    if #lines == 1 then
+      -- If only one line is selected, extract the substring from start to end
+      selection = lines[1]:sub(s_start[3], s_end[3])
+    else
+      -- If multiple lines are selected, adjust the first and last lines
+      lines[1] = lines[1]:sub(s_start[3])
+      lines[#lines] = lines[#lines]:sub(1, s_end[3])
+      -- Concatenate all lines to form the complete selection
+      selection = table.concat(lines, "\n")
+    end
+
+    return selection
+  else
+    -- Default to the word under the cursor
+    return vim.fn.expand("<cword>")
+  end
+end
+function bind_get_selected_or_cursor_word()
+  vim.keymap.set("v", ",rx", function()
+    local text = get_selected_or_cursor_word()
+    print("bind_get_selected_or_cursor_word", text)
+  end, { noremap = true, silent = true })
+  vim.keymap.set("n", ",rx", function()
+    local text = get_selected_or_cursor_word()
+    print("bind_get_selected_or_cursor_word", text)
+  end, { noremap = true, silent = true })
+end
 local function main()
-  git_replace_pathedgecase()
+  -- add key binding ,rp = run
+  -- runGetVisual()
+
   -- __AUTO_GENERATED_PRINT_VAR_START__
   -- call :messages
   -- testExpand()
@@ -530,6 +621,8 @@ local function main()
   -- testGetlineExe()
   -- testGitMatch()
   if false then
+    overseertestTask()
+    git_replace_pathedgecase()
     stringTest()
     printVariables()
     checkPyVenv()

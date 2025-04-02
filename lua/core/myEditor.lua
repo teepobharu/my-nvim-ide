@@ -70,6 +70,7 @@ return {
         "user.run_script",
         "common_shell.grep_async",
         "agoda.android_client.and_build",
+        "agoda.mmb.mmb_pick",
         "agoda.android_client.and_test",
         "agoda.android_client.and_pick",
       },
@@ -410,10 +411,12 @@ return {
     "folke/which-key.nvim",
     optional = true,
     opts = {
+ 
       spec = isSnackEnabled and {
-        { "<leader>" .. key_f, group = "Find(Fzf)", mode = { "n" } },
-        { "<leader>" .. key_g, group = "Git(Fzf)", mode = { "n", "v" } },
-        { "<leader>" .. key_s, group = "Search(Fzf)", mode = { "n", "v" } },
+        { "<leader>" .. key_f, group = "Find(Fzf)",   mode = { "n"     }, icon = { icon = "" }, color = "black" },
+        { "<leader>" .. key_g, group = "Git(Fzf)",    mode = { "n", "v"}, icon = { icon = "" }, color = "black" },
+        { "<leader>" .. key_s, group = "Search(Fzf)", mode = { "n", "v"}, icon = { icon = "" }, color = "black" },
+        { "gG",                group = "web",         mode = { "n", "v"}, icon = { icon = "🌐", color = "blue" }},
       } or {},
     },
   }, -- { import = "plugins.extras.copilot-chat-v2" },

@@ -2,26 +2,37 @@ return {
   name = "run script",
   builder = function()
     local file = vim.fn.expand("%:p")
-    local cmd = { file }
-    if vim.bo.filetype == "lua" then
-      cmd = { "luafile", file }
+    local ft = vim.bo.filetype
+    local cmd = { ft, file }
+    local filetype_commands = {
+      lua = { "luafile", file },
+      go = { "go", "run", file },
+      python = { "python", file },
+      javascript = { "node", file },
+      typescript = { "bun", file },
+      perl = { "perl", file },
+      sh = { "sh", file },
+      -- Add more filetypes and commands as needed
+    }
+
+    if not filetype_commands[ft] then
+      vim.notify("No run command found for " .. ft .. "using default command: " .. ft)
     end
-    if vim.bo.filetype == "go" then
-      cmd = { "go", "run", file }
-    end
-    if vim.bo.filetype == "python" then
-      cmd = { "python", file }
-    end
+
+    cmd = filetype_commands[ft] or cmd
+
     return {
       cmd = cmd,
       components = {
         { "on_output_quickfix", set_diagnostics = true },
+        -- popupup result view
+        -- { "on_output_popup", set_diagnostics = true },
         "on_result_diagnostics",
         "default",
       },
     }
   end,
   condition = {
-    filetype = { "sh", "python", "go", "lua" },
+    -- filetype = { "sh", "python", "go", "lua" },
   },
 }

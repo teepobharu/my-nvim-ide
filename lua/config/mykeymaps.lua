@@ -1,6 +1,7 @@
 local opts = { noremap = true, silent = true }
 local keymap = vim.keymap.set
 local Cmd = require("utils.cmd")
+local inputUtil = require("utils.input")
 -- ===========================
 -- LAZY NVIM ====================
 -- =======================
@@ -578,6 +579,7 @@ local function run_command(command, callback)
     detach = true,
   })
 end
+
 keymap({ "n", "v" }, "gx", function()
   local url_or_word = url_repo(true)
   -- copy to register + if not empty
@@ -588,7 +590,17 @@ keymap({ "n", "v" }, "gx", function()
   end
 end, { silent = true, desc = "Copy word / Open url" })
 
--- map gX to open in code editor
+keymap({ "n", "v" }, "gGs", function()
+  local text = inputUtil.get_selected_or_cursor_word()
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[(anon) text:]==], vim.inspect(text)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local escaped_text = text:gsub(" ", "%%20")
+  -- __AUTO_GENERATED_PRINT_VAR_
+  print([==[(anon) escaped_text:]==], vim.inspect(escaped_text)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local search_url = "https://www.google.com/search?q=" .. escaped_text
+  run_command({ open_command, search_url })
+end, { silent = true, desc = "Google Search" })
+
 keymap({ "n", "v" }, "gX", function()
   local url_or_word = url_repo()
   -- copy to register + if not empty

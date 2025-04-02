@@ -3,6 +3,10 @@
 ## TODOs
 
 - General
+  02/04/2025
+- [x] Overseer add custom task common + android
+  - [x] fix android not run / not show prompt
+  - [x] task work wit watch mode bind as <l>ow
 - [x] conform format line add key
 - [x] local leader not working
 - [x] telescope mapping not work - wrong key need to be inside default
@@ -223,6 +227,7 @@ Overseer - task manangement (leader + o)
 - support and read ./.vscode/tasks.json by default
 - can extend by https://github.com/stevearc/overseer.nvim/blob/master/doc/guides.md#custom-tasks
 - rerun last task with <leader>>or
+- vscode spec: https://github.com/stevearc/overseer.nvim/blob/master/doc/guides.md#vs-code-tasks
 
 Hurl - HTTP client runner (leader + h)
 

@@ -4,6 +4,7 @@
 vim.g.enable_plugins = {
   ["no-neck-pain"] = "no",
   -- lspsaga = "no",
+  harpoon = "yes",
   wakatime = "yes",
   avante = "yes",
   codecompanion = "yes",

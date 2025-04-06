@@ -115,26 +115,40 @@ return {
       {
         "<localleader>e",
         function()
-          require("neo-tree.command").execute({ toggle = true, dir = Path.get_root_directory() })
+          require("neo-tree.command").execute({ toggle = true, dir = Path.get_root_directory_current_buffer() })
         end,
         desc = "Explorer NeoTree (Root)",
       },
       {
         isSnackEnabled and "<localleader>E" or "<leader>E",
         function()
-          require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
+          require("neo-tree.command").execute({ toggle = true, dir = vim.fn.expand("%:p:h") })
         end,
         desc = "Explorer NeoTree (CWD)",
       },
       {
-        "<leader>" .. key_f .. "E",
+        "<leader>fE",
         function()
+          -- %:p:h:h
+          require("neo-tree.command").execute({ toggle = true, dir = vim.fn.expand("%:p:h") })
+        end,
+        desc = "NeoTree (CWD expand)",
+      },
+      {
+        "<leader>fe",
+        function()
+          local curr_dir = Path.get_root_directory_current_buffer()
           if isSnackEnabled then
-            Snacks.picker.explorer({
-              cwd = vim.fn.expand("%:p:h"),
+            local ok, err = pcall(Snacks.picker.explorer, {
+              cwd = curr_dir,
               auto_close = true,
               layout = {
-                preset = "vertical",
+                -- preset = "vertical",
+                preset = "sidebar",
+                preview = false,
+                -- to show the explorer to the right, add the below to
+                -- your config under `opts.picker.sources.explorer`
+                -- position = "right" ,
               },
               win = {
                 list = {
@@ -144,11 +158,17 @@ return {
                 },
               },
             })
+
+            if not ok then
+              vim.notify("Snacks Explorer: " .. err, vim.log.levels.ERROR)
+              require("neo-tree.command").execute({ toggle = true, dir = Path.get_root_directory_current_buffer() })
+            end
           else
-            require("neo-tree.command").execute({ toggle = true, dir = vim.uv.cwd() })
+            require("neo-tree.command").execute({ toggle = true, dir = Path.get_root_directory_current_buffer() })
           end
         end,
-        desc = isSnackEnabled and "Snack Explorer" or "NeoTree Explorer",
+        desc = (isSnackEnabled and "Snack Explorer" or "NeoTree Explorer") .. "(Root)",
+        -- desc = isSnackEnabled and "NeoTree Git root",
       },
       {
         "<leader>" .. key_g .. "e",
@@ -193,7 +213,8 @@ return {
           sources = { "filesystem", "buffers", "git_status" },
           open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
           filesystem = {
-            bind_to_cwd = false,
+            -- bind_to_cwd = false,
+            bind_to_cwd = true, -- true creates a 2-way binding between vim's cwd and neo-tree's root
             follow_current_file = { enabled = true },
             use_libuv_file_watcher = true,
           },

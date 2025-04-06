@@ -28,6 +28,20 @@ function M.get_root_directory()
   return vim.fn.getcwd()
 end
 
+---@return string|nil
+function M.get_root_directory_current_buffer()
+  -- Change directory to the current buffer's directory
+  local buffer_path = vim.fn.expand("%:p:h")
+  -- lcd buffer_path
+  vim.cmd("lcd " .. buffer_path)
+  -- Get git root from current buffer
+  if M.is_git_repo() then
+    return M.get_git_root()
+  else
+    return buffer_path
+  end
+end
+
 -- Function to get the Python path.
 -- @param pipenvFallback boolean: If true, falls back to pipenv --py if pyrightconfig.json is not found.
 -- @param isLog boolean: If true, logs the Python path using vim.notify.

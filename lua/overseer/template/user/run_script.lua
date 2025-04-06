@@ -16,7 +16,7 @@ return {
     }
 
     if not filetype_commands[ft] then
-      vim.notify("No run command found for " .. ft .. "using default command: " .. ft)
+      vim.notify("No run command found for " .. ft .. "using default command: " .. cmd)
     end
 
     cmd = filetype_commands[ft] or cmd
@@ -25,8 +25,6 @@ return {
       cmd = cmd,
       components = {
         { "on_output_quickfix", set_diagnostics = true },
-        -- popupup result view
-        -- { "on_output_popup", set_diagnostics = true },
         "on_result_diagnostics",
         "default",
       },

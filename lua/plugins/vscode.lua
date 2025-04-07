@@ -278,7 +278,14 @@ vim.api.nvim_create_autocmd("User", {
     vim.keymap.set("n", "<leader>bd", function()
       vscode.action("workbench.action.closeActiveEditor")
     end)
+    --
     -- Close other buffers
+    vim.keymap.set("n", "<leader>bl", function()
+      vscode.action("workbench.action.closeEditorsToTheLeft")
+    end)
+    vim.keymap.set("n", "<leader>br", function()
+      vscode.action("workbench.action.closeEditorsToTheRight")
+    end)
     vim.keymap.set("n", "<leader>bo", function()
       vscode.action("workbench.action.closeOtherEditors")
     end)
@@ -416,6 +423,7 @@ function my_vscode_keymaps(vscode)
     ** <leader>sna to see all keybind / prior messages **
 ]]
 
+  local isCursor = vscode.has_config("cursor") -- work around since cannot acces context like in when
   print(QuickOnboardKeyInstructions)
   -- vscode.notify(QuickOnboardKeyInstructions)
   -- Helper
@@ -630,18 +638,50 @@ function my_vscode_keymaps(vscode)
 
   -- AI ai
   vim.keymap.set({ "n", "v" }, "<leader>aq", function()
-    vscode.action("inlineChat.start")
+    if isCursor then
+      vscode.action("aipopup.action.modal.generate") -- cursor
+    else
+      vscode.action("inlineChat.start")
+    end
   end)
   vim.keymap.set({ "n", "v" }, "<leader>av", function()
-    vscode.action("workbench.action.chat.openInSidebar")
+    -- TODO can we check wit when context -- seems like not kjj?
+    -- Check if the cursor is active and start the composer prompt in VSCode
+    if isCursor then
+      vscode.action("composer.startComposerPrompt")
+    else
+      vscode.action("workbench.action.chat.openInSidebar")
+    end
+    -- local config = vscode.eval("return vscode.window.activeTextEditor.document.fileName")
+    -- local w1 = vscode.eval("return vscode.editorTextFocus") -- nil
+
+    -- vim.print(vscode.get_config({ "editor.fontFamily", "editor.tabSize" }))
+    -- __AUTO_GENERATED_PRINT_VAR_START__
+    -- print([==[my_vscode_keymaps#(anon) vscode.get_config("cursor"):]==], vim.inspect(vscode.get_config("cursor"))) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+    -- print(
+    --   [==[my_vscode_keymaps#(anon) vscode.get_config("cursor"):]==],
+    --   vim.inspect(vscode.get_config("editor.tabSize")),
+    --   vim.inspect(vscode.get_config("xzceditor")),
+    --   vim.inspect(vscode.get_config("cursor")),
+    --   isCursor
+    -- ) -- __AUTO_GENERATED_PRINT_VAR_END__
   end)
   vim.keymap.set("n", "<leader>aa", function()
-    vscode.action("github.copilot.chat.attachFile")
+    if isCursor then
+      vscode.action("aichat.newchataction") -- cursor
+    else
+      vscode.action("github.copilot.chat.attachFile")
+    end
+    -- vscode.action("aipopup.action.modal.generate") -- cursor
   end)
   vim.keymap.set("v", "<leader>aa", function()
-    vscode.action("github.copilot.chat.attachSelection")
+    if isCursor then
+      vscode.action("aichat.insertselectionintochat") -- cursor
+    else
+      vscode.action("github.copilot.chat.attachSelection")
+    end
   end)
-  --
   vim.keymap.set("n", "<leader>aA", function()
     vscode.action("github.copilot.edits.attachFile")
   end)
@@ -731,10 +771,19 @@ function my_vscode_keymaps(vscode)
   end)
 
   vim.keymap.set({ "v", "n" }, "<leader>sB", function()
-    vscode.action(
-      "workbench.action.findInFiles",
-      { args = { query = get_visual_selection(), filesToInclude = "", onlyOpenEditors = true } }
-    )
+    local query = get_visual_selection()
+    print([==[my_vscode_keymaps#(anon) query:]==], vim.inspect(query)) -- __AUTO_GENERATED_PRINT_VAR_END__
+    local isVmode = vim.fn.mode() == "v"
+
+    if (query ~= "" and #query > 2) or isVmode then
+      vscode.action(
+        "workbench.action.findInFiles",
+        { args = { query = query, filesToInclude = "", onlyOpenEditors = true } }
+      )
+      vscode.action("search.action.focusSearchList")
+    else
+      print("No selection found")
+    end
     vscode.action("search.action.focusSearchList")
   end)
 
@@ -821,7 +870,7 @@ function my_vscode_keymaps(vscode)
     local currText = vscode.eval("await vscode.env.clipboard.readText()", { args = { callback = callback } }, 200)
     vscode.notify("Copied relative file path")
   end)
-  vim.keymap.set("n", "<leader>sb", function()
+  vim.keymap.set("n", "<localleader>sb", function()
     vscode.action("bookmarksExplorer.focus")
   end)
   vim.keymap.set("n", "<leader>fb", function()

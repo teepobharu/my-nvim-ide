@@ -6,6 +6,7 @@
   02/04/2025
 - [x] Overseer add custom task common + android
   - [x] fix android not run / not show prompt
+  - [ ] android test extract module not work on dash path yet legacy-navigation
   - [x] task work wit watch mode bind as <l>ow
 - [x] conform format line add key
 - [x] local leader not working
@@ -182,10 +183,11 @@ CDs
 
 Config file settings / debug
 
-| Key         | Description                  |
-| ----------- | ---------------------------- |
-| <local>rl   | include lua (check test.lua) |
-| <leader>sna | open noice (messages) log    |
+| Key         | Description                             |
+| ----------- | --------------------------------------- |
+| <local>rl   | include lua (check test.lua)            |
+| <leader>sna | open noice (messages) log               |
+| C-v + <key> | get the key mapping char representation |
 
 ### Editing
 

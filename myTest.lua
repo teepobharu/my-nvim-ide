@@ -505,13 +505,47 @@ local function git_replace_pathedgecase()
   local a = "/Users/tharutaipree/AgodaGit/fe/messaging-client-messages"
   local b = "/Users/tharutaipree/AgodaGit/fe/messaging-client-messages/CONTRIBUTING.md"
   print([==[a:]==], vim.inspect(a))
+
   local escaped_a = vim.pesc(a) -- Escape special characters in 'a'
   print([==[main escaped_a:]==], vim.inspect(escaped_a)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  print([==[path - escaped :]==], vim.inspect(escaped_a)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
   -- unesacpe version will  not work when contains char like '-' in the path
-  local escPath = b:gsub(escaped_a .. "/?", "")
-  local unesRelPath = b:gsub(a .. "/?", "")
-  print([==[main relPath:]==], vim.inspect(escPath)) -- __AUTO_GENERATED_PRINT_VAR_END__
-  print([==[unesRelPath:]==], vim.inspect(unesRelPath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local escPath_replace = b:gsub(escaped_a .. "/?", "")
+  local unesRelPath_replace = b:gsub(a .. "/?", "")
+  print([==[replace relPath:]==], vim.inspect(escPath_replace)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  print([==[replace unesRelPath:]==], vim.inspect(unesRelPath_replace)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  -- for android project
+  local gitroot = "/Users/tharutaipree/AgodaGit/fe/client-android"
+  local c = gitroot
+    .. "/"
+    .. "presentation/legacy-navigation/src/test/kotlin/com/agoda/mobile/src/test/consumer/screens/home/BottomNavPageMapperImplTest.kt"
+  local c_no_root_fail = c:gsub(gitroot .. "/?", "")
+  local c_no_root = c:gsub(vim.pesc(gitroot), "")
+  -- `(.-)` is a non-greedy match for any character (except newline) as few times as possible.
+  local module_path_work = c_no_root:match("^(.-)/src/test/")
+
+  --
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[git_replace_pathedgecase modulee_path_work:]==], vim.inspect(module_path_work)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  --
+  -- print([==[git_replace_pathedgecase c_no_root_fail:]==], vim.inspect(c_no_root)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  print([==[git_replace_pathedgecase c_no_root:]==], vim.inspect(c_no_root)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  -- get path from fe untiil test fe/(.*)/test
+  local path_before_test = c:match("(.*)/src/test")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[git_replace_pathedgecase path_before_test:]==], vim.inspect(path_before_test)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  local module_pattern = "(.*)/src/test/"
+  local module = path_before_test:match(module_pattern)
+  print([==[git_replace_pathedgecase module:]==], vim.inspect(module)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  local module_pattern = "([^/]+)/([^/]+)/src/test/"
+  local module = path_before_test:match(module_pattern)
+  print([==[git_replace_pathedgecase module:]==], vim.inspect(module)) -- __AUTO_GENERATED_PRINT_VAR_END__
 end
 
 local function overseertestTask()
@@ -620,9 +654,9 @@ local function main()
   -- getArrListConfig()
   -- testGetlineExe()
   -- testGitMatch()
+  git_replace_pathedgecase()
   if false then
     overseertestTask()
-    git_replace_pathedgecase()
     stringTest()
     printVariables()
     checkPyVenv()

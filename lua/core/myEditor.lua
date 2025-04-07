@@ -62,6 +62,36 @@ return {
         end,
         desc = "WatchRun",
       },
+      {
+        "<leader>oT",
+        ":OverseerTaskAction<CR>", -- Add the command you want to run here
+        desc = "Run Overseer Task Action",
+      },
+      {
+        "<leader>oQ",
+        ":OverseerDeleteBundle<CR>",
+        desc = "Delete Overseer Bundle",
+      },
+      {
+        "<leader>oC",
+        ":OverseerClearCache<CR>",
+        desc = "Clear Overseer Cache",
+      },
+      {
+        "<leader>os",
+        ":OverseerSaveBundle<CR>",
+        desc = "Save Overseer Bundle",
+      },
+      {
+        "<leader>ol",
+        ":OverseerLoadBundle<CR>",
+        desc = "Load Overseer Bundle",
+      },
+      {
+        "<leader>on",
+        ":OverseerBuild<CR>",
+        desc = "New Task",
+      },
     },
     opts = {
       -- default config: https://github.com/stevearc/overseer.nvim/blob/a2734d90c514eea27c4759c9f502adbcdfbce485/lua/overseer/config.lua#L4
@@ -411,12 +441,35 @@ return {
     "folke/which-key.nvim",
     optional = true,
     opts = {
- 
+
       spec = isSnackEnabled and {
-        { "<leader>" .. key_f, group = "Find(Fzf)",   mode = { "n"     }, icon = { icon = "" }, color = "black" },
-        { "<leader>" .. key_g, group = "Git(Fzf)",    mode = { "n", "v"}, icon = { icon = "" }, color = "black" },
-        { "<leader>" .. key_s, group = "Search(Fzf)", mode = { "n", "v"}, icon = { icon = "" }, color = "black" },
-        { "gG",                group = "web",         mode = { "n", "v"}, icon = { icon = "🌐", color = "blue" }},
+        {
+          "<leader>" .. key_f,
+          group = "Find(Fzf)",
+          mode = { "n" },
+          icon = { icon = "" },
+          color = "black",
+        },
+        {
+          "<leader>" .. key_g,
+          group = "Git(Fzf)",
+          mode = { "n", "v" },
+          icon = { icon = "" },
+          color = "black",
+        },
+        {
+          "<leader>" .. key_s,
+          group = "Search(Fzf)",
+          mode = { "n", "v" },
+          icon = { icon = "" },
+          color = "black",
+        },
+        {
+          "gG",
+          group = "web",
+          mode = { "n", "v" },
+          icon = { icon = "🌐", color = "blue" },
+        },
       } or {},
     },
   }, -- { import = "plugins.extras.copilot-chat-v2" },

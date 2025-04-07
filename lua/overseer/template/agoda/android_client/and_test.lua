@@ -41,6 +41,7 @@ end
 ---@param filepath string
 ---@return string
 local function get_module(filepath)
+  -- __AUTO_GENERATED_PRINT_VAR_START__
   -- FIX: m2 = "myzxc-zxc/asdzxc/test/zxc/ag"
   -- local mmpatht = "/Users/tharutaipree/AgodaGit/fe/client-android/presentation/legacy-navigation/src/test/taga/framework/src/main/kotlin/com/agoda/mobile/taga/Store.kt"
   -- print(mmpatht:match("([^/]+)test"))
@@ -51,7 +52,17 @@ local function get_module(filepath)
   -- Extract the module from the path
   -- expected to be :presentation:legacy-navigation
   -- presentation/legacy-navigation/src/test/kotlin/com/agoda/mobile/consumer/screens/home/BottomNavPageMapperImplTest.kt
-  local module = filepath:match("([^/]+)/([^/]+)/src/test/")
+  -- local relpath = vim.fn.expand("%:p:h")
+  print([==[get_module filepath:]==], vim.inspect(filepath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local gitroot = require("utils.path").get_git_root()
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[get_module gitroot:]==], vim.inspect(gitroot)) -- __AUTO_GENERATED_PRINT_VAR_END__
+  local relpath = filepath:gsub(vim.pesc(gitroot) .. "/?", "")
+  -- __AUTO_GENERATED_PRINT_VAR_START__
+  print([==[get_module relpath:]==], vim.inspect(relpath)) -- __AUTO_GENERATED_PRINT_VAR_END__
+
+  -- local module = relpath:match("([^/]+)/([^/]+)/src/test/")
+  local module = relpath:match("(.*)/src/test/")
   print([==[get_module module:]==], vim.inspect(module)) -- __AUTO_GENERATED_PRINT_VAR_END__
   if module then
     module = ":" .. module:gsub("/", ":")

@@ -154,8 +154,6 @@ return {
     lazy = false,
     opts = {
       image = {
-        -- NOTE: brew install imagemagick to install on Mac, refer https://imagemagick.org/script/download.php for more detail
-        -- For mermaidjs: npm install -g @mermaid-js/mermaid-cli
         enabled = true,
         doc = {
           -- enable image viewer for documents

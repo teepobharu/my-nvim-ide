@@ -3,6 +3,8 @@
 ## Todo
 
 - [ ] Move common mappings outside and import before loading plugins (will help get base mappings before something might fail + extend to vanilla vim)
+- [ ] Neotree auto cd wrong dir https://github.com/LazyVim/LazyVim/discussions/952#discussioncomment-6249577
+- [ ] Avante add file context is nv2lzy instead of currrent dir
 
 # Migrations
 

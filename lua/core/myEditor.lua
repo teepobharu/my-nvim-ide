@@ -1,7 +1,7 @@
 local pathUtil = require("utils.path")
 local gitUtil = require("utils.git")
 local keyutil = require("utils.keyutil")
-
+local Lsp = require("utils.lsp")
 local isSnackEnabled = keyutil.isSnackEnabled
 local key_f = keyutil.key_f
 local key_s = keyutil.key_s
@@ -395,7 +395,7 @@ return {
       {
         "<leader>" .. key_g .. "o",
         function()
-          require("config.telescope_pickers").fzf.pickers.open_git_pickers_telescope()
+          require("config.telescope_pickers").fzf.pickers.open_git_pickers()
         end,
         desc = "Git branch FZF",
         mode = "n",
@@ -420,9 +420,64 @@ return {
   },
   {
     "folke/snacks.nvim",
+    enabled = isSnackEnabled,
     opts = {
       picker = {
         ui_select = true, -- boolean set `vim.ui.select` to a snacks picker, might conflict with fzf
+        sources = {
+          -- sample pickers: https://github.com/WizardStark/dotfiles/blob/main/home/.config/nvim/lua/workspaces/ui.lua#L417
+          git_branches = {
+            win = {
+              input = {
+                keys = {
+                  ["<C-s>"] = { "my_diff_compare", mode = { "n", "i" }, desc = "Open Diff" },
+                  -- ["<C-t>"] = { "test_picker", mode = { "n", "i" }, desc = "Test picker" },
+                },
+              },
+            },
+          },
+          git_log = {
+            win = {
+              input = {
+                keys = {
+                  ["<C-s>"] = { "my_diff_compare", mode = { "n", "i" }, desc = "Open Diff" },
+                },
+              },
+            },
+          },
+        },
+        actions = {
+          test_picker = function(picker, item)
+            print([==[ item:]==], vim.inspect(item)) -- __AUTO_GENERATED_PRINT_VAR_END__
+            picker:close()
+          end,
+          my_diff_compare = function(picker, item, action)
+            -- print([==[ item:]==], vim.inspect(item)) -- __AUTO_GENERATED_PRINT_VAR_END__
+            -- Check if Gitsigns is available
+            if not pcall(require, "gitsigns") then
+              vim.notify("Gitsigns is not available", vim.log.levels.ERROR)
+              return
+            end
+            -- Get the selected reference from the picker
+            local ref = item.branch or item.commit
+            vim.notify("diff ref=" .. vim.inspect(ref))
+
+            if not ref then
+              local git_default = "master"
+              ref = git_default
+              vim.notify("No reference compare with default", vim.log.levels.WARN)
+            end
+
+            picker:close() -- require this else not work
+            vim.cmd("tabnew")
+            vim.cmd("b#") -- switch to the previous buffer
+            vim.cmd("bd#") -- delete the previous buffer (empty buffer)
+            print([==[run my_diff_compare ref:]==], vim.inspect(ref)) -- __AUTO_GENERATED_PRINT_VAR_END__
+            require("gitsigns").diffthis(ref, {
+              vertical = true,
+            })
+          end,
+        },
       },
       -- https://github.com/folke/snacks.nvim/blob/main/docs/gitbrowse.md
       gitbrowse = {
@@ -436,43 +491,89 @@ return {
         },
       },
     },
+    keys = {
+      {
+        "<leader>gb",
+        function()
+          Snacks.picker.git_branches()
+        end,
+        desc = "Git Branches",
+      },
+    },
   },
   {
     "folke/which-key.nvim",
     optional = true,
     opts = {
 
-      spec = isSnackEnabled and {
-        {
-          "<leader>" .. key_f,
-          group = "Find(Fzf)",
-          mode = { "n" },
-          icon = { icon = "" },
-          color = "black",
-        },
-        {
-          "<leader>" .. key_g,
-          group = "Git(Fzf)",
-          mode = { "n", "v" },
-          icon = { icon = "" },
-          color = "black",
-        },
-        {
-          "<leader>" .. key_s,
-          group = "Search(Fzf)",
-          mode = { "n", "v" },
-          icon = { icon = "" },
-          color = "black",
-        },
-        {
-          "gG",
-          group = "web",
-          mode = { "n", "v" },
-          icon = { icon = "🌐", color = "blue" },
-        },
-      } or {},
+      spec = isSnackEnabled
+          and {
+            {
+              "<leader>L",
+              group = "Lsp Util",
+              mode = { "n" },
+              -- icon = { icon = "" },
+              color = "black",
+            },
+            {
+              "<leader>" .. key_f,
+              group = "Find(Fzf)",
+              mode = { "n" },
+              icon = { icon = "" },
+              color = "black",
+            },
+            {
+              "<leader>" .. key_g,
+              group = "Git(Fzf)",
+              mode = { "n", "v" },
+              icon = { icon = "" },
+              color = "black",
+            },
+            {
+              "<leader>" .. key_s,
+              group = "Search(Fzf)",
+              mode = { "n", "v" },
+              icon = { icon = "" },
+              color = "black",
+            },
+            {
+              "gG",
+              group = "web",
+              mode = { "n", "v" },
+              icon = { icon = "🌐", color = "blue" },
+            },
+          }
+        or {},
     },
   }, -- { import = "plugins.extras.copilot-chat-v2" },
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        vtsls = {
+          root_dir = require("lspconfig.util").root_pattern(".git"),
+          --   local bufPath = vim.api.nvim_buf_get_name(0)
+          -- local cwd = require("lspconfig").util.root_pattern(".git")(bufPath)
+        },
+        biome = {
+          -- root_dir = require("lspconfig.util").root_pattern(".git"),
+          root_dir = function()
+            if Lsp.biome_config_exists() then
+              print("biome_config_exists")
+              return Lsp.biome_config_path()
+            end
+            print("biome not exist in dir")
+            -- add option to copy biome config v
+            require("utils.lsp_setup")
+            -- else copied content from the config to the current gitdir
+            -- vim.fn.mkdir(pathUtil.biome_config_path(), "p")
+            -- vim.fn.writefile({ "biome.json" }, pathUtil.biome_config_path() .. "/biome_config")
+            -- return vim.fn.stdpath("config")
+          end,
+        },
+      },
+    },
+  },
   -- { import = "plugins.extras.telescope-lazy" },
   { import = "plugins.extras.myNoice" },
   { import = "plugins.extras.telescope" },

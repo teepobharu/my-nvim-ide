@@ -27,9 +27,14 @@ local get_git_pickers_fn = function()
     vim.cmd("Gitsigns diffthis " .. branch)
   end
 
-  local function get_remote_branches_name()
+  local function get_branches_n_commits()
     local results = {}
+    local local_branches =
+      vim.fn.system("git branch | awk '/^*/{print; next} {print | \"sort\"}' | sed -E 's|.* ||' | uniq")
     local remote_branches = vim.fn.system("git branch --remote | sed -E 's|.* ||' | uniq")
+    for branch in local_branches:gmatch("[^\r\n]+") do
+      table.insert(results, { value = branch })
+    end
     for branch in remote_branches:gmatch("[^\r\n]+") do
       table.insert(results, { value = branch })
     end
@@ -44,7 +49,7 @@ local get_git_pickers_fn = function()
     return results
   end
   return {
-    get_remote_branches_name = get_remote_branches_name,
+    get_remote_branches_name = get_branches_n_commits,
     diff_ref = diff_ref,
     open_branch_url = open_remote,
   }
@@ -94,7 +99,7 @@ M.fzf.pickers.session_picker = function()
   })
 end
 
-M.fzf.pickers.open_git_pickers_telescope = function()
+M.fzf.pickers.open_git_pickers = function()
   print("FZF PICKERS OPEN GIT PICKERS")
   local fn_list = get_git_pickers_fn()
   local fzf_lua = require("fzf-lua")

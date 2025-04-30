@@ -397,70 +397,15 @@ end
 -- ===============
 -- LSP
 -- ===============
-local function addVenvPyrightConfig()
-  local pathUtil = require("utils.path")
-  local git_dir = pathUtil.get_git_root() or vim.fn.getcwd()
-
-  local venv_path = vim.fn.input("Enter config venv path: ", git_dir .. "/.venv")
-  local config = { venvPath = venv_path, venv = ".venv" }
-  if vim.fn.isdirectory(venv_path) == 0 then
-    vim.notify("Venv path not exists, please run pipenv install", vim.log.levels.WARN)
-    return
-  end
-  -- if file exists then confirm before override
-  local pyrightconfig = git_dir .. "/pyrightconfig.json"
-
-  if vim.fn.filereadable(pyrightconfig) == 1 then
-    local confirm = vim.fn.input("Override existing pyrightconfig.json? (y/n): ")
-    -- confirm or empty string continue to override if not return
-    if confirm ~= "y" and confirm ~= "" then
-      vim.notify("Not override pyrightconfig.json")
-      return
-    end
-  end
-
-  local configStr = vim.fn.json_encode(config)
-  vim.fn.writefile({ configStr }, pyrightconfig)
-end
-
-local function processLspClients(action)
-  -- List all active clients
-  local clients = vim.lsp.get_clients()
-  local items = {}
-  for _, client in ipairs(clients) do
-    table.insert(items, client.name)
-  end
-
-  -- Show list of clients with ui select
-  vim.ui.select(items, {
-    prompt = "Select LSP client to " .. action,
-  }, function(choice)
-    if choice ~= nil then
-      for _, client in ipairs(clients) do
-        if client.name == choice then
-          if action == "stop" then
-            vim.notify("Stopping " .. client.name)
-            vim.lsp.stop_client(client.id, true)
-          elseif action == "restart" then
-            vim.notify("Stopping and starting " .. client.name)
-            vim.lsp.stop_client(client.id, true)
-            vim.lsp.start_client(client.config)
-          end
-          return
-        end
-      end
-    end
-  end)
-end
 
 -- Restart LSP client by name
 Cmd.create_cmd("RestartLspClients", function()
-  processLspClients("restart")
+  require("utils.lsp_setup").processLspClients("restart")
 end, { nargs = 0 })
 
 -- Stop LSP clients by name
 Cmd.create_cmd("StopLspClients", function()
-  processLspClients("stop")
+  require("utils.lsp_setup").processLspClients("stop")
 end, { nargs = 0 })
 
 keymap("n", "<leader>Llr", ":RestartLspClients<CR>", { desc = "LSPRestart", noremap = true, silent = true })
@@ -477,7 +422,18 @@ keymap("n", "<localleader>cf", ":let @+=@%<CR>", { desc = "Copy relative filepat
 keymap("n", "<localleader>cF", ':let @+=expand("%:p")<CR>', { desc = "Copy absolute filepath" })
 -- lsp / files
 keymap("n", "<localleader>rs", "", { desc = "Setup" })
-keymap("n", "<localleader>rsp", addVenvPyrightConfig, { desc = "Python Setup pyright config " })
+keymap(
+  "n",
+  "<localleader>rsp",
+  require("utils.lsp_setup").addVenvPyrightConfig,
+  { desc = "Python Setup pyright config " }
+)
+keymap(
+  "n",
+  "<localleader>rsb",
+  require("utils.lsp_setup").copyBiomeConfigFromToCurrentGitRoot,
+  { desc = "Setup biome config" }
+)
 keymap("n", "<localleader>rsn", addNvimConfigInRoot, { desc = "Setup nvim proj lang & plugin config" })
 keymap("n", "<localleader>rp", "", { desc = "Profile" })
 keymap("n", "<localleader>rl", ":luafile %<CR>", { desc = "Reload Lua file" })

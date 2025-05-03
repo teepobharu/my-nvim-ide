@@ -510,45 +510,70 @@ return {
     "folke/which-key.nvim",
     optional = true,
     opts = {
-
-      spec = isSnackEnabled
-          and {
-            {
-              "<leader>L",
-              group = "Lsp Util",
-              mode = { "n" },
-              -- icon = { icon = "" },
-              color = "black",
-            },
-            {
-              "<leader>" .. key_f,
-              group = "Find(Fzf)",
-              mode = { "n" },
-              icon = { icon = "" },
-              color = "black",
-            },
-            {
-              "<leader>" .. key_g,
-              group = "Git(Fzf)",
-              mode = { "n", "v" },
-              icon = { icon = "" },
-              color = "black",
-            },
-            {
-              "<leader>" .. key_s,
-              group = "Search(Fzf)",
-              mode = { "n", "v" },
-              icon = { icon = "" },
-              color = "black",
-            },
-            {
-              "gG",
-              group = "web",
-              mode = { "n", "v" },
-              icon = { icon = "🌐", color = "blue" },
-            },
-          }
-        or {},
+      spec = vim.list_extend({
+        {
+          "gG",
+          group = "web",
+          mode = { "n", "v" },
+          icon = { icon = "🌐", color = "blue" },
+        },
+        {
+          "<localleader>g",
+          group = "Git",
+          mode = { "n" },
+          icon = { icon = "" },
+          color = "black",
+        },
+        {
+          "<localleader>c",
+          group = "file/dir",
+          mode = { "n" },
+          icon = { icon = "📂" },
+          color = "black",
+        },
+        {
+          "<localleader>f",
+          group = "file/find",
+          mode = { "n" },
+          icon = { icon = "📂" },
+          color = "black",
+        },
+        {
+          "<localleader>r",
+          group = "code/lsp/lua",
+          mode = { "n" },
+          icon = { icon = "💻" },
+          color = "black",
+        },
+      }, isSnackEnabled and {
+        {
+          "<leader>L",
+          group = "linter/lsp",
+          mode = { "n" },
+          color = "black",
+        },
+        {
+          "<leader>" .. key_f,
+          group = "Find(Fzf)",
+          mode = { "n" },
+          icon = { icon = "" },
+          color = "black",
+        },
+        {
+          "<leader>" .. key_g,
+          group = "Git(Fzf)",
+          mode = { "n", "v" },
+          icon = { icon = "" },
+          color = "black",
+        },
+        {
+          "<leader>" .. key_s,
+          group = "Search(Fzf)",
+          mode = { "n", "v" },
+          icon = { icon = "" },
+          color = "black",
+        },
+      } or {}),
     },
   }, -- { import = "plugins.extras.copilot-chat-v2" },
   {

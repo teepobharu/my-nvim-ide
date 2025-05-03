@@ -423,6 +423,11 @@ return {
     enabled = isSnackEnabled,
     opts = {
       picker = {
+        formatters = {
+          file = {
+            truncate = 200,
+          },
+        },
         ui_select = true, -- boolean set `vim.ui.select` to a snacks picker, might conflict with fzf
         sources = {
           -- sample pickers: https://github.com/WizardStark/dotfiles/blob/main/home/.config/nvim/lua/workspaces/ui.lua#L417

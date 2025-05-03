@@ -265,6 +265,23 @@ Use nvim spectre
 
 ### Searching
 
+#### Snacks Preview
+
+https://github.com/folke/snacks.nvim/discussions/1306
+Configured:
+
+- truncate files 200
+  | Key | Description |
+  | ----------- | ----------- |
+  | <leader> s + b | search inside current buffer + jump |
+  | pickers keyboard | |
+  | ? | help |
+  |a+w| switch window can edit in preview |
+  | a+p| preview |
+  |a+f| follow |
+
+#### Telescope
+
 `Telescope` is main searching tools using <leader>f
 
 | Key               | Description            |

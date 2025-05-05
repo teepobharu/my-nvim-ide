@@ -244,6 +244,24 @@ return {
     },
   },
   {
+    "ThePrimeagen/refactoring.nvim",
+    keys = {
+      -- conflict with avante edit
+      {
+        "<leader>re",
+        false,
+      },
+      {
+        "<leader>rE",
+        function()
+          require("refactoring").refactor("Extract Function")
+        end,
+        desc = "Extract",
+        mode = "x",
+      },
+    },
+  },
+  {
     "yetone/avante.nvim",
     opts = {
       mappings = {

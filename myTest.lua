@@ -627,6 +627,17 @@ function get_selected_or_cursor_word()
     return vim.fn.expand("<cword>")
   end
 end
+
+function testExtendTblwithKey()
+  local CF2 = { { "T3", config = {} }, { "TTrue1", config = {} }, { "TTrue2", config = {} } }
+  local TT = true -- get overridden
+  local tbl = { { "t1", config = {} }, { "t3", config = {} } }
+  tbl = vim.tbl_extend("force", tbl, TT and CF2 or {})
+  -- not work wrong key the later table with keys
+  -- print(vim.inspect(tbl))
+  print(vim.inspect(vim.list_extend({ 1, 2 }, CF2)))
+end
+
 function bind_get_selected_or_cursor_word()
   vim.keymap.set("v", ",rx", function()
     local text = get_selected_or_cursor_word()
@@ -654,8 +665,11 @@ local function main()
   -- getArrListConfig()
   -- testGetlineExe()
   -- testGitMatch()
-  git_replace_pathedgecase()
+  -- git_replace_pathedgecase()
+
   if false then
+    testExtendTblwithKey()
+    checkLspClients()
     overseertestTask()
     stringTest()
     printVariables()
@@ -670,7 +684,6 @@ local function main()
     testKeyMap()
     -- require("toggleterm").setup({ size = 20, open_mapping = [[<C-\>]] }) -- open terminal with <C-\>
     print("not run functions")
-    checkLspClients()
   end
 end
 

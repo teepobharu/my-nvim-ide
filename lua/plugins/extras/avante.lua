@@ -8,7 +8,7 @@ return {
       provider = "copilot", -- You can then change this provider here
       mappings = {
         ask = "<leader>ra",
-        edit = "<leader>re",
+        edit = "<leader>rA",
         refresh = "<leader>rr",
       },
     },
@@ -22,7 +22,7 @@ return {
       local wk = require("which-key")
       wk.add({
         { "<leader>ra", desc = "Ask AI" },
-        { "<leader>re", desc = "Edit selected" },
+        { "<leader>rA", desc = "Edit selected", mode = { "v" } },
         { "<leader>rr", desc = "Refresh AI" },
       })
     end,

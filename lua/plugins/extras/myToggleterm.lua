@@ -27,9 +27,15 @@ local isToggleCurrentLazyTerm = function(name, termOpts)
     lazygitTerm.term:toggle()
   else
     local lazygitBaseTerm = {
+      on_create = function(term)
+        -- vim.notify("OPEN.CREATE", vim.log.levels.INFO, { title = "Lazygit" })
+        -- These keys will overwrite the lazygit keymap !! - only t mode keymap will work
+        vim.api.nvim_buf_set_keymap(term.bufnr, "t", "q", "<cmd>close<CR>", { noremap = true, silent = true })
+        vim.api.nvim_buf_set_keymap(term.bufnr, "t", "Q", "<cmd>bd!<CR>", { noremap = true, silent = true })
+      end,
       on_open = function(term)
         vim.cmd("startinsert!")
-        vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
+        -- vim.notify("OPEN", vim.log.levels.INFO, { title = "Lazygit" })
 
         -- Allow to make it work for lazygit for Esc and ctrl + hjkl
         vim.keymap.set("t", "<c-h>", "<c-h>", { buffer = term.bufnr, nowait = true })
@@ -40,11 +46,13 @@ local isToggleCurrentLazyTerm = function(name, termOpts)
       end,
       -- function to run on closing the terminal
       on_close = function(_)
+        -- vim.notify("Closing", vim.log.levels.INFO, { title = "Lazygit" })
         vim.cmd("startinsert!")
       end,
     }
     require("utils.lazygit").open() -- overide nvim edit set key config for lazygit
     termOpts.on_open = lazygitBaseTerm.on_open
+    termOpts.on_create = lazygitBaseTerm.on_create
     termOpts.on_close = lazygitBaseTerm.on_close
     local lazygit = require("toggleterm.terminal").Terminal:new(termOpts)
     lazygitTerm = {

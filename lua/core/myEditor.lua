@@ -299,7 +299,8 @@ return {
           "lua",
         },
         typescript = {
-          "bun run",
+          -- "bun run",
+          "deno run",
         },
         --  end common -------------------
         sh = {

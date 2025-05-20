@@ -5,10 +5,95 @@
 - [ ] Move common mappings outside and import before loading plugins (will help get base mappings before something might fail + extend to vanilla vim)
 - [ ] Neotree auto cd wrong dir https://github.com/LazyVim/LazyVim/discussions/952#discussioncomment-6249577
 - [ ] Avante add file context is nv2lzy instead of currrent dir
+- [ ] try tiny nvim new 2025 May migrations
 
 # Migrations
 
+## Try Using docker
+
+### Side notes
+
+Trying migrations via docker
+
+- Copilot: use copilot auth + place id in browser https://github.com/login/device
+
+Limitation: open gx will not work
+
+### May tinyvim migrations try
+
+Optimized
+
+```sh
+# Create a Dockerfile
+cat > Dockerfile <<EOL
+FROM alpine:latest
+
+# Install necessary packages
+RUN apk add --update git nodejs npm neovim fzf ripgrep build-base make musl-dev go && \\
+    go install github.com/jesseduffield/lazygit@latest && \\
+    git clone https://github.com/jellydn/my-nvim-ide ~/.config/nvim
+
+# Set working directory
+WORKDIR /workspace
+EOL
+
+rm Dockerfile
+
+# Build the image
+docker build -t tinynvim-image .
+
+docker run --rm -it --name tinynvim -v "$(pwd)":/workspace tinynvim-image nvim
+
+# Using docker with sh ========
+
+cat > run-tinynvim.sh <<EOL
+#!/bin/bash
+PROJECT_PATH="\${1:-\$(pwd)}"
+CONTAINER_NAME="tinynvim-\$(date +%s)"
+
+docker run --rm -it \\
+  --name \$CONTAINER_NAME \\
+  -v "\$PROJECT_PATH":/workspace \\
+  -w /workspace \\
+  tinynvim-image nvim
+EOL
+
+chmod +x run-tinynvim.sh
+
+```
+
+Non optimized - reinstall deps everytime
+
+```sh
+docker run -w /root -it --name tinynvim -v "$(pwd)":/root alpine:latest sh -c '
+  # Install necessary packages including git, nodejs, npm, neovim, fzf, ripgrep, build tools, and Go
+  apk add git nodejs npm neovim fzf ripgrep build-base make musl-dev go --update
+  # Install lazygit using Go
+  go install github.com/jesseduffield/lazygit@latest
+# - TODO fix lazygit requires go version > 1.49
+
+  # Clone the custom Neovim configuration
+  git clone https://github.com/jellydn/my-nvim-ide ~/.config/nvim
+  # Change directory to /root
+  cd /root
+  # Open Neovim
+  nvim
+  '
+# Suggestion: Consider using a Dockerfile for better maintainability and version control
+# Start the container with volume and open Neovim
+# cannot reattach volume
+docker start tinynvim
+docker exec -it tinynvim nvim /path/to/directory
+
+
+
+# Open Neovim in the working directory
+docker run -w /root -it --rm --name tinynvim -v "$(pwd)":/root alpine:latest sh -c 'nvim'
+```
+
 ## TO Patch
+
+### Migrate to new version tinynvim
 
 Telescope-Lazy : Not work well when open root / git root
 
@@ -27,6 +112,12 @@ Some interesting changes
 Features
 
 - \_cp / \_cr (select) = open code pad (not work with lua - vim and require)
+
+To proceed to Neovim 0.10+
+
+- handle refactor on neovim LSP on plugin nvim-lspconfig
+  - https://github.com/neovim/nvim-lspconfig?tab=readme-ov-file#quickstart
+  - https://github.com/neovim/nvim-lspconfig/pull/3659/files#diff-b335630551682c19a781afebcf4d07bf978fb1f8ac04c6bf87428ed5106870f5
 
 ### 2025 13 Mar
 

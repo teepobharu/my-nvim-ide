@@ -31,8 +31,8 @@ local isToggleCurrentLazyTerm = function(name, termOpts)
         -- vim.notify("OPEN.CREATE", vim.log.levels.INFO, { title = "Lazygit" })
         -- These keys will overwrite the lazygit keymap !! - only t mode keymap will work
         vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<c-q>", "<cmd>close<CR>", { noremap = true, silent = true })
-        -- q will quit like Q
         -- All keys (q) break when type in input prompt a
+        -- q will quit like Q
         -- Q already do the job to quit buffer (still work on typing input)
         -- vim.api.nvim_buf_set_keymap(term.bufnr, "t", "Q", "<cmd>bd!<CR>", { noremap = true, silent = true })
       end,
@@ -139,7 +139,7 @@ return {
     --   desc = "Toggle term vertical",
     -- },
     {
-      "<localleader>T2",
+      "<localleader>ft",
       "<cmd>:2ToggleTerm<cr>",
       desc = "Find Terminal",
     },

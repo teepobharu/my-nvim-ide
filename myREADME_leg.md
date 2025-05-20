@@ -61,7 +61,6 @@ Migration idea
 
 ```sh
 VOLUME=$(pwd)
-
 docker run -w /root -it --rm -v $VOLUME:/root/mount alpine:latest sh -uelic '
   apk add git nodejs npm neovim ripgrep build-base make musl-dev go --update
   go install github.com/jesseduffield/lazygit@latest
@@ -113,6 +112,50 @@ Main lazy setup for plugins :
 
 Understand each plugin more: https://www.youtube.com/watch?v=6pAG3BHurdM&ab_channel=JoseanMartinez
 
+## AI
+
+### CodeCompanion
+
+Actions
+
+- multi select files /files
+- gd : view debug info - post submit (not truncate, context file)
+  Context and setup
+- does #lsp work - not shown in debug info ?
+- #viewport get all buffers that visible in all tabs ?
+- slash commands /now , /file , /clear
+
+### Copilot-Chat
+
+- ui trigger happens after pressing tab #command:<tab>
+- buffers: select visible (including gitsigns buffer can indicate master-curerent change correctly)
+- gc: see context - pre submit (preview: truncate file content)
+  Actions
+- go to diff / and accept c-y , applying not have correct space ?
+  Context and setup
+- select model with $models
+- #buffers:visible get all buffers that visible in all tabs ?
+- #url
+- #git : stage / unstaged
+
+### Avante
+
+Actions
+
+- add open file with key <l>ac
+- inline edit without asking for quick task
+- edit / retry with e / r on user prompt
+- accept key , more reliable diff marker acceptance
+  Context / setup
+- single file, add using shortcut <l>ab
+-
+
+Cons
+
+- a bit hard to navigate to the conv chat / edit (only hover cmnd when focus user prompt)
+- file apply on root dir
+- cursor alwasy move when response streaming
+
 ## Keymaps
 
 🤩 try to search the keys should already be there
@@ -130,6 +173,7 @@ Understand each plugin more: https://www.youtube.com/watch?v=6pAG3BHurdM&ab_chan
 - install formatters via Mason
 - enable on config
 - enable format from lazy = <leader>fm
+- leader + <L> old lsp infos (not snack)
 
 | Key              | Description                                     |
 | ---------------- | ----------------------------------------------- |
@@ -140,6 +184,10 @@ Understand each plugin more: https://www.youtube.com/watch?v=6pAG3BHurdM&ab_chan
 | [e and ]e        | Errors Jump                                     |
 | <leader>ca       | Code action - to help fix                       |
 | <leader>cA       | bulk file actions                               |
+
+Troubleshoot some problems
+
+- Python/ruff lsp not working try :e again on the file / enter vim again (might because session)
 
 ### Windows
 

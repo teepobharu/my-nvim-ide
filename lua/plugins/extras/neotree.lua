@@ -8,7 +8,8 @@ local KeyUtils = require("utils.keyutil")
 local key_f = KeyUtils.key_f
 local key_g = KeyUtils.key_g
 
-local isSnackEnabled = vim.g.enable_plugins and vim.g.enable_plugins.snacks == "yes"
+-- local isSnackEnabled = vim.g.enable_plugins and vim.g.enable_plugins.snacks == "yes"
+local isSnackEnabled = KeyUtils.isSnackEnabled
 
 function openGitRemote(state)
   local node = state.tree:get_node()

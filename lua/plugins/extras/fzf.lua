@@ -263,7 +263,7 @@ return {
         desc = "Find Files at project directory",
       },
       {
-        not isSnackEnabled and "<localleader>/" or "<leader>/",
+        isSnackEnabled and "<localleader>/" or "<leader>/",
         function()
           local root_dir = require("utils.root").get()
           require("fzf-lua").live_grep({ cwd = root_dir, multiprocess = true })

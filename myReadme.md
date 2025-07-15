@@ -29,9 +29,13 @@ cat > Dockerfile <<EOL
 FROM alpine:latest
 
 # Install necessary packages
-RUN apk add --update git nodejs npm neovim fzf ripgrep build-base make musl-dev go && \\
+RUN apk add --update git nodejs npm neovim fzf ripgrep build-base make musl-dev curl go && \\
     go install github.com/jesseduffield/lazygit@latest && \\
     git clone https://github.com/jellydn/my-nvim-ide ~/.config/nvim
+# extra copilot : curl, lzg go@v
+
+# install lazygit version 0.49
+# go itchnstall github.com/jesseduffield/lazygit@v0.49.0
 
 # Set working directory
 WORKDIR /workspace
@@ -65,7 +69,7 @@ chmod +x run-tinynvim.sh
 Non optimized - reinstall deps everytime
 
 ```sh
-docker run -w /root -it --name tinynvim -v "$(pwd)":/root alpine:latest sh -c '
+docker run -w /working -it --name tinynvim -v "$(pwd)":/working alpine:latest sh -c '
   # Install necessary packages including git, nodejs, npm, neovim, fzf, ripgrep, build tools, and Go
   apk add git nodejs npm neovim fzf ripgrep build-base make musl-dev go --update
   # Install lazygit using Go

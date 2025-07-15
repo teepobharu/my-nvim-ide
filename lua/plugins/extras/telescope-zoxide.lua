@@ -1,5 +1,6 @@
 return {
   "jvgrootveld/telescope-zoxide",
+  cmd = "Telescope zoxide list", -- Lazy load when this command is called
   dependencies = {
     "nvim-telescope/telescope.nvim",
   },

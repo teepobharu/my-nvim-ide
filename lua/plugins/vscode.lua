@@ -154,19 +154,7 @@ vim.api.nvim_create_autocmd("User", {
     end)
     -- Code format
     vim.keymap.set("n", "<leader>cf", function()
-      vscode.action("editor.action.formatDocument")
-    end)
-    vim.keymap.set("v", "<leader>cf", function()
-      vscode.action("editor.action.formatSelection")
-    end)
-    vim.keymap.set("n", "<leader>cF", function()
-      vscode.action("editor.action.formatChanges")
-    end)
-    vim.keymap.set("n", "<leader>cS", function()
-      vscode.action("workbench.action.files.saveWithoutFormatting")
-    end)
-    vim.keymap.set("v", "<leader>cF", function()
-      vscode.action("editor.action.formatSelection.multiple")
+      vscode.action "editor.action.formatDocument"
     end)
     -- Refactor
     vim.keymap.set("n", "<leader>cR", function()
@@ -176,53 +164,7 @@ vim.api.nvim_create_autocmd("User", {
     -- +Terminal
     -- Open terminal
     vim.keymap.set("n", "<leader>ft", function()
-      vscode.action("workbench.action.terminal.focus")
-    end)
-
-    -- DEBUG
-    vim.keymap.set("n", "<leader>sna", function()
-      vscode.action("workbench.panel.output.focus")
-      vim.cmd("messages")
-    end)
-    vim.keymap.set("n", "<leader>snx", function()
-      vscode.action("workbench.output.action.clearOutput")
-    end)
-    vim.keymap.set("n", "<leader>ds", function()
-      vscode.action("workbench.action.debug.start")
-    end)
-    vim.keymap.set("n", "<leader>dS", function()
-      vscode.action("workbench.action.debug.stop")
-    end)
-    vim.keymap.set("n", "<leader>da", function()
-      vscode.action("editor.debug.action.toggleBreakpoint")
-    end)
-    -- console
-    vim.keymap.set("n", "<leader>de", function()
-      vscode.action("workbench.debug.action.toggleRepl")
-    end)
-    vim.keymap.set("n", "<leader>dc", function()
-      vscode.action("workbench.debug.action.toggleRepl")
-    end)
-    vim.keymap.set("n", "<leader>db", function()
-      vscode.action("workbench.debug.action.focusBreakpointsView")
-    end)
-    vim.keymap.set("n", "<leader>dt", function()
-      vscode.action("extension.js-debug.createDebuggerTerminal")
-    end)
-    vim.keymap.set("n", "<leader>dl", function()
-      vscode.action("workbench.action.debug.continue")
-    end)
-    vim.keymap.set("n", "<leader>dh", function()
-      vscode.action("workbench.action.debug.continue")
-    end)
-    vim.keymap.set("n", "<leader>dk", function()
-      vscode.action("workbench.action.debug.stepOut")
-    end)
-    vim.keymap.set("n", "<leader>dj", function()
-      vscode.action("workbench.action.debug.stepInto")
-    end)
-    vim.keymap.set("n", "<leader>dn", function()
-      vscode.action("workbench.action.debug.stepOver")
+      vscode.action "workbench.action.terminal.focus"
     end)
 
     -- +LSP
@@ -244,16 +186,6 @@ vim.api.nvim_create_autocmd("User", {
     end)
 
     -- +Git
-    -- toggle gitlab <l>gg
-    vim.keymap.set("n", "<leader>gag", function()
-      vscode.action("workbench.view.extension.gitlab-workflow")
-    end)
-    vim.keymap.set("n", "<leader>gal", function()
-      vscode.action("gl.advancedSearch")
-    end)
-    vim.keymap.set("n", "<leader>gac", function()
-      vscode.action("workbench.action.focusCommentsPanel")
-    end)
     -- Git status
     vim.keymap.set("n", "<leader>gs", function()
       vscode.action("workbench.view.scm")
@@ -362,11 +294,11 @@ function my_vscode_keymaps(vscode)
   -- local vscode = vscode or require("vscode")
 
   local QuickOnboardKeyInstructions = [[
-    <l> = leader 
+    <l> = leader
     -----------------------------
-    \n ?+?      WhichKey search 
+    \n ?+?      WhichKey search
     <l>ls / qq  Stop plugin
-    <l>lr       Restart neovim plugin 
+    <l>lr       Restart neovim plugin
     -----------------------------
     <l>sna Open output + messages
     <l>oo Open test results
@@ -399,7 +331,7 @@ function my_vscode_keymaps(vscode)
     <l>. Quickfix shortcut
     <l>cf Code format
     <l>cR Refactor
-    -- 
+    --
     n  <l>dv Print below variables
     n  <l>rB Extract block to file
     n  <l>rI Inline function
@@ -939,6 +871,7 @@ function my_vscode_keymaps(vscode)
   -- Refer to
   --
 end
+
 -- vim.api.nvim_create_autocmd("User", {
 --   pattern = "NvimIdeKeymaps", -- This pattern will be called when the plugin is loaded
 --   callback = function()

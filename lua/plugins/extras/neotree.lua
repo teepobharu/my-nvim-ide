@@ -1,3 +1,17 @@
+--   Based on the actual CPU time of the Neovim process till UIEnter.
+-- This is more accurate than `nvim --startuptime`.
+--   LazyStart 26.73ms
+--   LazyDone  194.63ms (+167.91ms)
+--   UIEnter   277.61ms (+82.98ms)
+--
+--     Startuptime: 285.22ms - very lazy,   Startuptime: 264.02ms
+-- This is more accurate than `nvim --startuptime`.
+--   LazyStart 29.29ms
+--   LazyDone  204.77ms (+175.48ms)
+--   UIEnter   285.22ms (+80.44ms)
+--
+-- Startuptime: 279.64ms
+
 -- editor.lua in Lazy override
 -- setup examples
 -- https://github.com/LazyVim/LazyVim/blob/0e2eaa3fbad1519e9f4fb29235e13374f297ff00/lua/lazyvim/plugins/editor.lua#L43
